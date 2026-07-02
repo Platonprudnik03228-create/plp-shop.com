@@ -1,1 +1,104 @@
-body{margin:0;background:#090909;color:#fff;font-family:Arial}.hero{text-align:center;padding:80px}.logo{width:180px}.telegram-button{background:#c00;color:#fff;padding:12px 24px;text-decoration:none}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+background:#070707;
+color:#fff;
+font-family:'Montserrat',sans-serif;
+}
+.hero{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+text-align:center;
+background:radial-gradient(circle,#1b1b1b 0%,#070707 70%);
+}
+.hero-content{max-width:800px}
+.logo{
+width:220px;
+height:auto;
+margin-bottom:25px;
+filter:drop-shadow(0 0 20px rgba(255,0,0,.35));
+}
+h1{
+font-size:72px;
+font-weight:900;
+letter-spacing:8px;
+color:#fff;
+margin-bottom:10px;
+}
+.subtitle{
+color:#b5b5b5;
+font-size:22px;
+margin-bottom:30px;
+}
+.telegram-button{
+display:inline-block;
+padding:16px 34px;
+background:#b40000;
+color:#fff;
+text-decoration:none;
+border-radius:12px;
+font-weight:700;
+transition:.3s;
+}
+.telegram-button:hover{
+background:#ff1d1d;
+box-shadow:0 0 25px rgba(255,0,0,.5);
+transform:translateY(-3px);
+}
+section{
+padding:80px 8%;
+}
+h2{
+font-size:40px;
+margin-bottom:30px;
+text-align:center;
+}
+.grid,.categories-grid,.products-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:25px;
+}
+.card,.category-card,.product-card,.feature-card{
+background:#111;
+border:1px solid #2a2a2a;
+border-radius:16px;
+padding:24px;
+transition:.3s;
+text-align:center;
+}
+.card:hover,.category-card:hover,.product-card:hover,.feature-card:hover{
+border-color:#c00000;
+transform:translateY(-8px);
+box-shadow:0 0 25px rgba(255,0,0,.25);
+}
+.price{
+color:#ff3d3d;
+font-size:24px;
+font-weight:700;
+margin:15px 0;
+}
+.buy-button{
+display:inline-block;
+padding:12px 24px;
+background:#c00000;
+color:#fff;
+text-decoration:none;
+border-radius:10px;
+}
+footer{
+border-top:1px solid #222;
+padding:50px;
+text-align:center;
+color:#888;
+}
+.footer-logo{
+width:120px;
+margin-bottom:15px;
+}
+@media(max-width:768px){
+h1{font-size:48px}
+h2{font-size:30px}
+.logo{width:160px}
+}
