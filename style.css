@@ -1,125 +1,13 @@
+body{background:#090909;color:#fff;font-family:Arial,sans-serif}.hero{min-height:100vh;display:flex;justify-content:center;align-items:center;text-align:center;background:radial-gradient(circle,#7a0000 0%,#1a0000 35%,#090909 75%)}.logo{width:220px;display:block;margin:0 auto 20px;filter:drop-shadow(0 0 18px rgba(255,0,0,.45))}.section{max-width:1200px;margin:70px auto;padding:0 20px}.grid,.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}.card,.product{background:#141414;border:1px solid #2b2b2b;border-radius:16px;padding:22px}.photo{height:220px;background:#1e1e1e;border:2px dashed #444;border-radius:12px;display:flex;align-items:center;justify-content:center}.telegram-button,.buy-button{display:inline-block;padding:14px 28px;background:#d60000;color:#fff;text-decoration:none;border-radius:10px}.footer{text-align:center;padding:35px;background:#111;margin-top:80px}
 
-*{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{
-  background:#070707;
-  color:#fff;
-  font-family:'Montserrat',Arial,sans-serif;
-}
-.hero{
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  position:relative;
-  overflow:hidden;
-  background:radial-gradient(circle at center,#2a0000 0%,#070707 65%);
-}
-.hero::before{
-  content:"";
-  position:absolute;
-  width:700px;
-  height:700px;
-  border-radius:50%;
-  background:rgba(220,0,0,.18);
-  filter:blur(120px);
-  animation:pulse 5s ease-in-out infinite;
-}
-@keyframes pulse{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.15)}
-}
-.hero-content{position:relative;z-index:2}
-.logo{
-  width:180px;
-  filter:drop-shadow(0 0 20px rgba(255,0,0,.6));
-  margin-bottom:20px;
-}
-.logo-title{
-  font-size:78px;
-  font-weight:900;
-  color:#fff;
-  text-shadow:0 0 20px #d40000;
-}
-.subtitle{
-  color:#cfcfcf;
-  margin:15px 0 30px;
-  font-size:22px;
-}
-.telegram-button,.buy-button{
-  display:inline-block;
-  padding:14px 28px;
-  border-radius:12px;
-  text-decoration:none;
-  color:#fff;
-  background:#c00000;
-  box-shadow:0 0 20px rgba(255,0,0,.45);
-  transition:.3s;
-}
-.telegram-button:hover,.buy-button:hover{
-  transform:translateY(-3px);
-  box-shadow:0 0 35px rgba(255,0,0,.8);
-}
-.container{width:min(1200px,92%);margin:auto}
-section{padding:80px 0}
-.section-title{
-  text-align:center;
-  font-size:42px;
-  margin-bottom:12px;
-}
-.section-description{
-  text-align:center;
-  color:#aaa;
-  margin-bottom:40px;
-}
-.categories-grid,.products-grid,.features-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-  gap:24px;
-}
-.category-card,.product-card,.feature-card{
-  background:#121212;
-  border:1px solid #2b2b2b;
-  border-radius:18px;
-  padding:24px;
-  transition:.35s;
-}
-.category-card:hover,.product-card:hover,.feature-card:hover{
-  transform:translateY(-8px);
-  border-color:#d00000;
-  box-shadow:0 0 30px rgba(255,0,0,.25);
-}
-.category-card img,.product-card img{
-  width:100%;
-  border-radius:12px;
-  margin-bottom:16px;
-}
-.price{
-  color:#ff4d4d;
-  font-weight:700;
-  margin:14px 0;
-}
-.footer{
-  border-top:1px solid #222;
-  text-align:center;
-  padding:50px 20px;
-}
-.footer-logo{
-  width:90px;
-  margin-bottom:15px;
-}
-.show{
-  opacity:1!important;
-  transform:none!important;
-}
-.category-card,.product-card,.feature-card{
-  opacity:0;
-  transform:translateY(30px);
-}
-@media(max-width:768px){
-.logo{width:130px}
-.logo-title{font-size:52px}
-.section-title{font-size:32px}
-.subtitle{font-size:18px}
-}
+
+/* === Premium animations === */
+.logo{width:460px;max-width:90%;transition:.45s ease}
+.logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 22px rgba(255,0,0,.7)) drop-shadow(0 0 48px rgba(255,0,0,.35))}
+.hero-content{animation:fadeUp .8s ease both}
+.section{animation:fadeUp .8s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+.card,.product{transition:transform .3s ease,box-shadow .3s ease,border-color .3s ease}
+.card:hover,.product:hover{transform:translateY(-8px) scale(1.02);border-color:#ff2b2b;box-shadow:0 0 18px rgba(255,0,0,.25),0 0 40px rgba(255,0,0,.15)}
+.telegram-button,.buy-button{transition:.3s ease}
+.telegram-button:hover,.buy-button:hover{background:#ff2b2b;box-shadow:0 0 20px rgba(255,0,0,.5);transform:translateY(-2px)}
