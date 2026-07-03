@@ -1,91 +1,50 @@
-/* ===== АНИМАЦИИ ===== */
+/* Animation pack for PLP */
+.section{animation:fadeUp .9s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(50px)}to{opacity:1;transform:translateY(0)}}
 
-.section{
-    animation:fadeUp .9s ease both;
+.card,.product{
+transition:.35s ease;
+border:1px solid rgba(255,255,255,.05);
+background:#111;
 }
 
-@keyframes fadeUp{
-    from{
-        opacity:0;
-        transform:translateY(50px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+.card:hover,.product:hover{
+transform:translateY(-10px) scale(1.03);
+border-color:#ff2020;
+box-shadow:0 0 20px rgba(255,0,0,.25),0 0 40px rgba(255,0,0,.18),0 0 70px rgba(255,0,0,.12);
 }
 
-.card,
-.product{
-    transition:.35s ease;
-    border:1px solid rgba(255,255,255,.05);
-    background:#111;
+.photo{transition:.35s ease}
+.product:hover .photo{transform:scale(1.08)}
+
+.buy-button,.telegram-button{transition:.35s ease}
+.buy-button:hover,.telegram-button:hover{
+transform:translateY(-3px);
+background:#ff2020;
+box-shadow:0 0 15px #ff0000,0 0 35px rgba(255,0,0,.5);
 }
 
-.card:hover,
-.product:hover{
-    transform:translateY(-10px) scale(1.03);
-    border-color:#ff2020;
-    box-shadow:
-        0 0 20px rgba(255,0,0,.25),
-        0 0 40px rgba(255,0,0,.18),
-        0 0 70px rgba(255,0,0,.12);
-}
-
-.photo{
-    transition:.35s ease;
-}
-
-.product:hover .photo{
-    transform:scale(1.08);
-}
-
-.buy-button,
-.telegram-button{
-    transition:.35s ease;
-}
-
-.buy-button:hover,
-.telegram-button:hover{
-    transform:translateY(-3px);
-    background:#ff2020;
-    box-shadow:
-        0 0 15px #ff0000,
-        0 0 35px rgba(255,0,0,.5);
-}
-
-.logo{
-    transition:.5s ease;
-}
-
+.logo{transition:.5s ease}
 .logo:hover{
-    transform:scale(1.05);
-    filter:
-        drop-shadow(0 0 20px rgba(255,0,0,.6))
-        drop-shadow(0 0 50px rgba(255,0,0,.4));
+transform:scale(1.05);
+filter:drop-shadow(0 0 20px rgba(255,0,0,.6))
+drop-shadow(0 0 50px rgba(255,0,0,.4));
 }
 
 .grid .card{
-    opacity:0;
-    animation:showCard .7s forwards;
+opacity:0;
+animation:showCard .7s forwards;
 }
 
-.grid .card:nth-child(1){animation-delay:.1s;}
-.grid .card:nth-child(2){animation-delay:.2s;}
-.grid .card:nth-child(3){animation-delay:.3s;}
-.grid .card:nth-child(4){animation-delay:.4s;}
-.grid .card:nth-child(5){animation-delay:.5s;}
-.grid .card:nth-child(6){animation-delay:.6s;}
-.grid .card:nth-child(7){animation-delay:.7s;}
-.grid .card:nth-child(8){animation-delay:.8s;}
+.grid .card:nth-child(1){animation-delay:.1s}
+.grid .card:nth-child(2){animation-delay:.2s}
+.grid .card:nth-child(3){animation-delay:.3s}
+.grid .card:nth-child(4){animation-delay:.4s}
+.grid .card:nth-child(5){animation-delay:.5s}
+.grid .card:nth-child(6){animation-delay:.6s}
+.grid .card:nth-child(7){animation-delay:.7s}
 
 @keyframes showCard{
-    from{
-        opacity:0;
-        transform:translateY(40px);
-    }
-    to{
-        opacity:1;
-        transform:translateY(0);
-    }
+from{opacity:0;transform:translateY(40px)}
+to{opacity:1;transform:translateY(0)}
 }
