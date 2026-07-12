@@ -61,25 +61,24 @@
 <a href="https://t.me/plp_shop">@plp_shop</a>
 </footer>
 
-
-
 <script>
-document.addEventListener('DOMContentLoaded',()=>{
 const menu=document.getElementById('categories');
-const main=['trichotki','kolpaki','clipper','tea','exclusive'];
-const subs=['silicone','ceramic','cases'];
-function hideAll(){[...main,...subs].forEach(id=>{let e=document.getElementById(id);if(e)e.style.display='none';});}
-hideAll();menu.style.display='block';
-document.querySelectorAll('[data-target]').forEach(a=>a.onclick=e=>{
-e.preventDefault();hideAll();menu.style.display='none';
-let t=a.dataset.target;document.getElementById(t).style.display='block';
-if(t==='kolpaki')subs.forEach(id=>document.getElementById(id).style.display='block');
-scrollTo({top:0,behavior:'smooth'});
+document.querySelectorAll('.menu-card').forEach(c=>{
+ c.onclick=e=>{
+  e.preventDefault();
+  menu.style.display='none';
+  document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(c.dataset.target).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+ };
 });
-document.querySelectorAll('.back-btn').forEach(b=>b.onclick=e=>{
-e.preventDefault();hideAll();menu.style.display='block';scrollTo({top:0,behavior:'smooth'});
+document.querySelectorAll('.back-btn').forEach(b=>{
+ b.onclick=e=>{
+  e.preventDefault();
+  document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
+  menu.style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+ };
 });
-});
-</script>
-</body>
+</script></body>
 </html>
