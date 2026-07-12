@@ -68,7 +68,21 @@ document.querySelectorAll('.menu-card').forEach(c=>{
   e.preventDefault();
   menu.style.display='none';
   document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
+['silicone','ceramic','cases'].forEach(id=>{
+ const e=document.getElementById(id);
+ if(e)e.style.display='none';
+});
+['silicone','ceramic','cases'].forEach(id=>{
+ const e=document.getElementById(id);
+ if(e)e.style.display='none';
+});
   document.getElementById(c.dataset.target).classList.add('active');
+if(c.dataset.target==='kolpaki'){
+['silicone','ceramic','cases'].forEach(id=>{
+ const e=document.getElementById(id);
+ if(e)e.style.display='block';
+});
+}
   window.scrollTo({top:0,behavior:'smooth'});
  };
 });
