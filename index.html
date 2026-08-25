@@ -538,8 +538,144 @@ html,body{background:#000!important;color:#fff!important}
 a,a:visited{color:#fff}
 button,input,select{accent-color:#fff}
 ::selection{background:#fff;color:#000}
+
+/* ===== Navigation loader + stronger logo glow ===== */
+.logo-wrap::before,
+.logo-wrap::after{
+  content:"";
+  position:absolute;
+  inset:-16%;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:1;
+}
+.logo-wrap::before{
+  background:radial-gradient(circle,rgba(255,255,255,.22) 0%,rgba(255,255,255,.10) 24%,rgba(255,255,255,0) 68%);
+  filter:blur(12px);
+  animation:logoHalo 3.2s ease-in-out infinite;
+}
+.logo-wrap::after{
+  inset:-7%;
+  border:1px solid rgba(255,255,255,.16);
+  box-shadow:0 0 18px rgba(255,255,255,.12),0 0 44px rgba(255,255,255,.08);
+  animation:logoRing 3.2s ease-in-out infinite;
+}
+@keyframes logoHalo{
+  0%,100%{transform:scale(.86);opacity:.35}
+  50%{transform:scale(1.08);opacity:.9}
+}
+@keyframes logoRing{
+  0%,100%{transform:scale(.92);opacity:.28}
+  50%{transform:scale(1.08);opacity:.75}
+}
+
+.site-loader{
+  position:fixed;
+  inset:0;
+  z-index:99999;
+  display:grid;
+  place-items:center;
+  background:rgba(0,0,0,.94);
+  backdrop-filter:blur(16px);
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+  transition:opacity .22s ease,visibility .22s ease;
+}
+.site-loader.is-visible{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+}
+.site-loader__inner{
+  display:grid;
+  justify-items:center;
+  gap:18px;
+  width:min(260px,70vw);
+}
+.site-loader__logo-wrap{
+  position:relative;
+  width:118px;
+  height:118px;
+  display:grid;
+  place-items:center;
+}
+.site-loader__logo{
+  position:relative;
+  z-index:3;
+  width:72%;
+  height:72%;
+  object-fit:contain;
+  animation:loaderLogoPulse 1.25s ease-in-out infinite;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.35))
+         drop-shadow(0 0 28px rgba(255,255,255,.20));
+}
+.site-loader__halo{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+}
+.site-loader__halo--1{
+  inset:8%;
+  background:radial-gradient(circle,rgba(255,255,255,.24),rgba(255,255,255,0) 68%);
+  filter:blur(8px);
+  animation:loaderHalo 1.4s ease-in-out infinite;
+}
+.site-loader__halo--2{
+  inset:-3%;
+  border:1px solid rgba(255,255,255,.18);
+  box-shadow:0 0 20px rgba(255,255,255,.16),0 0 55px rgba(255,255,255,.08);
+  animation:loaderRing 1.4s ease-in-out infinite;
+}
+@keyframes loaderLogoPulse{
+  0%,100%{transform:scale(.96);opacity:.78}
+  50%{transform:scale(1.06);opacity:1}
+}
+@keyframes loaderHalo{
+  0%,100%{transform:scale(.82);opacity:.3}
+  50%{transform:scale(1.12);opacity:.9}
+}
+.site-loader__bar{
+  width:100%;
+  height:2px;
+  overflow:hidden;
+  border-radius:999px;
+  background:rgba(255,255,255,.10);
+}
+.site-loader__bar span{
+  display:block;
+  width:38%;
+  height:100%;
+  border-radius:inherit;
+  background:#fff;
+  box-shadow:0 0 12px rgba(255,255,255,.8);
+  animation:loaderBar 1.05s ease-in-out infinite;
+}
+@keyframes loaderBar{
+  0%{transform:translateX(-130%)}
+  100%{transform:translateX(360%)}
+}
+.site-loader__text{
+  font-size:10px;
+  letter-spacing:.38em;
+  color:#aaa;
+}
+
 </style></head>
 <body id="top">
+
+<div class="site-loader" id="siteLoader" aria-hidden="true">
+  <div class="site-loader__inner">
+    <div class="site-loader__logo-wrap">
+      <span class="site-loader__halo site-loader__halo--1"></span>
+      <span class="site-loader__halo site-loader__halo--2"></span>
+      <img class="site-loader__logo" src="logo.png" alt="PLP">
+    </div>
+    <div class="site-loader__bar"><span></span></div>
+    <div class="site-loader__text">PLP</div>
+  </div>
+</div>
+
 <a class="floating-plp" href="#top" aria-label="PLP — на главную"><img src="logo.png" alt="PLP"></a>
 
 <button class="cart-fab" id="cartFab" aria-label="Открыть корзину">🛒<span class="cart-count" id="cartCount">0</span></button>
@@ -659,135 +795,135 @@ button,input,select{accent-color:#fff}
     <p>Вся коллекция PLP — от тричёток до китайского чая.</p>
   </div>
   <div class="products all-products-grid">
-    <a class="product product-link" href="#" data-target="trichotki">
+    <a class="product product-link" href="#" data-target="trichotki" data-product-src="products/IMG_8472.PNG">
       <div class="photo"><img src="products/IMG_8472.PNG" alt="Тричётки белые (светящиеся)"></div>
       <h3>Тричётки белые</h3><p class="price">20 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="trichotki">
+    <a class="product product-link" href="#" data-target="trichotki" data-product-src="products/IMG_8519.PNG">
       <div class="photo"><img src="products/IMG_8519.PNG" alt="Тричётки зелёные (светящиеся)"></div>
       <h3>Тричётки зелёные</h3><p class="price">20 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="trichotki">
+    <a class="product product-link" href="#" data-target="trichotki" data-product-src="products/IMG_8471.PNG">
       <div class="photo"><img src="products/IMG_8471.PNG" alt="Тричётки перламутровые"></div>
       <h3>Тричётки перламутровые</h3><p class="price">15 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="silicone" data-product-src="products/IMG_8576.JPG">
       <div class="photo"><img src="products/IMG_8576.JPG" alt="Силиконовый колпак красный"></div>
       <h3>Колпак красный</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="silicone" data-product-src="products/IMG_8571.JPG">
       <div class="photo"><img src="products/IMG_8571.JPG" alt="Силиконовый колпак синий"></div>
       <h3>Колпак синий</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="silicone" data-product-src="products/IMG_8573.JPG">
       <div class="photo"><img src="products/IMG_8573.JPG" alt="Силиконовый колпак зелёный"></div>
       <h3>Колпак зелёный</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="silicone" data-product-src="products/IMG_8566.JPG">
       <div class="photo"><img src="products/IMG_8566.JPG" alt="Силиконовый колпак чёрный"></div>
       <h3>Колпак чёрный</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="silicone" data-product-src="products/IMG_9234.PNG">
       <div class="photo"><img src="products/IMG_9234.PNG" alt="Силиконовый колпак фиолетовый"></div>
       <h3>Колпак фиолетовый</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_8594.JPG">
       <div class="photo"><img src="products/IMG_8594.JPG" alt="R2-D2"></div>
       <h3>R2-D2</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_8587.JPG">
       <div class="photo"><img src="products/IMG_8587.JPG" alt="Stormtrooper"></div>
       <h3>Stormtrooper</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_4981.JPG">
       <div class="photo"><img src="products/IMG_4981.JPG" alt="Darth Vader"></div>
       <h3>Darth Vader</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_8591.JPG">
       <div class="photo"><img src="products/IMG_8591.JPG" alt="Alien"></div>
       <h3>Alien</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_8579.JPG">
       <div class="photo"><img src="products/IMG_8579.JPG" alt="Yoda"></div>
       <h3>Yoda</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_4971.JPG">
       <div class="photo"><img src="products/IMG_4971.JPG" alt="Spider-Man"></div>
       <h3>Spider-Man</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="ceramic" data-product-src="products/IMG_5371.JPG">
       <div class="photo"><img src="products/IMG_5371.JPG" alt="Мраморный"></div>
       <h3>Мраморный</h3><p class="price">17 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="cases" data-product-src="products/IMG_9116.JPG">
       <div class="photo"><img src="products/IMG_9116.JPG" alt="Колпак в кейсе MK2"></div>
       <h3>Кейс «MK2»</h3><p class="price">30 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="cases" data-product-src="products/IMG_5408.PNG">
       <div class="photo"><img src="products/IMG_5408.PNG" alt="Колпак в кейсе Жёлудь"></div>
       <h3>Кейс «Жёлудь»</h3><p class="price">30 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="cases" data-product-src="products/IMG_5374.JPG">
       <div class="photo"><img src="products/IMG_5374.JPG" alt="Колпак в кейсе Лимонка"></div>
       <h3>Кейс «Лимонка»</h3><p class="price">30 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="cases" data-product-src="products/IMG_5410.PNG">
       <div class="photo"><img src="products/IMG_5410.PNG" alt="Колпак в кейсе Граната"></div>
       <h3>Кейс «Граната»</h3><p class="price">30 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="kolpaki">
+    <a class="product product-link" href="#" data-target="kolpaki" data-subcategory="cases" data-product-src="products/IMG_8601.JPG">
       <div class="photo"><img src="products/IMG_8601.JPG" alt="Колпак-конус в кейсе-брелке"></div>
       <h3>Колпак-конус в кейсе</h3><p class="price">30 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8559.PNG">
       <div class="photo"><img src="products/IMG_8559.PNG" alt="Капсула Glow"></div>
       <h3>Капсула Glow</h3><p class="price">18,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8541.PNG">
       <div class="photo"><img src="products/IMG_8541.PNG" alt="Ананас"></div>
       <h3>Ананас</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8538.PNG">
       <div class="photo"><img src="products/IMG_8538.PNG" alt="Ананас Lime"></div>
       <h3>Ананас Lime</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8547.PNG">
       <div class="photo"><img src="products/IMG_8547.PNG" alt="Статуя Свободы"></div>
       <h3>Статуя Свободы</h3><p class="price">18,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8531.PNG">
       <div class="photo"><img src="products/IMG_8531.PNG" alt="Плачущая Свобода"></div>
       <h3>Плачущая Свобода</h3><p class="price">18,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8535.PNG">
       <div class="photo"><img src="products/IMG_8535.PNG" alt="Sexy Police"></div>
       <h3>Sexy Police</h3><p class="price">18,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="clipper">
+    <a class="product product-link" href="#" data-target="clipper" data-product-src="products/IMG_8544.PNG">
       <div class="photo"><img src="products/IMG_8544.PNG" alt="Разгильдяй"></div>
       <h3>Разгильдяй</h3><p class="price">10 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9232.PNG">
       <div class="photo"><img src="products/IMG_9232.PNG" alt="Тегуаньинь 100 г"></div>
       <h3>Тегуаньинь 100 г</h3><p class="price">17,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9228.PNG">
       <div class="photo"><img src="products/IMG_9228.PNG" alt="Шу Пуэр 100 г"></div>
       <h3>Шу Пуэр 100 г</h3><p class="price">17,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9233.PNG">
       <div class="photo"><img src="products/IMG_9233.PNG" alt="Шэн Пуэр 100 г"></div>
       <h3>Шэн Пуэр 100 г</h3><p class="price">17,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9231.PNG">
       <div class="photo"><img src="products/IMG_9231.PNG" alt="Да Хун Пао 100 г"></div>
       <h3>Да Хун Пао 100 г</h3><p class="price">17,50 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9229.PNG">
       <div class="photo"><img src="products/IMG_9229.PNG" alt="Смола Ча Гао"></div>
       <h3>Смола Ча Гао</h3><p class="price">11 €</p>
     </a>
-    <a class="product product-link" href="#" data-target="tea">
+    <a class="product product-link" href="#" data-target="tea" data-product-src="products/IMG_9230.PNG">
       <div class="photo"><img src="products/IMG_9230.PNG" alt="Смола Ча Гао ×2"></div>
       <h3>Смола Ча Гао ×2</h3><p class="price">18,50 €</p>
     </a>
@@ -914,13 +1050,47 @@ function renderCart(){
   cartItemsPage.querySelectorAll('.cart-remove').forEach(b=>b.addEventListener('click',()=>{cart.splice(Number(b.dataset.index),1);saveCart();renderCart();}));
   updateTotalsPage();
 }
-function addToCart(product){if(!product)return;const name=product.querySelector('h3')?.textContent.trim()||'Товар PLP';const price=parseFloat((product.querySelector('.price')?.textContent||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;const img=product.querySelector('img')?.getAttribute('src')||'';const existing=cart.find(i=>i.name===name);if(existing)existing.qty+=1;else cart.push({name,price,img,qty:1});saveCart();renderCart();openView('cart-view');}
+function addToCart(product){
+  if(!product)return;
+  const name=product.querySelector('h3')?.textContent.trim()||'Товар PLP';
+  const price=parseFloat((product.querySelector('.price')?.textContent||'0').replace(',','.').replace(/[^0-9.]/g,''))||0;
+  const img=product.querySelector('img')?.getAttribute('src')||'';
+  const existing=cart.find(i=>i.name===name);
+  if(existing)existing.qty+=1;else cart.push({name,price,img,qty:1});
+  saveCart();
+  renderCart();
+  withLoader(()=>{
+    openViewNow('cart-view',document.getElementById('checkoutForm'));
+  });
+}
 document.querySelectorAll('.buy-button').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();addToCart(btn.closest('.product'));}));
 document.querySelectorAll('#all-products .product-link').forEach(card=>{if(card.querySelector('.quick-cart-btn'))return;const btn=document.createElement('button');btn.type='button';btn.className='quick-cart-btn';btn.textContent='В корзину';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();addToCart(card);});card.appendChild(btn);});
 function updateTotalsPage(){const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);const zone=countryToZone[countryPage.value];const weight=Number(parcelWeightPage.value);const shipping=zone?DHL[zone].prices[weight]:null;cartSubtotalPage.textContent=money(subtotal);shippingCostPage.textContent=shipping==null?'—':money(shipping);cartTotalPage.textContent=money(subtotal+(shipping||0));}
 countryPage.addEventListener('change',updateTotalsPage);parcelWeightPage.addEventListener('change',updateTotalsPage);
 document.getElementById('checkoutForm').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){alert('Корзина пуста.');return;}const ids=['firstNamePage','lastNamePage','streetPage','cityPage','postalPage','countryPage','phonePage'];for(const id of ids){const el=document.getElementById(id);if(!el.value.trim()){el.focus();alert('Заполните все поля доставки.');return;}}const zone=countryToZone[countryPage.value],weight=Number(parcelWeightPage.value),ship=DHL[zone]?.prices[weight];if(ship==null){alert('Для выбранной страны и веса сейчас нет цены в таблице DHL.');return;}const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0),total=subtotal+ship;const payment=document.querySelector('input[name="paymentPage"]:checked')?.value||'Не выбран';const items=cart.map(i=>`• ${i.name} × ${i.qty} — ${money(i.price*i.qty)}`).join('\n');const order=`PLP — НОВЫЙ ЗАКАЗ\n\n${items}\n\nТовары: ${money(subtotal)}\nDHL: ${money(ship)}\nИтого: ${money(total)}\n\nПолучатель:\n${document.getElementById('firstNamePage').value} ${document.getElementById('lastNamePage').value}\n${document.getElementById('streetPage').value}\n${document.getElementById('postalPage').value}, ${document.getElementById('cityPage').value}\n${countryPage.value}\nТелефон: ${document.getElementById('phonePage').value}\nОплата: ${payment}`;navigator.clipboard?.writeText(order).then(()=>alert('Заказ подготовлен и скопирован. Его можно отправить в Telegram @plp_shop1.')).catch(()=>alert(order));});
 
+const siteLoader=document.getElementById('siteLoader');
+let loaderTimer=null;
+function showLoader(){
+  if(!siteLoader)return;
+  clearTimeout(loaderTimer);
+  siteLoader.classList.add('is-visible');
+  siteLoader.setAttribute('aria-hidden','false');
+}
+function hideLoader(){
+  if(!siteLoader)return;
+  siteLoader.classList.remove('is-visible');
+  siteLoader.setAttribute('aria-hidden','true');
+}
+function withLoader(action,delay=420){
+  showLoader();
+  clearTimeout(loaderTimer);
+  loaderTimer=setTimeout(()=>{
+    try{action();}finally{
+      requestAnimationFrame(()=>setTimeout(hideLoader,120));
+    }
+  },delay);
+}
 function hideDetailSections(){
   document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
   ['silicone','ceramic','cases'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='none';});
@@ -928,23 +1098,32 @@ function hideDetailSections(){
 function closeViews(){
   document.querySelectorAll('.page-view').forEach(v=>{v.classList.remove('active');v.setAttribute('aria-hidden','true');});
 }
-function openView(id){
+function openViewNow(id,scrollTarget){
   closeViews();
   const v=document.getElementById(id);
   if(!v)return;
   v.classList.add('active');
   v.setAttribute('aria-hidden','false');
   renderCart();
-  window.scrollTo({top:0,behavior:'smooth'});
+  requestAnimationFrame(()=>{
+    const target=scrollTarget||v;
+    target?.scrollIntoView({top:0,behavior:'smooth',block:'start'});
+  });
 }
-function showHome(){
+function openView(id,scrollTarget){
+  withLoader(()=>openViewNow(id,scrollTarget));
+}
+function showHomeNow(){
   closeViews();
   hideDetailSections();
   menu.style.display='block';
   if(allProducts)allProducts.style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function openCategory(target){
+function showHome(){
+  withLoader(showHomeNow);
+}
+function openCategoryNow(target,productSrc){
   closeViews();
   hideDetailSections();
   const el=document.getElementById(target);
@@ -952,9 +1131,22 @@ function openCategory(target){
   menu.style.display='none';
   if(allProducts)allProducts.style.display='none';
   el.classList.add('active');
-  window.scrollTo({top:0,behavior:'smooth'});
+
+  requestAnimationFrame(()=>{
+    let product=null;
+    if(productSrc){
+      product=[...el.querySelectorAll('.product')].find(p=>{
+        const img=p.querySelector('img');
+        return img && img.getAttribute('src')===productSrc;
+      });
+    }
+    (product||el).scrollIntoView({behavior:'smooth',block:'start'});
+  });
 }
-function openSubcategory(target){
+function openCategory(target,productSrc){
+  withLoader(()=>openCategoryNow(target,productSrc));
+}
+function openSubcategoryNow(target,productSrc){
   closeViews();
   hideDetailSections();
   menu.style.display='none';
@@ -964,27 +1156,64 @@ function openSubcategory(target){
   const el=document.getElementById(target);
   if(!el)return;
   el.style.display='block';
-  requestAnimationFrame(()=>el.scrollIntoView({behavior:'smooth',block:'start'}));
+  requestAnimationFrame(()=>{
+    let product=null;
+    if(productSrc){
+      product=[...el.querySelectorAll('.product')].find(p=>{
+        const img=p.querySelector('img');
+        return img && img.getAttribute('src')===productSrc;
+      });
+    }
+    (product||el).scrollIntoView({behavior:'smooth',block:'start'});
+  });
 }
+function openSubcategory(target,productSrc){
+  withLoader(()=>openSubcategoryNow(target,productSrc));
+}
+
 document.querySelectorAll('[data-target]').forEach(el=>el.addEventListener('click',e=>{
   if(el.closest('.page-view')) return;
+  if(el.dataset.subcategory) return;
   e.preventDefault();
-  openCategory(el.dataset.target);
+  openCategory(el.dataset.target,el.dataset.productSrc||null);
 }));
 document.querySelectorAll('[data-subcategory]').forEach(el=>el.addEventListener('click',e=>{
   e.preventDefault();
-  openSubcategory(el.dataset.subcategory);
+  openSubcategory(el.dataset.subcategory,el.dataset.productSrc||null);
 }));
-document.querySelectorAll('.back-btn').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();showHome();}));
+document.querySelectorAll('.back-btn').forEach(btn=>btn.addEventListener('click',e=>{
+  e.preventDefault();
+  showHome();
+}));
 document.querySelectorAll('.product-link[data-target]').forEach(el=>el.addEventListener('click',e=>{
   if(e.target.closest('.quick-cart-btn'))return;
   e.preventDefault();
-  openCategory(el.dataset.target);
+  openCategory(el.dataset.target,el.dataset.productSrc||el.querySelector('img')?.getAttribute('src')||null);
 }));
-document.querySelector('.floating-plp')?.addEventListener('click',e=>{e.preventDefault();showHome();});
-cartFab.addEventListener('click',()=>openView('cart-view'));
-document.querySelectorAll('[data-view-back]').forEach(b=>b.addEventListener('click',e=>{e.preventDefault();showHome();}));
-document.querySelectorAll('a[href="#contact-view"]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();openView('contact-view');}));
+
+/* Клик по товару внутри категории тоже аккуратно возвращает к конкретной карточке. */
+document.querySelectorAll('.hidden-section .product').forEach(product=>{
+  product.addEventListener('click',e=>{
+    if(e.target.closest('.buy-button')||e.target.closest('button'))return;
+    e.preventDefault();
+    const section=product.closest('.hidden-section');
+    if(section)openCategory(section.id,product.querySelector('img')?.getAttribute('src')||null);
+  });
+});
+
+document.querySelector('.floating-plp')?.addEventListener('click',e=>{
+  e.preventDefault();
+  showHome();
+});
+cartFab.addEventListener('click',()=>openView('cart-view',document.getElementById('checkoutForm')));
+document.querySelectorAll('[data-view-back]').forEach(b=>b.addEventListener('click',e=>{
+  e.preventDefault();
+  showHome();
+}));
+document.querySelectorAll('a[href="#contact-view"]').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  openView('contact-view');
+}));
 renderCart();
 </script>
 </body>
