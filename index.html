@@ -310,6 +310,119 @@ h2{
 }
 .footer a{color:#fff}
 
+
+.featured-section{
+  width:min(1180px,calc(100% - 28px));
+  margin:0 auto 52px;
+  min-height:440px;
+  display:grid;
+  grid-template-columns:.82fr 1.18fr;
+  gap:28px;
+  align-items:stretch;
+}
+.featured-copy{
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:42px;
+  border:1px solid var(--line);
+  border-radius:26px;
+  background:linear-gradient(145deg,rgba(28,28,28,.92),rgba(10,10,10,.82));
+  box-shadow:0 22px 70px rgba(0,0,0,.35);
+}
+.eyebrow{
+  display:inline-block;
+  margin-bottom:10px;
+  color:#a8a8a8;
+  font-size:.7rem;
+  font-weight:800;
+  letter-spacing:.22em;
+}
+.featured-copy h1{
+  margin:0 0 12px;
+  font-size:clamp(2.5rem,6vw,5rem);
+  line-height:.95;
+}
+.featured-copy p,.section-heading p{
+  color:var(--muted);
+  line-height:1.6;
+  max-width:500px;
+}
+.featured-button{
+  align-self:flex-start;
+  margin-top:18px;
+  padding:13px 18px;
+  border-radius:13px;
+  background:#f4f4f4;
+  color:#0b0b0b;
+  text-decoration:none;
+  font-weight:800;
+  transition:transform .25s ease,box-shadow .25s ease;
+}
+.featured-button:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 30px rgba(255,255,255,.12);
+}
+.featured-product{
+  position:relative;
+  min-height:440px;
+  overflow:hidden;
+  border-radius:26px;
+  border:1px solid var(--line);
+  background:#101010;
+  box-shadow:0 22px 70px rgba(0,0,0,.4);
+}
+.featured-product img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  display:block;
+  transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .5s ease;
+}
+.featured-product::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(0,0,0,.75));
+}
+.featured-product span{
+  position:absolute;
+  z-index:2;
+  left:22px;
+  bottom:20px;
+  font-weight:800;
+}
+.featured-product:hover img{
+  transform:scale(1.045);
+  filter:brightness(1.08);
+}
+.section-heading{margin-bottom:22px}
+.all-products{padding-top:10px}
+.all-products-grid .product-link{
+  color:inherit;
+  text-decoration:none;
+  cursor:pointer;
+}
+.all-products-grid .product-link:hover{
+  border-color:rgba(255,255,255,.28);
+}
+
+@media(max-width:768px){
+  .featured-section{
+    grid-template-columns:1fr;
+    min-height:auto;
+  }
+  .featured-copy{
+    padding:28px;
+    order:2;
+  }
+  .featured-product{
+    min-height:330px;
+    order:1;
+  }
+}
+
 @media(max-width:768px){
   .hero{padding-top:28px}
   .logo-wrap{width:min(240px,70vw)}
@@ -341,6 +454,20 @@ h2{
 <p>Premium Lifestyle</p>
 
 </header>
+
+<section class="featured-section" aria-label="Популярный товар">
+  <div class="featured-copy">
+    <span class="eyebrow">ПОПУЛЯРНОЕ</span>
+    <h1>Тричётки</h1>
+    <p>Один из главных товаров PLP — смотри всю коллекцию одним нажатием.</p>
+    <a class="featured-button" href="#" data-target="trichotki">Смотреть тричётки →</a>
+  </div>
+  <a class="featured-product" href="#" data-target="trichotki" aria-label="Открыть раздел Тричётки">
+    <img src="products/IMG_9254.JPG" alt="Тричётки">
+    <span>Открыть коллекцию</span>
+  </a>
+</section>
+
 <section class="section" id="categories">
 <h2>Категории</h2>
 <div class="main-menu">
@@ -378,6 +505,149 @@ h2{
 <section class="section hidden-section" id="clipper"><a href="#" class="back-btn">⬅ Назад</a><h2>💡 Чехлы для Clipper</h2><div class="products"><div class="product"><div class="photo"><img alt="Капсула Glow" src="products/IMG_8559.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Капсула Glow</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Ананас" src="products/IMG_8541.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Ананас</h3><p class="price">10 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Ананас Lime" src="products/IMG_8538.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Ананас Lime</h3><p class="price">10 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Статуя Свободы" src="products/IMG_8547.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Статуя Свободы</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Плачущая Свобода" src="products/IMG_8531.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Плачущая Свобода</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Sexy Police" src="products/IMG_8535.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Sexy Police</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Разгильдяй" src="products/IMG_8544.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Разгильдяй</h3><p class="price">10 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div></div></section>
 <section class="section hidden-section" id="tea"><a href="#" class="back-btn">⬅ Назад</a><h2>🍃 Китайский чай</h2><div class="products"><div class="product"><div class="photo"><img alt="Тегуаньинь 100 г" src="products/IMG_9232.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Тегуаньинь 100 г</h3><p class="price">17,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Шу Пуэр 100 г" src="products/IMG_9228.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Шу Пуэр 100 г</h3><p class="price">17,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Шэн Пуэр 100 г" src="products/IMG_9233.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Шэн Пуэр 100 г</h3><p class="price">17,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Да Хун Пао 100 г" src="products/IMG_9231.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Да Хун Пао 100 г</h3><p class="price">17,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Смола Ча Гао" src="products/IMG_9229.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Смола Ча Гао</h3><p class="price">11 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Смола Ча Гао ×2" src="products/IMG_9230.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Смола Ча Гао ×2</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div></div></section>
 <section class="section hidden-section" id="exclusive"><a href="#" class="back-btn">⬅ Назад</a><h2>⭐ Эксклюзивные товары</h2><div class="products"><div class="product"><div class="photo"><img alt="Тричотки белые (светящиеся)" src="products/IMG_8472.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Тричотки белые (светящиеся)</h3><p class="price">20 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Тричотки зелёные (светящиеся)" src="products/IMG_8519.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Тричотки зелёные (светящиеся)</h3><p class="price">20 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Sexy Police" src="products/IMG_8535.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Sexy Police</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Статуя Свободы" src="products/IMG_8547.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Статуя Свободы</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Плачущая Свобода" src="products/IMG_8531.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Плачущая Свобода</h3><p class="price">18,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Колпак в кейсе «Жёлудь»" src="products/IMG_5408.PNG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Колпак в кейсе «Жёлудь»</h3><p class="price">30 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Колпак в кейсе «Лимонка (Ф-1)»" src="products/IMG_5374.JPG" style="width:100%;height:280px;object-fit:contain;border-radius:12px;"/></div><h3>Колпак в кейсе «Лимонка (Ф-1)»</h3><p class="price">30 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div><div class="product"><div class="photo"><img alt="Шу Пуэр 100 г" src="products/IMG_9228.PNG" style="width:100%;height:280px;object-fit:contain;object-position:center;border-radius:12px;"/></div><h3>Шу Пуэр 100 г</h3><p class="price">17,50 €</p><a class="buy-button" href="https://t.me/plp_shop">Заказать</a></div></div></section>
+
+<section class="section all-products" id="all-products">
+  <div class="section-heading">
+    <span class="eyebrow">КАТАЛОГ</span>
+    <h2>Все товары</h2>
+    <p>Вся коллекция PLP — от тричёток до китайского чая.</p>
+  </div>
+  <div class="products all-products-grid">
+    <a class="product product-link" href="#" data-target="trichotki">
+      <div class="photo"><img src="products/IMG_8472.PNG" alt="Тричётки белые (светящиеся)"></div>
+      <h3>Тричётки белые</h3><p class="price">20 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="trichotki">
+      <div class="photo"><img src="products/IMG_8519.PNG" alt="Тричётки зелёные (светящиеся)"></div>
+      <h3>Тричётки зелёные</h3><p class="price">20 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="trichotki">
+      <div class="photo"><img src="products/IMG_8471.PNG" alt="Тричётки перламутровые"></div>
+      <h3>Тричётки перламутровые</h3><p class="price">15 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8576.JPG" alt="Силиконовый колпак красный"></div>
+      <h3>Колпак красный</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8571.JPG" alt="Силиконовый колпак синий"></div>
+      <h3>Колпак синий</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8573.JPG" alt="Силиконовый колпак зелёный"></div>
+      <h3>Колпак зелёный</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8566.JPG" alt="Силиконовый колпак чёрный"></div>
+      <h3>Колпак чёрный</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_9234.PNG" alt="Силиконовый колпак фиолетовый"></div>
+      <h3>Колпак фиолетовый</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8594.JPG" alt="R2-D2"></div>
+      <h3>R2-D2</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8587.JPG" alt="Stormtrooper"></div>
+      <h3>Stormtrooper</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_4981.JPG" alt="Darth Vader"></div>
+      <h3>Darth Vader</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8591.JPG" alt="Alien"></div>
+      <h3>Alien</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8579.JPG" alt="Yoda"></div>
+      <h3>Yoda</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_4971.JPG" alt="Spider-Man"></div>
+      <h3>Spider-Man</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_5371.JPG" alt="Мраморный"></div>
+      <h3>Мраморный</h3><p class="price">17 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_9116.JPG" alt="Колпак в кейсе MK2"></div>
+      <h3>Кейс «MK2»</h3><p class="price">30 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_5408.PNG" alt="Колпак в кейсе Жёлудь"></div>
+      <h3>Кейс «Жёлудь»</h3><p class="price">30 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_5374.JPG" alt="Колпак в кейсе Лимонка"></div>
+      <h3>Кейс «Лимонка»</h3><p class="price">30 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_5410.PNG" alt="Колпак в кейсе Граната"></div>
+      <h3>Кейс «Граната»</h3><p class="price">30 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="kolpaki">
+      <div class="photo"><img src="products/IMG_8601.JPG" alt="Колпак-конус в кейсе-брелке"></div>
+      <h3>Колпак-конус в кейсе</h3><p class="price">30 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8559.PNG" alt="Капсула Glow"></div>
+      <h3>Капсула Glow</h3><p class="price">18,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8541.PNG" alt="Ананас"></div>
+      <h3>Ананас</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8538.PNG" alt="Ананас Lime"></div>
+      <h3>Ананас Lime</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8547.PNG" alt="Статуя Свободы"></div>
+      <h3>Статуя Свободы</h3><p class="price">18,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8531.PNG" alt="Плачущая Свобода"></div>
+      <h3>Плачущая Свобода</h3><p class="price">18,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8535.PNG" alt="Sexy Police"></div>
+      <h3>Sexy Police</h3><p class="price">18,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="clipper">
+      <div class="photo"><img src="products/IMG_8544.PNG" alt="Разгильдяй"></div>
+      <h3>Разгильдяй</h3><p class="price">10 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9232.PNG" alt="Тегуаньинь 100 г"></div>
+      <h3>Тегуаньинь 100 г</h3><p class="price">17,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9228.PNG" alt="Шу Пуэр 100 г"></div>
+      <h3>Шу Пуэр 100 г</h3><p class="price">17,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9233.PNG" alt="Шэн Пуэр 100 г"></div>
+      <h3>Шэн Пуэр 100 г</h3><p class="price">17,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9231.PNG" alt="Да Хун Пао 100 г"></div>
+      <h3>Да Хун Пао 100 г</h3><p class="price">17,50 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9229.PNG" alt="Смола Ча Гао"></div>
+      <h3>Смола Ча Гао</h3><p class="price">11 €</p>
+    </a>
+    <a class="product product-link" href="#" data-target="tea">
+      <div class="photo"><img src="products/IMG_9230.PNG" alt="Смола Ча Гао ×2"></div>
+      <h3>Смола Ча Гао ×2</h3><p class="price">18,50 €</p>
+    </a>
+  </div>
+</section>
+
 <footer class="footer">
 <a href="https://t.me/plp_shop">@plp_shop</a>
 </footer>
@@ -408,12 +678,12 @@ if(c.dataset.target==='kolpaki'){
  };
 });
 document.querySelectorAll('.back-btn').forEach(b=>{
- b.onclick=e=>{
-  e.preventDefault();
-  document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
-  menu.style.display='block';
-  window.scrollTo({top:0,behavior:'smooth'});
- };
+  b.onclick=e=>{
+    e.preventDefault();
+    document.querySelectorAll('.hidden-section').forEach(s=>s.classList.remove('active'));
+    menu.style.display='block';
+    window.scrollTo({top:0,behavior:'smooth'});
+  };
 });
 </script></body>
 </html>
