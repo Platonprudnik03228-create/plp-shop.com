@@ -80,58 +80,16 @@ body::after{
 }
 
 /* Электрические дуги вокруг логотипа — без красной подсветки. */
+/* Realistic lightning: the effect is rendered on canvas, not as decorative lines. */
 .logo-electric{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  z-index:2;
-  overflow:visible;
+  inset:-9%;
+  width:118%;
+  height:118%;
+  z-index:4;
   pointer-events:none;
-}
-
-.logo-electric path{
-  fill:none;
-  stroke:#fff;
-  stroke-linecap:round;
-  stroke-linejoin:round;
-  stroke-width:1.8;
-  opacity:.0;
-  filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 9px rgba(255,255,255,.7));
-}
-
-.logo-electric path:nth-child(1){animation:electric1 2.4s linear infinite}
-.logo-electric path:nth-child(2){animation:electric2 3.1s linear infinite .35s}
-.logo-electric path:nth-child(3){animation:electric3 2.7s linear infinite .8s}
-.logo-electric path:nth-child(4){animation:electric4 3.6s linear infinite 1.15s}
-
-@keyframes electric1{
-  0%,72%,100%{opacity:0;stroke-dashoffset:170}
-  75%{opacity:1;stroke-dashoffset:125}
-  78%{opacity:.35;stroke-dashoffset:90}
-  81%{opacity:1;stroke-dashoffset:45}
-  84%{opacity:0;stroke-dashoffset:0}
-}
-@keyframes electric2{
-  0%,68%,100%{opacity:0;stroke-dashoffset:210}
-  70%{opacity:1;stroke-dashoffset:165}
-  74%{opacity:.45;stroke-dashoffset:105}
-  77%{opacity:1;stroke-dashoffset:50}
-  81%{opacity:0;stroke-dashoffset:0}
-}
-@keyframes electric3{
-  0%,74%,100%{opacity:0;stroke-dashoffset:190}
-  76%{opacity:1;stroke-dashoffset:140}
-  79%{opacity:.3;stroke-dashoffset:80}
-  82%{opacity:1;stroke-dashoffset:30}
-  85%{opacity:0;stroke-dashoffset:0}
-}
-@keyframes electric4{
-  0%,70%,100%{opacity:0;stroke-dashoffset:230}
-  73%{opacity:1;stroke-dashoffset:180}
-  76%{opacity:.35;stroke-dashoffset:120}
-  80%{opacity:1;stroke-dashoffset:55}
-  83%{opacity:0;stroke-dashoffset:0}
+  overflow:visible;
+  filter:drop-shadow(0 0 3px rgba(255,255,255,.95)) drop-shadow(0 0 14px rgba(190,215,255,.8));
 }
 
 .hero p{
@@ -444,12 +402,7 @@ h2{
 <header class="hero">
 <div class="logo-wrap" aria-label="PLP">
   <img alt="PLP" class="logo" src="logo.png"/>
-  <svg class="logo-electric" viewBox="0 0 300 300" aria-hidden="true">
-    <path d="M56 112 L37 101 L55 94 L42 78 L70 84 L61 63 L84 72 L91 45 L106 67 L126 43 L132 70 L158 52 L153 79 L183 70 L166 92 L196 91 L176 108"/>
-    <path d="M224 92 L245 78 L236 103 L260 106 L239 119 L259 136 L232 135 L241 160 L218 146 L208 171 L199 145 L176 160 L185 136 L160 132 L184 118 L166 99 L194 103 L193 76 L211 93"/>
-    <path d="M70 211 L49 226 L71 229 L59 251 L84 238 L91 264 L105 239 L126 259 L130 234 L154 249 L151 224 L177 222 L157 207"/>
-    <path d="M206 181 L225 193 L219 170 L242 176 L230 155 L253 150 L229 139"/>
-  </svg>
+  <canvas class="logo-electric" aria-hidden="true"></canvas>
 </div>
 <p>Premium Lifestyle</p>
 
@@ -653,6 +606,80 @@ h2{
 </footer>
 
 <script>
+/* Natural-looking lightning around the logo: irregular branching, flicker and short bursts. */
+(() => {
+  const wrap = document.querySelector('.logo-wrap');
+  const canvas = document.querySelector('.logo-electric');
+  if (!wrap || !canvas) return;
+  const ctx = canvas.getContext('2d');
+  let dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let w = 0, h = 0, bolts = [], flash = 0, nextStrike = 0;
+
+  function resize(){
+    const r = wrap.getBoundingClientRect();
+    w = r.width * 1.18; h = r.height * 1.18;
+    canvas.width = Math.round(w*dpr); canvas.height = Math.round(h*dpr);
+    canvas.style.width = w+'px'; canvas.style.height = h+'px';
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  resize();
+  addEventListener('resize', resize, {passive:true});
+
+  const rand=(a,b)=>a+Math.random()*(b-a);
+  function pointOnRing(){
+    const a=rand(0,Math.PI*2), rx=w*.40, ry=h*.40;
+    return {x:w/2+Math.cos(a)*rx,y:h/2+Math.sin(a)*ry,a};
+  }
+  function makeBolt(a,b,depth=0){
+    const pts=[a];
+    const n=Math.max(5,Math.floor(Math.hypot(b.x-a.x,b.y-a.y)/14));
+    for(let i=1;i<n;i++){
+      const t=i/n, x=a.x+(b.x-a.x)*t, y=a.y+(b.y-a.y)*t;
+      const mag=(1-Math.abs(.5-t)*1.5)*rand(5,18);
+      const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy)||1;
+      pts.push({x:x-dy/len*rand(-mag,mag),y:y+dx/len*rand(-mag,mag)});
+    }
+    pts.push(b);
+    const children=[];
+    if(depth<2 && Math.random()<.72){
+      const i=Math.floor(rand(1,pts.length-2)), p=pts[i], end=pointOnRing();
+      children.push(makeBolt(p,{x:p.x+(end.x-p.x)*.45,y:p.y+(end.y-p.y)*.45},depth+1));
+    }
+    return {pts,children,life:rand(55,110),max:0};
+  }
+  function strike(){
+    const a=pointOnRing(), b=pointOnRing();
+    bolts=[makeBolt(a,b),makeBolt(pointOnRing(),pointOnRing(),1)];
+    flash=rand(.18,.55);
+    nextStrike=performance.now()+rand(700,2400);
+  }
+  function drawBolt(b,alpha=1){
+    ctx.beginPath(); ctx.moveTo(b.pts[0].x,b.pts[0].y);
+    for(let i=1;i<b.pts.length;i++) ctx.lineTo(b.pts[i].x,b.pts[i].y);
+    ctx.strokeStyle=`rgba(255,255,255,${alpha*.96})`; ctx.lineWidth=1.2; ctx.shadowBlur=4; ctx.shadowColor='white'; ctx.stroke();
+    ctx.strokeStyle=`rgba(205,225,255,${alpha*.7})`; ctx.lineWidth=4; ctx.shadowBlur=15; ctx.shadowColor='rgba(190,215,255,.95)'; ctx.stroke();
+    for(const c of b.children) drawBolt(c,alpha*.62);
+  }
+  function frame(t){
+    ctx.clearRect(0,0,w,h);
+    if(t>=nextStrike) strike();
+    for(const b of bolts){
+      b.life-=1;
+      if(b.life>0){
+        const a=Math.min(1,b.life/22)*(.55+Math.random()*.45);
+        drawBolt(b,a);
+      }
+    }
+    bolts=bolts.filter(b=>b.life>0);
+    if(flash>0){
+      ctx.fillStyle=`rgba(255,255,255,${flash*.035})`; ctx.fillRect(0,0,w,h); flash*=.86;
+    }
+    requestAnimationFrame(frame);
+  }
+  nextStrike=performance.now()+650;
+  requestAnimationFrame(frame);
+})();
+
 const menu=document.getElementById('categories');
 document.querySelectorAll('.menu-card').forEach(c=>{
  c.onclick=e=>{
