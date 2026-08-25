@@ -6,22 +6,338 @@
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>PLP Premium Lifestyle</title>
 <link href="style.css" rel="stylesheet"/>
-<style>.photo{display:flex;align-items:center;justify-content:center}.photo img{width:100%;height:280px;object-fit:contain;object-position:center}@media(max-width:768px){.photo img{height:220px;object-fit:contain;object-position:center}}
-.main-menu{display:grid;gap:18px}
-.menu-card{display:block;text-decoration:none;background:#171717;border-radius:18px;padding:14px;color:#fff}
-.menu-card img{width:100%;height:220px;object-fit:contain}
-.hidden-section{display:none;opacity:0;transition:opacity .35s}
-.hidden-section.active{display:block;opacity:1}
-.back-btn{display:inline-block;margin:10px 0 20px;padding:10px 16px;border-radius:12px;background:#222;color:#fff;text-decoration:none}
+<style>
+:root{
+  --bg:#090909;
+  --card:#151515;
+  --card-2:#1b1b1b;
+  --text:#f5f5f5;
+  --muted:#a7a7a7;
+  --line:rgba(255,255,255,.10);
+}
 
-.menu-card,.card,.buy-button,.back-btn{transition:all .28s ease;border:1px solid transparent}
-.menu-card:hover,.card:hover,.buy-button:hover,.back-btn:hover{transform:translateY(-4px) scale(1.02);border-color:#ff2b2b;box-shadow:0 0 12px rgba(255,0,0,.45),0 0 28px rgba(255,0,0,.25),inset 0 0 10px rgba(255,0,0,.08)}
-.menu-card:active,.card:active,.buy-button:active,.back-btn:active{transform:scale(.97)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
 
+body{
+  margin:0;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 50% -10%,rgba(255,255,255,.08),transparent 34%),
+    var(--bg);
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* Едва заметный паттерн из логотипов по всей странице. */
+body::before{
+  content:"";
+  position:fixed;
+  inset:-12%;
+  z-index:-1;
+  pointer-events:none;
+  background-image:url("logo.png");
+  background-repeat:repeat;
+  background-size:150px auto;
+  background-position:0 0;
+  opacity:.028;
+  filter:grayscale(1) brightness(1.8);
+  transform:rotate(-7deg) scale(1.08);
+}
+
+/* Дополнительная мягкая дымка, чтобы паттерн не отвлекал от товаров. */
+body::after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:radial-gradient(circle at center,transparent 35%,rgba(0,0,0,.38) 100%);
+}
+
+.hero{
+  position:relative;
+  text-align:center;
+  padding:42px 18px 28px;
+}
+
+.logo-wrap{
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  width:min(280px,72vw);
+  aspect-ratio:1;
+  isolation:isolate;
+}
+
+.logo{
+  position:relative;
+  z-index:3;
+  width:68%;
+  height:auto;
+  object-fit:contain;
+  filter:drop-shadow(0 0 10px rgba(255,255,255,.08));
+}
+
+/* Электрические дуги вокруг логотипа — без красной подсветки. */
+.logo-electric{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:2;
+  overflow:visible;
+  pointer-events:none;
+}
+
+.logo-electric path{
+  fill:none;
+  stroke:#fff;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  stroke-width:1.8;
+  opacity:.0;
+  filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 9px rgba(255,255,255,.7));
+}
+
+.logo-electric path:nth-child(1){animation:electric1 2.4s linear infinite}
+.logo-electric path:nth-child(2){animation:electric2 3.1s linear infinite .35s}
+.logo-electric path:nth-child(3){animation:electric3 2.7s linear infinite .8s}
+.logo-electric path:nth-child(4){animation:electric4 3.6s linear infinite 1.15s}
+
+@keyframes electric1{
+  0%,72%,100%{opacity:0;stroke-dashoffset:170}
+  75%{opacity:1;stroke-dashoffset:125}
+  78%{opacity:.35;stroke-dashoffset:90}
+  81%{opacity:1;stroke-dashoffset:45}
+  84%{opacity:0;stroke-dashoffset:0}
+}
+@keyframes electric2{
+  0%,68%,100%{opacity:0;stroke-dashoffset:210}
+  70%{opacity:1;stroke-dashoffset:165}
+  74%{opacity:.45;stroke-dashoffset:105}
+  77%{opacity:1;stroke-dashoffset:50}
+  81%{opacity:0;stroke-dashoffset:0}
+}
+@keyframes electric3{
+  0%,74%,100%{opacity:0;stroke-dashoffset:190}
+  76%{opacity:1;stroke-dashoffset:140}
+  79%{opacity:.3;stroke-dashoffset:80}
+  82%{opacity:1;stroke-dashoffset:30}
+  85%{opacity:0;stroke-dashoffset:0}
+}
+@keyframes electric4{
+  0%,70%,100%{opacity:0;stroke-dashoffset:230}
+  73%{opacity:1;stroke-dashoffset:180}
+  76%{opacity:.35;stroke-dashoffset:120}
+  80%{opacity:1;stroke-dashoffset:55}
+  83%{opacity:0;stroke-dashoffset:0}
+}
+
+.hero p{
+  margin:2px 0 0;
+  color:var(--muted);
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  font-size:.78rem;
+}
+
+.section{
+  width:min(1180px,calc(100% - 28px));
+  margin:0 auto 42px;
+}
+
+h2{
+  margin:10px 0 20px;
+  font-size:clamp(1.5rem,3vw,2.1rem);
+}
+
+.main-menu{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+}
+
+/* Фото теперь реально заполняет карточку. */
+.menu-card{
+  position:relative;
+  display:flex;
+  align-items:flex-end;
+  min-height:290px;
+  overflow:hidden;
+  padding:0;
+  color:#fff;
+  text-decoration:none;
+  background:#111;
+  border:1px solid var(--line);
+  border-radius:20px;
+  isolation:isolate;
+  box-shadow:0 12px 34px rgba(0,0,0,.28);
+}
+
+.menu-card img{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  z-index:-2;
+  transition:transform .55s cubic-bezier(.2,.7,.2,1),filter .4s ease;
+}
+
+.menu-card::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:-1;
+  background:linear-gradient(180deg,transparent 35%,rgba(0,0,0,.82) 100%);
+}
+
+.menu-card h3{
+  width:100%;
+  margin:0;
+  padding:22px 18px 18px;
+  font-size:1.08rem;
+  text-shadow:0 2px 12px #000;
+}
+
+.menu-card:hover img{
+  transform:scale(1.06);
+  filter:brightness(1.06);
+}
+
+.menu-card,.card,.product,.buy-button,.back-btn{
+  transition:transform .28s ease,border-color .28s ease,box-shadow .28s ease;
+}
+
+.menu-card:hover,.card:hover,.product:hover{
+  transform:translateY(-4px);
+  border-color:rgba(255,255,255,.32);
+  box-shadow:0 18px 45px rgba(0,0,0,.42);
+}
+
+.menu-card:active,.card:active,.buy-button:active,.back-btn:active{
+  transform:scale(.98);
+}
+
+.products{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:18px;
+}
+
+.product{
+  overflow:hidden;
+  background:linear-gradient(145deg,#191919,#111);
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:12px;
+}
+
+.photo{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height:300px;
+  overflow:hidden;
+  border-radius:14px;
+  background:#0d0d0d;
+}
+
+.photo img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  object-position:center;
+  border-radius:12px;
+  transition:transform .45s ease;
+}
+
+.product:hover .photo img{transform:scale(1.04)}
+
+.product h3{margin:14px 4px 6px}
+.price{margin:0 4px 12px;color:#fff;font-weight:700}
+
+.buy-button,.back-btn{
+  display:inline-block;
+  padding:11px 16px;
+  border-radius:12px;
+  background:#222;
+  color:#fff;
+  text-decoration:none;
+  border:1px solid var(--line);
+}
+
+.buy-button:hover,.back-btn:hover{
+  border-color:rgba(255,255,255,.38);
+  background:#292929;
+  box-shadow:0 8px 24px rgba(0,0,0,.3);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:18px;
+}
+
+.card{
+  display:block;
+  min-height:120px;
+  padding:22px;
+  border-radius:18px;
+  background:linear-gradient(145deg,#191919,#111);
+  color:#fff;
+  text-decoration:none;
+  border:1px solid var(--line);
+}
+
+.hidden-section{display:none;opacity:0}
+.hidden-section.active{
+  display:block;
+  opacity:1;
+  animation:sectionIn .35s ease both;
+}
+
+@keyframes sectionIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:none}
+}
+
+.footer{
+  padding:28px 16px 40px;
+  text-align:center;
+}
+.footer a{color:#fff}
+
+@media(max-width:768px){
+  .hero{padding-top:28px}
+  .logo-wrap{width:min(240px,70vw)}
+  .main-menu{grid-template-columns:1fr}
+  .menu-card{min-height:250px}
+  .photo{height:260px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+    scroll-behavior:auto!important;
+  }
+}
 </style></head>
 <body>
 <header class="hero">
-<img alt="PLP" class="logo" src="logo.png"/>
+<div class="logo-wrap" aria-label="PLP">
+  <img alt="PLP" class="logo" src="logo.png"/>
+  <svg class="logo-electric" viewBox="0 0 300 300" aria-hidden="true">
+    <path d="M56 112 L37 101 L55 94 L42 78 L70 84 L61 63 L84 72 L91 45 L106 67 L126 43 L132 70 L158 52 L153 79 L183 70 L166 92 L196 91 L176 108"/>
+    <path d="M224 92 L245 78 L236 103 L260 106 L239 119 L259 136 L232 135 L241 160 L218 146 L208 171 L199 145 L176 160 L185 136 L160 132 L184 118 L166 99 L194 103 L193 76 L211 93"/>
+    <path d="M70 211 L49 226 L71 229 L59 251 L84 238 L91 264 L105 239 L126 259 L130 234 L154 249 L151 224 L177 222 L157 207"/>
+    <path d="M206 181 L225 193 L219 170 L242 176 L230 155 L253 150 L229 139"/>
+  </svg>
+</div>
 <p>Premium Lifestyle</p>
 
 </header>
