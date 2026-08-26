@@ -527,6 +527,33 @@ body::before{background-size:165px auto;opacity:.024;filter:grayscale(1) contras
 .contact-view-inner{min-height:75vh;display:flex;flex-direction:column}.contact-center{margin:auto;width:min(740px,100%);text-align:center}.contact-center h2{font-family:Georgia,serif;font-size:clamp(2.8rem,7vw,5.5rem);margin:0 0 14px}.contact-center p{color:#999;line-height:1.6}.contact-buttons{display:grid;gap:14px;margin-top:34px;text-align:left}.contact-large{position:relative;display:grid;grid-template-columns:1fr auto;gap:4px 20px;padding:20px 22px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:linear-gradient(145deg,#171717,#0d0d0d);text-decoration:none;transition:.28s ease}.contact-large:hover{transform:translateY(-3px) scale(1.01);border-color:rgba(255,255,255,.4);box-shadow:0 18px 45px rgba(0,0,0,.4),0 0 20px rgba(255,255,255,.05)}.contact-large span{font-size:17px;font-weight:800}.contact-large small{color:#8f949a}.contact-large b{grid-column:2;grid-row:1 / span 2;align-self:center;font-size:22px}.contact-entry{display:inline-flex;margin-top:10px;padding:10px 14px;border:1px solid rgba(255,255,255,.14);border-radius:12px;text-decoration:none;color:#fff}
 @media(max-width:820px){.checkout-layout{grid-template-columns:1fr}.payment-grid{grid-template-columns:1fr}.shipping-row{grid-template-columns:1fr}.contact-center h2{font-size:3rem}}
 
+
+/* ===== BLP visual polish ===== */
+body::before{
+  background-size:220px auto;
+  opacity:.035;
+  transform:rotate(-12deg) scale(1.12);
+  background-position:20px 10px;
+}
+.hero{overflow:hidden}
+.logo-wrap{cursor:pointer;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.logo-wrap:hover{transform:scale(1.08)}
+.logo-wrap:hover .logo{transform:translateY(-2px) scale(1.16) rotate(.4deg);filter:drop-shadow(0 0 18px rgba(255,255,255,.28))}
+.logo-wrap:active{transform:scale(1.13)}
+.logo-wrap:active .logo{transform:scale(1.24)}
+.floating-plp:active{transform:scale(1.16) rotate(-3deg)}
+.hero::after{
+  content:"BLP   BLP   BLP   BLP   BLP   BLP";
+  position:absolute;left:-8%;right:-8%;bottom:-12px;
+  font-size:clamp(34px,8vw,96px);font-weight:900;letter-spacing:.08em;
+  color:rgba(255,255,255,.025);white-space:nowrap;transform:rotate(-6deg);
+  pointer-events:none;
+}
+.shipping-country-hint{font-size:10px;color:#8b8f94;margin-top:8px}
+.order-status{margin-top:12px;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#111;color:#bbb;font-size:12px;display:none}
+.order-status.show{display:block}
+.order-status.success{border-color:rgba(255,255,255,.35);color:#fff}
+
 /* STRICT MONOCHROME */
 html,body{background:#000!important;color:#fff!important}
 a,a:visited{color:#fff!important}
@@ -661,6 +688,38 @@ button,input,select{accent-color:#fff}
   color:#aaa;
 }
 
+
+/* Readability polish: high-contrast product buttons */
+.buy-button, .quick-cart-btn {
+  background: #ffffff !important;
+  color: #0a0a0a !important;
+  border: 2px solid #0a0a0a !important;
+  text-shadow: none !important;
+  box-shadow: 0 6px 18px rgba(0,0,0,.18), inset 0 0 0 1px rgba(255,255,255,.35);
+  font-weight: 900 !important;
+  letter-spacing: .01em;
+}
+.buy-button:hover, .quick-cart-btn:hover {
+  background: #f2f2f2 !important;
+  color: #000000 !important;
+  border-color: #000000 !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 26px rgba(0,0,0,.28);
+}
+.buy-button:active, .quick-cart-btn:active {
+  transform: translateY(0) scale(.99);
+}
+
+
+/* Catalog filters */
+.product-filters{width:min(1180px,calc(100% - 28px));margin:10px auto 28px;padding:20px;border:1px solid rgba(255,255,255,.12);border-radius:22px;background:linear-gradient(145deg,rgba(255,255,255,.07),rgba(255,255,255,.025));backdrop-filter:blur(10px);box-shadow:0 20px 55px rgba(0,0,0,.22)}
+.filter-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:16px}.filter-kicker{font-size:10px;letter-spacing:.22em;color:#888}.filter-head h3{margin:4px 0 0;font-size:20px}.filter-reset{border:1px solid rgba(255,255,255,.16);background:#111;color:#fff;border-radius:10px;padding:8px 12px;cursor:pointer}.filter-reset:hover{border-color:#fff}
+.filter-row{display:grid;grid-template-columns:1fr 1fr 1.4fr;gap:12px}.filter-field{display:grid;gap:7px;font-size:11px;color:#aaa}.filter-field select{width:100%;height:42px;border:1px solid rgba(255,255,255,.13);border-radius:11px;background:#0d0d0d;color:#fff;padding:0 11px;outline:none}.filter-field select:focus{border-color:#fff}.filter-field input[type=range]{width:100%;accent-color:#fff}.filter-field b{font-size:12px;color:#fff}.quick-pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.quick-pill{border:1px solid rgba(255,255,255,.14);background:#111;color:#ddd;border-radius:999px;padding:9px 13px;cursor:pointer;font-size:11px;transition:.2s ease}.quick-pill:hover,.quick-pill.active{background:#fff;color:#000;border-color:#fff}.filter-count{margin-top:11px;color:#777;font-size:10px}
+.product-badge{position:absolute;z-index:4;top:12px;left:12px;padding:7px 10px;border:1px solid rgba(255,255,255,.48);border-radius:999px;background:rgba(0,0,0,.38);backdrop-filter:blur(7px);color:#fff;font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;text-shadow:0 1px 4px #000;box-shadow:0 5px 18px rgba(0,0,0,.22)}
+.product-badge.new{border-color:rgba(255,255,255,.65);background:rgba(255,255,255,.16)}.product-badge.exclusive{background:rgba(0,0,0,.52);border-color:rgba(255,255,255,.75)}
+.product-link{position:relative}
+@media(max-width:700px){.filter-row{grid-template-columns:1fr}.product-filters{padding:16px}.quick-pills{overflow:auto;flex-wrap:nowrap;padding-bottom:3px}.quick-pill{white-space:nowrap}}
+
 </style></head>
 <body id="top">
 
@@ -711,7 +770,7 @@ button,input,select{accent-color:#fff}
         <div class="shipping-line"><span>Товары</span><strong id="cartSubtotal">0,00 €</strong></div>
         <div class="shipping-line"><span>DHL Versand</span><strong id="shippingCost">—</strong></div>
         <div class="shipping-line total"><span>Итого</span><strong id="cartTotal">0,00 €</strong></div>
-        <div class="shipping-note">Расчёт использует текущую официальную таблицу DHL Paket International для онлайн-цены. Итоговая возможность отправки и таможенные условия зависят от страны и содержимого посылки. <a href="https://www.dhl.de/de/privatkunden/pakete-versenden/weltweit-versenden/preise-international.html" target="_blank" rel="noopener" style="color:#fff">Проверить у DHL →</a></div>
+        <div class="shipping-note">Расчёт использует настроенную таблицу тарифов DHL; перед отправкой проверьте актуальный тариф и ограничения на сайте DHL. Итоговая возможность отправки и таможенные условия зависят от страны и содержимого посылки. <a href="https://www.dhl.de/de/privatkunden/pakete-versenden/weltweit-versenden/preise-international.html" target="_blank" rel="noopener" style="color:#fff">Проверить у DHL →</a></div>
       </div>
       <div class="payment-box">
   <div class="payment-title">Способ оплаты</div>
@@ -944,7 +1003,7 @@ button,input,select{accent-color:#fff}
           <div class="field full"><label>Адрес</label><input id="streetPage" required autocomplete="street-address"></div>
           <div class="field"><label>Город</label><input id="cityPage" required autocomplete="address-level2"></div>
           <div class="field"><label>Индекс</label><input id="postalPage" required autocomplete="postal-code"></div>
-          <div class="field full"><label>Страна</label><select id="countryPage" required><option value="">Выберите страну</option></select></div>
+          <div class="field full"><label>Страна</label><select id="countryPage" required><option value="">Выберите страну</option></select></div><div class="shipping-country-hint">Стоимость DHL пересчитывается автоматически по стране и весу.</div>
           <div class="field full"><label>Телефон</label><input id="phonePage" required autocomplete="tel"></div>
         </div>
         <h3 class="payment-title">Способ оплаты</h3>
@@ -954,8 +1013,8 @@ button,input,select{accent-color:#fff}
           <label class="payment-card"><input type="radio" name="paymentPage" value="Криптокошелёк"><span>Криптокошелёк</span></label>
         </div>
         <div class="shipping-row"><div><span>Вес посылки</span><select id="parcelWeightPage"><option value="2">до 2 кг</option><option value="5">до 5 кг</option><option value="10">до 10 кг</option><option value="20">до 20 кг</option><option value="30">до 30 кг</option></select></div><div class="totals"><div>Товары <strong id="cartSubtotalPage">€0.00</strong></div><div>Доставка DHL <strong id="shippingCostPage">—</strong></div><div class="grand">Итого <strong id="cartTotalPage">€0.00</strong></div></div></div>
-        <button class="order-primary" type="submit">Подготовить заказ →</button>
-        <p class="fineprint">После подготовки заказа данные копируются и их можно отправить в Telegram.</p>
+        <button class="order-primary" type="submit">Подготовить заказ →</button><div class="order-status" id="orderStatus" aria-live="polite"></div>
+        <p class="fineprint">После нажатия кнопки заказ автоматически отправляется в ваш Telegram через защищённый серверный endpoint.</p>
       </form>
     </div>
   </div>
@@ -1002,7 +1061,7 @@ const DHL = {
 };
 
 const countries = {
-1:["Бельгия","Болгария","Дания","Эстония","Финляндия","Франция","Греция","Ирландия","Италия","Хорватия","Латвия","Литва","Люксембург","Мальта","Монако","Нидерланды","Австрия","Польша","Португалия","Румыния","Швеция","Словакия","Словения","Испания","Чехия","Венгрия","Кипр"],
+1:["Германия","Бельгия","Болгария","Дания","Эстония","Финляндия","Франция","Греция","Ирландия","Италия","Хорватия","Латвия","Литва","Люксембург","Мальта","Монако","Нидерланды","Австрия","Польша","Португалия","Румыния","Швеция","Словакия","Словения","Испания","Чехия","Венгрия","Кипр"],
 2:["Великобритания","Швейцария"],
 3:["Аландские острова","Андорра","Албания","Беларусь","Босния и Герцеговина","Фарерские острова","Гибралтар","Исландия","Каналовые острова","Косово","Лихтенштейн","Молдова","Черногория","Северная Македония","Норвегия","Сан-Марино","Сербия","Турция","Украина","Ватикан","Канарские острова","Сеута","Мелилья","Ливиньо","Кампьоне-д'Италия"],
 4:["Россия"],
@@ -1012,15 +1071,30 @@ const countries = {
 8:["Американское Самоа","Австралия","Острова Кука","Фиджи","Федеративные Штаты Микронезии","Французская Полинезия","Гуам","Кирибати","Маршалловы Острова","Науру","Новая Каледония","Новая Зеландия","Ниуэ","Северные Марианские Острова","Палау","Папуа — Новая Гвинея","Питкэрн","Самоа","Соломоновы Острова","Южный Судан","Токелау","Тонга","Тувалу","Вануату","Уоллис и Футуна","Сомали","Саба","Синт-Эстатиус","Западная Сахара"]
 };
 
+
+/* Country-specific retail shipping overrides. All other countries use the DHL zone table below. */
+const DHL_COUNTRY_OVERRIDES = {
+  "Нидерланды": {2:20,5:20,10:25,20:35,30:50},
+  "Украина": {2:25,5:30,10:40,20:60,30:90},
+  "США": {2:45,5:50,10:80,20:145,30:210}
+};
+
 const countryToZone = {};
 Object.entries(countries).forEach(([zone, list])=>list.forEach(c=>countryToZone[c]=Number(zone)));
 const countrySelect=document.getElementById('country');
+const countryPageSelect=document.getElementById('countryPage');
 Object.keys(countries).forEach(zone=>{
-  const group=document.createElement('optgroup'); group.label=`Зона ${zone} — ${DHL[zone].name}`;
-  countries[zone].slice().sort((a,b)=>a.localeCompare(b,'ru')).forEach(country=>{
-    const o=document.createElement('option'); o.value=country; o.textContent=country; group.appendChild(o);
-  });
-  countrySelect.appendChild(group);
+  const addGroup=(select)=>{
+    if(!select)return;
+    const group=document.createElement('optgroup');
+    group.label=`Зона ${zone} — ${DHL[zone].name}`;
+    countries[zone].slice().sort((a,b)=>a.localeCompare(b,'ru')).forEach(country=>{
+      const o=document.createElement('option'); o.value=country; o.textContent=country; group.appendChild(o);
+    });
+    select.appendChild(group);
+  };
+  addGroup(countrySelect);
+  addGroup(countryPageSelect);
 });
 
 const money=n=>n.toLocaleString('de-DE',{style:'currency',currency:'EUR'});
@@ -1065,9 +1139,78 @@ function addToCart(product){
 }
 document.querySelectorAll('.buy-button').forEach(btn=>btn.addEventListener('click',e=>{e.preventDefault();addToCart(btn.closest('.product'));}));
 document.querySelectorAll('#all-products .product-link').forEach(card=>{if(card.querySelector('.quick-cart-btn'))return;const btn=document.createElement('button');btn.type='button';btn.className='quick-cart-btn';btn.textContent='В корзину';btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();addToCart(card);});card.appendChild(btn);});
-function updateTotalsPage(){const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);const zone=countryToZone[countryPage.value];const weight=Number(parcelWeightPage.value);const shipping=zone?DHL[zone].prices[weight]:null;cartSubtotalPage.textContent=money(subtotal);shippingCostPage.textContent=shipping==null?'—':money(shipping);cartTotalPage.textContent=money(subtotal+(shipping||0));}
-countryPage.addEventListener('change',updateTotalsPage);parcelWeightPage.addEventListener('change',updateTotalsPage);
-document.getElementById('checkoutForm').addEventListener('submit',e=>{e.preventDefault();if(!cart.length){alert('Корзина пуста.');return;}const ids=['firstNamePage','lastNamePage','streetPage','cityPage','postalPage','countryPage','phonePage'];for(const id of ids){const el=document.getElementById(id);if(!el.value.trim()){el.focus();alert('Заполните все поля доставки.');return;}}const zone=countryToZone[countryPage.value],weight=Number(parcelWeightPage.value),ship=DHL[zone]?.prices[weight];if(ship==null){alert('Для выбранной страны и веса сейчас нет цены в таблице DHL.');return;}const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0),total=subtotal+ship;const payment=document.querySelector('input[name="paymentPage"]:checked')?.value||'Не выбран';const items=cart.map(i=>`• ${i.name} × ${i.qty} — ${money(i.price*i.qty)}`).join('\n');const order=`PLP — НОВЫЙ ЗАКАЗ\n\n${items}\n\nТовары: ${money(subtotal)}\nDHL: ${money(ship)}\nИтого: ${money(total)}\n\nПолучатель:\n${document.getElementById('firstNamePage').value} ${document.getElementById('lastNamePage').value}\n${document.getElementById('streetPage').value}\n${document.getElementById('postalPage').value}, ${document.getElementById('cityPage').value}\n${countryPage.value}\nТелефон: ${document.getElementById('phonePage').value}\nОплата: ${payment}`;navigator.clipboard?.writeText(order).then(()=>alert('Заказ подготовлен и скопирован. Его можно отправить в Telegram @plp_shop1.')).catch(()=>alert(order));});
+function getShippingPrice(country, weight){
+  if(!country || !weight) return null;
+  const override=DHL_COUNTRY_OVERRIDES[country];
+  if(override && override[weight]!=null) return override[weight];
+  const zone=countryToZone[country];
+  return zone ? (DHL[zone]?.prices?.[weight] ?? null) : null;
+}
+function updateTotalsPage(){
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0);
+  const weight=Number(parcelWeightPage.value);
+  const shipping=getShippingPrice(countryPage.value,weight);
+  cartSubtotalPage.textContent=money(subtotal);
+  shippingCostPage.textContent=shipping==null?'—':money(shipping);
+  cartTotalPage.textContent=money(subtotal+(shipping||0));
+}
+countryPage.addEventListener('change',updateTotalsPage);
+parcelWeightPage.addEventListener('change',updateTotalsPage);
+
+async function submitOrderToBackend(orderPayload){
+  const response=await fetch('/api/order',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(orderPayload)
+  });
+  let data={};
+  try{data=await response.json();}catch(_){}
+  if(!response.ok) throw new Error(data.error||'Не удалось отправить заказ.');
+  return data;
+}
+
+document.getElementById('checkoutForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!cart.length){alert('Корзина пуста.');return;}
+  const ids=['firstNamePage','lastNamePage','streetPage','cityPage','postalPage','countryPage','phonePage'];
+  for(const id of ids){
+    const el=document.getElementById(id);
+    if(!el.value.trim()){el.focus();alert('Заполните все поля доставки.');return;}
+  }
+  const country=countryPage.value;
+  const weight=Number(parcelWeightPage.value);
+  const ship=getShippingPrice(country,weight);
+  if(ship==null){alert('Для выбранной страны и веса сейчас нет цены доставки.');return;}
+  const subtotal=cart.reduce((s,i)=>s+i.price*i.qty,0),total=subtotal+ship;
+  const payment=document.querySelector('input[name="paymentPage"]:checked')?.value||'Не выбран';
+  const customer={
+    firstName:document.getElementById('firstNamePage').value.trim(),
+    lastName:document.getElementById('lastNamePage').value.trim(),
+    street:document.getElementById('streetPage').value.trim(),
+    city:document.getElementById('cityPage').value.trim(),
+    postal:document.getElementById('postalPage').value.trim(),
+    country,
+    phone:document.getElementById('phonePage').value.trim()
+  };
+  const orderPayload={
+    items:cart.map(i=>({name:i.name,price:i.price,qty:i.qty})),
+    subtotal,shipping:ship,total,currency:'EUR',weight,payment,customer
+  };
+  const status=document.getElementById('orderStatus');
+  if(status){status.className='order-status show';status.textContent='Отправляем заказ…';}
+  const button=document.querySelector('.order-primary');
+  if(button)button.disabled=true;
+  try{
+    const result=await submitOrderToBackend(orderPayload);
+    if(status){status.className='order-status show success';status.textContent=`Заказ №${result.orderId} принят. Мы свяжемся с вами для подтверждения оплаты.`;}
+    localStorage.removeItem('plp_cart_v2'); cart=[]; renderCart();
+  }catch(err){
+    if(status){status.className='order-status show';status.textContent='Заказ не отправлен: '+err.message;}
+    alert('Не удалось отправить заказ. Проверьте подключение Telegram на сервере.');
+  }finally{
+    if(button)button.disabled=false;
+  }
+});
 
 const siteLoader=document.getElementById('siteLoader');
 let loaderTimer=null;
@@ -1215,6 +1358,78 @@ document.querySelectorAll('a[href="#contact-view"]').forEach(a=>a.addEventListen
   openView('contact-view');
 }));
 renderCart();
+
+/* Catalog filter logic */
+(function(){
+  const root=document.getElementById('productFilters');
+  if(!root)return;
+  const cards=[...document.querySelectorAll('#all-products .product-link')];
+  const cat=document.getElementById('filterCategory'), sort=document.getElementById('filterSort');
+  const price=document.getElementById('filterPrice'), priceValue=document.getElementById('filterPriceValue');
+  const count=document.getElementById('filterCount'), reset=document.getElementById('filterReset');
+  const pills=[...document.querySelectorAll('.quick-pill')];
+
+  const norm=s=>(s||'').toLowerCase().trim();
+  function priceOf(card){return parseFloat((card.querySelector('.price')?.textContent||'0').replace(',','.').replace(/[^0-9.]/g,''))||0}
+  function textOf(card){return norm(card.textContent)}
+  function categoryOf(card){
+    return card.dataset.category || norm(card.getAttribute('data-category')) ||
+      norm(card.closest('[data-category]')?.dataset.category) || 'all';
+  }
+  function badgeType(card){
+    return norm(card.dataset.badge || card.getAttribute('data-badge') || card.querySelector('.product-badge')?.dataset.type);
+  }
+  function isStock(card){
+    const t=textOf(card);
+    return !/нет в наличии|out of stock|sold out/.test(t) && !card.matches('.out-of-stock,[data-stock="0"],[data-stock="false"]');
+  }
+  function ensureMeta(card){
+    const t=textOf(card);
+    let type=badgeType(card);
+    if(!type){
+      if(/\bновинк/.test(t)) type='new';
+      else if(/эксклюзив/.test(t)) type='exclusive';
+      else if(/популяр/.test(t)) type='popular';
+    }
+    if(type && !card.querySelector('.product-badge')){
+      const b=document.createElement('span');
+      b.className='product-badge '+type;
+      b.dataset.type=type;
+      b.textContent=type==='new'?'Новинка':type==='exclusive'?'Эксклюзив':'Популярное';
+      const img=card.querySelector('img');
+      (img?.parentElement||card).prepend(b);
+    }
+    return type;
+  }
+  cards.forEach(ensureMeta);
+
+  const categories=[...new Set(cards.map(categoryOf).filter(x=>x&&x!=='all'))].sort();
+  categories.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;cat.appendChild(o)});
+
+  function apply(){
+    const c=cat.value, max=Number(price.value), mode=sort.value;
+    let visible=cards.filter(card=>{
+      const p=priceOf(card), type=badgeType(card);
+      const categoryOk=c==='all'||categoryOf(card)===c;
+      const priceOk=p<=max;
+      let modeOk=true;
+      if(mode==='new') modeOk=type==='new';
+      if(mode==='exclusive') modeOk=type==='exclusive';
+      if(mode==='popular') modeOk=type==='popular';
+      if(mode==='stock') modeOk=isStock(card);
+      return categoryOk&&priceOk&&modeOk;
+    });
+    cards.forEach(card=>card.style.display=visible.includes(card)?'':'none');
+    priceValue.textContent=`до ${max} €`;
+    count.textContent=`Показано: ${visible.length} из ${cards.length}`;
+    pills.forEach(p=>p.classList.toggle('active',p.dataset.filter===mode || (mode==='default'&&p.dataset.filter==='all')));
+  }
+  cat.addEventListener('change',apply); sort.addEventListener('change',apply); price.addEventListener('input',apply);
+  pills.forEach(p=>p.addEventListener('click',()=>{const f=p.dataset.filter;sort.value=f==='all'?'default':f;apply()}));
+  reset.addEventListener('click',()=>{cat.value='all';sort.value='default';price.value=30;apply()});
+  apply();
+})();
+
 </script>
 </body>
 </html>
