@@ -759,8 +759,248 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
 .hero a,.hero button,.hero .cta,.hero .primary-action,.hero .buy-button,.hero .hero-cta{color:#000!important;background:#fff!important;border:2px solid #000!important;text-shadow:none!important;font-weight:900!important;box-shadow:0 8px 25px rgba(0,0,0,.25)!important}
 .hero a:hover,.hero button:hover,.hero .cta:hover,.hero .primary-action:hover,.hero .buy-button:hover,.hero .hero-cta:hover{background:#f2f2f2!important;color:#000!important}
 
-</style></head>
+
+/* ABSOLUTE TOP NAV */
+#plpTopControls{display:flex!important;position:fixed!important;right:20px!important;top:20px!important;z-index:2147483647!important;gap:10px!important}
+#plpTopControls .top-icon{display:grid!important;place-items:center!important;width:48px!important;height:48px!important;background:#080808!important;color:#fff!important;border:2px solid #fff!important;border-radius:14px!important;font-size:21px!important;font-weight:900!important;opacity:1!important;visibility:visible!important;box-shadow:0 8px 28px rgba(0,0,0,.5)!important}
+#plpTopControls .top-icon:hover{background:#fff!important;color:#000!important}
+@media(max-width:600px){#plpTopControls{right:10px!important;top:10px!important;gap:6px!important}#plpTopControls .top-icon{width:42px!important;height:42px!important}}
+
+.hero-cta{display:inline-flex!important;position:relative!important;z-index:999!important;margin:18px auto 0!important;padding:14px 22px!important;background:#fff!important;color:#000!important;border:2px solid #000!important;border-radius:14px!important;text-decoration:none!important;font-weight:900!important;}
+#PLP-HERO-CTA{display:inline-flex!important;position:relative!important;z-index:999999!important;margin:20px 0!important;padding:14px 24px!important;background:#fff!important;color:#000!important;border:2px solid #000!important;border-radius:14px!important;text-decoration:none!important;font:900 15px Arial,sans-serif!important;box-shadow:0 8px 30px rgba(0,0,0,.35)!important}#PLP-HERO-CTA:hover{background:#eee!important;color:#000!important}
+</style>
+<style id="PLP-HERO-FINAL-FIX">
+#PLP-HERO-CTA,
+#heroThreeBeads,
+.hero-cta{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#fff !important;
+  color:#000 !important;
+  -webkit-text-fill-color:#000 !important;
+  text-shadow:none !important;
+  border:2px solid #000 !important;
+  border-radius:14px !important;
+  padding:14px 24px !important;
+  font-family:Arial,sans-serif !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+  line-height:1.2 !important;
+  text-decoration:none !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+#PLP-HERO-CTA:hover,
+#heroThreeBeads:hover,
+.hero-cta:hover{background:#eee !important;color:#000 !important;-webkit-text-fill-color:#000 !important}
+</style>
+
+<style id="PLP-FEATURED-BUTTON-FINAL">
+.featured-button{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  background:#fff !important;
+  color:#000 !important;
+  -webkit-text-fill-color:#000 !important;
+  text-shadow:none !important;
+  border:2px solid #000 !important;
+  border-radius:14px !important;
+  padding:14px 22px !important;
+  font-family:Arial,sans-serif !important;
+  font-size:15px !important;
+  font-weight:900 !important;
+  line-height:1.2 !important;
+  text-decoration:none !important;
+  box-shadow:0 8px 24px rgba(0,0,0,.28) !important;
+  opacity:1 !important;
+}
+.featured-button:hover{
+  background:#eee !important;
+  color:#000 !important;
+  -webkit-text-fill-color:#000 !important;
+  transform:translateY(-2px) !important;
+}
+</style>
+
+<style id="PLP-REAL-MENU-STYLE">
+.plp-real-menu{display:grid!important;gap:10px!important;margin-top:24px!important}
+.plp-real-menu button{display:grid!important;grid-template-columns:34px 1fr!important;grid-template-rows:auto auto!important;column-gap:10px!important;text-align:left!important;padding:16px!important;min-height:70px!important}
+.plp-real-menu button span{grid-row:1/3!important;color:#777!important;font:700 11px Arial!important;padding-top:2px!important}
+.plp-real-menu button strong{font:900 15px Arial,sans-serif!important;color:inherit!important}
+.plp-real-menu button small{font:12px Arial,sans-serif!important;color:#888!important;margin-top:4px!important}
+.plp-real-menu button:hover small{color:#333!important}
+</style>
+
+<style id="PLP-SEPARATE-WINDOWS">
+/* Each menu destination is its own full-screen PLP window */
+.page-view{
+  position:fixed !important;
+  inset:0 !important;
+  z-index:1000000 !important;
+  width:100vw !important;
+  height:100vh !important;
+  min-height:100vh !important;
+  margin:0 !important;
+  padding:90px 24px 40px !important;
+  overflow-y:auto !important;
+  background:
+    radial-gradient(circle at 50% 0%,rgba(255,255,255,.06),transparent 35%),
+    rgba(5,5,5,.98) !important;
+  opacity:0 !important;
+  visibility:hidden !important;
+  pointer-events:none !important;
+  transform:translateY(14px) scale(.985) !important;
+  transition:opacity .25s ease,transform .25s ease,visibility .25s ease !important;
+}
+.page-view.active{
+  opacity:1 !important;
+  visibility:visible !important;
+  pointer-events:auto !important;
+  transform:none !important;
+}
+.page-view .view-inner{
+  width:min(1050px,100%) !important;
+  margin:0 auto !important;
+  padding-bottom:50px !important;
+}
+.page-view .view-back{
+  cursor:pointer !important;
+  border:1px solid rgba(255,255,255,.2) !important;
+  background:#111 !important;
+  color:#fff !important;
+  border-radius:12px !important;
+  padding:11px 16px !important;
+  font-weight:800 !important;
+}
+.page-view .view-back:hover{background:#fff!important;color:#000!important}
+.page-view .view-title h2{font-size:clamp(34px,6vw,64px)!important;line-height:.98!important}
+</style>
+
+<style id="PLP-WINDOW-CLOSES">
+.page-view .view-top{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:35px!important}
+.page-view .view-top:after{content:"ESC — закрыть";font-size:10px;color:#666;letter-spacing:.08em}
+</style>
+
+<style id="PLP-UX-FINAL">
+/* Header and menu always stay above every content window */
+#PLP-FINAL-HEADER{z-index:2147483647!important}
+#sideMenu{z-index:2147483646!important}
+#sideMenuOverlay{z-index:2147483645!important}
+
+/* Full-screen sections behave like cards/windows, not page jumps */
+.page-view{
+  position:fixed!important;inset:0!important;z-index:1000000!important;
+  width:100vw!important;height:100vh!important;min-height:100vh!important;
+  margin:0!important;padding:90px 24px 40px!important;overflow-y:auto!important;
+  background:radial-gradient(circle at 50% 0%,rgba(255,255,255,.06),transparent 35%),rgba(5,5,5,.98)!important;
+  opacity:0!important;visibility:hidden!important;pointer-events:none!important;
+  transform:translate3d(0,22px,0) scale(.965)!important;
+  transform-origin:center!important;
+  transition:opacity .28s ease,transform .38s cubic-bezier(.2,.75,.2,1),visibility .28s ease!important;
+}
+.page-view.active{
+  opacity:1!important;visibility:visible!important;pointer-events:auto!important;
+  transform:translate3d(0,0,0) scale(1)!important;
+}
+.page-view.closing{
+  opacity:0!important;pointer-events:none!important;
+  transform:translate3d(0,18px,0) scale(.92)!important;
+}
+.view-inner{animation:plpWindowIn .38s cubic-bezier(.2,.75,.2,1)}
+@keyframes plpWindowIn{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:none}}
+
+/* Clicking another side of the screen closes the menu */
+.side-menu-overlay{background:rgba(0,0,0,.62)!important;backdrop-filter:blur(4px)!important}
+.side-menu{z-index:2147483646!important}
+.side-menu.open{transform:translateX(0)!important}
+</style>
+</head>
 <body id="top">
+
+<!-- PLP HEADER: SEARCH / CART / MENU -->
+<style id="plp-final-header-style">
+#PLP-FINAL-HEADER{
+  position:fixed !important;
+  top:14px !important;
+  right:14px !important;
+  z-index:2147483647 !important;
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  padding:7px !important;
+  background:rgba(0,0,0,.94) !important;
+  border:1px solid rgba(255,255,255,.35) !important;
+  border-radius:16px !important;
+  box-shadow:0 12px 40px rgba(0,0,0,.7) !important;
+  visibility:visible !important;
+  opacity:1 !important;
+}
+#PLP-FINAL-HEADER button{
+  appearance:none !important;
+  -webkit-appearance:none !important;
+  position:relative !important;
+  width:48px !important;
+  height:48px !important;
+  min-width:48px !important;
+  padding:0 !important;
+  display:grid !important;
+  place-items:center !important;
+  border:1px solid rgba(255,255,255,.55) !important;
+  border-radius:12px !important;
+  background:#111 !important;
+  color:#fff !important;
+  cursor:pointer !important;
+  font-family:Arial,sans-serif !important;
+  font-size:24px !important;
+  line-height:1 !important;
+  font-weight:900 !important;
+}
+#PLP-FINAL-HEADER button:hover{background:#fff !important;color:#000 !important;border-color:#fff !important}
+#PLP-FINAL-HEADER .cart-num{
+  position:absolute !important;
+  top:-5px !important;
+  right:-5px !important;
+  width:19px !important;
+  height:19px !important;
+  display:grid !important;
+  place-items:center !important;
+  border-radius:50% !important;
+  background:#fff !important;
+  color:#000 !important;
+  font:900 10px Arial,sans-serif !important;
+}
+@media(max-width:600px){
+ #PLP-FINAL-HEADER{top:8px !important;right:8px !important;padding:5px !important}
+ #PLP-FINAL-HEADER button{width:43px !important;height:43px !important;min-width:43px !important}
+}
+</style>
+<div id="PLP-FINAL-HEADER">
+  <button type="button" id="PLP-FINAL-SEARCH" aria-label="Поиск" title="Поиск">⌕</button>
+  <button type="button" id="PLP-FINAL-CART" aria-label="Корзина" title="Корзина">🛒<span class="cart-num" id="PLP-FINAL-CART-NUM">0</span></button>
+  <button type="button" id="PLP-FINAL-MENU" aria-label="Меню" title="Меню">☰</button>
+</div>
+
+<div class="search-panel" id="searchPanel" aria-hidden="true">
+  <div class="search-inner">
+    <input id="siteSearch" type="search" placeholder="Поиск товара: чётки, колпак, граната..." autocomplete="off">
+    <button type="button" id="searchClose" aria-label="Закрыть">×</button>
+  </div>
+</div>
+<div class="side-menu" id="sideMenu" aria-hidden="true">
+  <div class="side-menu-head"><span>PLP</span><button type="button" id="menuClose">×</button></div>
+  
+<nav class="plp-real-menu">
+  <button type="button" data-nav="catalog"><span>01</span><strong>Каталог</strong><small>Все товары и быстрый поиск</small></button>
+  <button type="button" data-nav="delivery"><span>02</span><strong>Доставка и оплата</strong><small>DHL, страны, сроки и способы оплаты</small></button>
+  <button type="button" data-nav="about"><span>03</span><strong>О магазине</strong><small>О PLP Shop и ассортименте</small></button>
+  <button type="button" data-nav="contacts"><span>04</span><strong>Контакты</strong><small>Telegram, Instagram, WhatsApp и email</small></button>
+  <button type="button" data-nav="account"><span>05</span><strong>Личный кабинет</strong><small>Профиль и история заказов</small></button>
+</nav>
+</div>
+<div class="side-menu-overlay" id="sideMenuOverlay"></div>
+
 
 <div class="site-loader" id="siteLoader" aria-hidden="true">
   <div class="site-loader__inner">
@@ -840,7 +1080,7 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
     <span class="eyebrow">ПОПУЛЯРНОЕ</span>
     <h1>Тричётки</h1>
     <p>Один из главных товаров PLP — смотри всю коллекцию одним нажатием.</p>
-    <a class="featured-button" href="#" data-target="trichotki">Смотреть тричётки →</a>
+    <a class="featured-button" href="#" data-target="trichotki">Смотреть три чётки →</a>
   </div>
   <a class="featured-product" href="#" data-target="trichotki" aria-label="Открыть раздел Тричётки">
     <img src="products/IMG_9254.JPG" alt="Тричётки">
@@ -1064,8 +1304,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
     <div class="contact-center"><span class="eyebrow">КОНТАКТЫ</span><h2>Связаться с нами</h2><p>Выбери удобный канал — нужный контакт уже спрятан внутри кнопки.</p>
       <div class="contact-buttons">
         <a class="contact-large" href="https://t.me/plp_shop1" target="_blank" rel="noopener"><span>Telegram</span><small>@plp_shop1</small><b>↗</b></a>
-        <a class="contact-large" href="https://instagram.com/REPLACE_INSTAGRAM" target="_blank" rel="noopener"><span>Instagram</span><small>@REPLACE_INSTAGRAM</small><b>↗</b></a>
-        <a class="contact-large" href="https://wa.me/REPLACE_WHATSAPP" target="_blank" rel="noopener"><span>WhatsApp</span><small>Чат с нами</small><b>↗</b></a>
+        <a class="contact-large" href="https://instagram.com/plp_shop" target="_blank" rel="noopener"><span>Instagram</span><small>@plp_shop</small><b>↗</b></a>
+        <a class="contact-large" href="https://wa.me/491234567890" target="_blank" rel="noopener"><span>WhatsApp</span><small>Чат с нами</small><b>↗</b></a>
       </div>
     </div>
   </div>
@@ -1075,8 +1315,8 @@ body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;bac
   <h3 style="margin:0 0 12px;color:#fff">Связаться с нами</h3>
   <div class="contact-row">
     <a class="contact-btn" href="https://t.me/plp_shop1" target="_blank" rel="noopener">✈ Telegram</a>
-    <a class="contact-btn" href="https://instagram.com/REPLACE_INSTAGRAM" target="_blank" rel="noopener">◎ Instagram</a>
-    <a class="contact-btn" href="https://wa.me/REPLACE_WHATSAPP" target="_blank" rel="noopener">◉ WhatsApp</a>
+    <a class="contact-btn" href="https://instagram.com/plp_shop" target="_blank" rel="noopener">◎ Instagram</a>
+    <a class="contact-btn" href="https://wa.me/491234567890" target="_blank" rel="noopener">◉ WhatsApp</a>
   </div>
   <a href="https://t.me/plp_shop1" target="_blank" rel="noopener">@plp_shop1</a>
 <div style="margin-top:12px;color:#666;font-size:10px">Админ-панель лучше делать отдельно с авторизацией и базой данных; не хранить секреты в публичном GitHub.</div>
@@ -1549,9 +1789,9 @@ renderCart();
     <div class="contact-detail-grid">
       <div class="info-panel"><h3>Связаться</h3><div class="contact-links">
         <a href="https://t.me/plp_shop1" target="_blank" rel="noopener">Telegram <span>@plp_shop1</span></a>
-        <a href="mailto:REPLACE_EMAIL">Email <span>REPLACE_EMAIL</span></a>
-        <a href="https://instagram.com/REPLACE_INSTAGRAM" target="_blank" rel="noopener">Instagram <span>@REPLACE_INSTAGRAM</span></a>
-        <a href="https://wa.me/REPLACE_WHATSAPP" target="_blank" rel="noopener">WhatsApp <span>REPLACE_WHATSAPP</span></a>
+        <a href="mailto:your@email.com">Email <span>your@email.com</span></a>
+        <a href="https://instagram.com/plp_shop" target="_blank" rel="noopener">Instagram <span>@plp_shop</span></a>
+        <a href="https://wa.me/491234567890" target="_blank" rel="noopener">WhatsApp <span>491234567890</span></a>
       </div></div>
       <div class="info-panel"><h3>С чем можно обратиться</h3><ul class="clean-list">
         <li>Подбор товара или категории</li><li>Уточнение наличия и фото</li><li>Вопросы по DHL и стране доставки</li><li>Выбранный способ оплаты</li><li>Изменение контактных данных</li><li>Обращение после получения</li>
@@ -1565,7 +1805,7 @@ renderCart();
   <div class="view-inner">
     <div class="view-top"><button class="view-back" data-back>← Каталог</button></div>
     <div class="view-title"><span class="view-kicker">ACCOUNT</span><h2>Личный кабинет</h2>
-      <p>Регистрация и вход по электронной почте. Данные аккаунта хранятся для доступа к истории заказов.</p>
+      <p>Вход по электронной почте. В этой версии профиль и история заказов сохраняются в браузере на этом устройстве.</p>
     </div>
     <div class="account-layout">
       <div class="info-panel">
@@ -1586,30 +1826,181 @@ renderCart();
 </section>
 
 
-/* FINAL NAV SEARCH SCRIPT */
-(function(){
- const q=id=>document.getElementById(id);
- const search=q('searchToggle'), panel=q('searchPanel'), input=q('siteSearch'), close=q('searchClose');
- const menu=q('menuToggle'), drawer=q('sideMenu'), overlay=q('sideMenuOverlay'), menuClose=q('menuClose');
- search?.addEventListener('click',()=>{panel?.classList.add('open');setTimeout(()=>input?.focus(),50)});
- close?.addEventListener('click',()=>{panel?.classList.remove('open');if(input){input.value='';input.dispatchEvent(new Event('input'))}});
- input?.addEventListener('input',()=>{
-   const term=input.value.trim().toLowerCase();
-   document.querySelectorAll('#all-products .product-link').forEach(card=>{
-     card.style.display=(!term||card.innerText.toLowerCase().includes(term))?'':'none';
-   });
- });
- function openMenu(){drawer?.classList.add('open');overlay?.classList.add('open')}
- function shut(){drawer?.classList.remove('open');overlay?.classList.remove('open')}
- menu?.addEventListener('click',openMenu);menuClose?.addEventListener('click',shut);overlay?.addEventListener('click',shut);
- document.addEventListener('click',e=>{
-   const b=e.target.closest('[data-nav]'); if(!b)return;
-   shut(); const k=b.dataset.nav;
-   if(k==='catalog'){document.querySelectorAll('.page-view').forEach(v=>{v.classList.remove('active');v.setAttribute('aria-hidden','true')});window.scrollTo({top:0,behavior:'smooth'});return}
-   const id={delivery:'delivery-view',about:'about-view',contacts:'contacts-view',account:'account-view'}[k];
-   if(id){document.querySelectorAll('.page-view').forEach(v=>{v.classList.remove('active');v.setAttribute('aria-hidden','true')});const v=q(id);if(v){v.classList.add('active');v.setAttribute('aria-hidden','false');window.scrollTo({top:0,behavior:'smooth'})}}
- });
-})();
+<script id="PLP-FINAL-CONTROLS">
 
+(function(){
+  function byId(x){return document.getElementById(x)}
+  var searchBtn=byId('PLP-FINAL-SEARCH');
+  var cartBtn=byId('PLP-FINAL-CART');
+  var menuBtn=byId('PLP-FINAL-MENU');
+  var searchPanel=byId('searchPanel');
+  var searchInput=byId('siteSearch');
+  var menu=byId('sideMenu');
+  var overlay=byId('sideMenuOverlay');
+
+  if(searchBtn) searchBtn.onclick=function(){
+    if(searchPanel){searchPanel.classList.add('open');searchPanel.style.transform='translateY(0)';searchPanel.style.zIndex='2147483646'}
+    if(searchInput){searchInput.focus()}
+  };
+  if(cartBtn) cartBtn.onclick=function(){
+    var c=byId('cartFab');
+    if(c)c.click();
+  };
+  /* menu is handled by PLP-REAL-ROUTER */
+
+  if(searchInput) searchInput.addEventListener('input',function(){
+    var q=(searchInput.value||'').toLowerCase().trim();
+    document.querySelectorAll('#all-products .product-link').forEach(function(card){
+      card.style.display=(!q || (card.innerText||'').toLowerCase().indexOf(q)!==-1)?'':'none';
+    });
+  });
+
+  var n=byId('PLP-FINAL-CART-NUM');
+  function cartCount(){
+    try{
+      var arr=JSON.parse(localStorage.getItem('plp_cart_v2')||'[]');
+      var total=arr.reduce(function(s,x){return s+(Number(x.qty)||0)},0);
+      if(n)n.textContent=total;
+    }catch(e){}
+  }
+  cartCount(); setInterval(cartCount,500);
+})();
+</script>
+
+<script id="PLP_CLICK_OUTSIDE_FINAL">
+/* PLP_CLICK_OUTSIDE_FINAL */
+(function(){
+  function el(id){return document.getElementById(id)}
+  var searchPanel=el('searchPanel'), searchInput=el('siteSearch');
+  var menu=el('sideMenu'), overlay=el('sideMenuOverlay');
+
+  function closeSearch(){
+    if(!searchPanel) return;
+    searchPanel.classList.remove('open');
+    searchPanel.setAttribute('aria-hidden','true');
+    searchPanel.style.transform='';
+    if(searchInput){ searchInput.value=''; searchInput.dispatchEvent(new Event('input')); }
+  }
+  function closeMenu(){
+    if(menu){menu.classList.remove('open');menu.setAttribute('aria-hidden','true');menu.style.transform='';}
+    if(overlay){overlay.classList.remove('open');overlay.style.zIndex='';}
+  }
+
+  document.addEventListener('click',function(e){
+    var t=e.target;
+    if(searchPanel && searchPanel.classList.contains('open')){
+      if(!searchPanel.contains(t) && !el('PLP-FINAL-SEARCH')?.contains(t)) closeSearch();
+    }
+    if(menu && menu.classList.contains('open')){
+      if(!menu.contains(t) && !el('PLP-FINAL-MENU')?.contains(t)) closeMenu();
+    }
+  },true);
+
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){closeSearch();closeMenu();}
+  });
+
+  if(overlay) overlay.addEventListener('click',closeMenu);
+  if(searchPanel) searchPanel.addEventListener('click',function(e){e.stopPropagation()});
+  if(menu) menu.addEventListener('click',function(e){e.stopPropagation()});
+})();
+</script>
+
+<script id="PLP-REAL-ROUTER">
+(function(){
+  const ids={delivery:'delivery-view',about:'about-view',contacts:'contacts-view',account:'account-view'};
+  const menu=document.getElementById('sideMenu');
+  const overlay=document.getElementById('sideMenuOverlay');
+
+  function closeMenu(){
+    if(menu){menu.classList.remove('open');menu.setAttribute('aria-hidden','true');}
+    if(overlay){overlay.classList.remove('open');}
+  }
+
+  function openMenu(){
+    if(menu){menu.classList.add('open');menu.setAttribute('aria-hidden','false');}
+    if(overlay){overlay.classList.add('open');}
+  }
+
+  function closeWindow(){
+    const active=document.querySelector('.page-view.active');
+    if(active){
+      active.classList.add('closing');
+      setTimeout(function(){
+        active.classList.remove('active','closing');
+        active.setAttribute('aria-hidden','true');
+      },320);
+    }
+  }
+
+  function show(key){
+    /* The menu can be used again from ANY info window. */
+    closeMenu();
+    const active=document.querySelector('.page-view.active');
+
+    if(key==='catalog'){
+      closeWindow();
+      window.scrollTo({top:0,behavior:'smooth'});
+      return;
+    }
+
+    const target=document.getElementById(ids[key]);
+    if(!target)return;
+
+    if(active && active!==target){
+      active.classList.add('closing');
+      setTimeout(function(){
+        active.classList.remove('active','closing');
+        active.setAttribute('aria-hidden','true');
+        target.classList.add('active');
+        target.setAttribute('aria-hidden','false');
+        target.scrollTop=0;
+      },220);
+    }else{
+      target.classList.add('active');
+      target.setAttribute('aria-hidden','false');
+      target.scrollTop=0;
+    }
+  }
+
+  /* Every menu item is available from every screen. */
+  document.addEventListener('click',function(e){
+    const nav=e.target.closest('[data-nav]');
+    if(nav){
+      e.preventDefault();
+      e.stopPropagation();
+      show(nav.dataset.nav);
+      return;
+    }
+    const back=e.target.closest('[data-back]');
+    if(back){
+      e.preventDefault();
+      show('catalog');
+    }
+  },true);
+
+  /* Click outside the three-line drawer = close it. */
+  if(overlay) overlay.addEventListener('click',function(e){
+    e.preventDefault(); e.stopPropagation(); closeMenu();
+  });
+
+  /* Escape closes drawer first, then current window. */
+  document.addEventListener('keydown',function(e){
+    if(e.key!=='Escape')return;
+    if(menu && menu.classList.contains('open')){closeMenu();return;}
+    closeWindow();
+  });
+
+  /* Rebind the visible hamburger to this same simple behavior. */
+  const hamburger=document.getElementById('PLP-FINAL-MENU');
+  if(hamburger){
+    hamburger.onclick=function(e){
+      e.preventDefault();e.stopPropagation();
+      if(menu && menu.classList.contains('open')) closeMenu();
+      else openMenu();
+    };
+  }
+})();
+</script>
 </body>
 </html>
