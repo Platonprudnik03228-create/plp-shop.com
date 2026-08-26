@@ -720,6 +720,35 @@ button,input,select{accent-color:#fff}
 .product-link{position:relative}
 @media(max-width:700px){.filter-row{grid-template-columns:1fr}.product-filters{padding:16px}.quick-pills{overflow:auto;flex-wrap:nowrap;padding-bottom:3px}.quick-pill{white-space:nowrap}}
 
+
+/* Global PLP watermark background */
+body{position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:-10%;z-index:-2;pointer-events:none;opacity:.075;background-image:url("logo.png");background-repeat:repeat;background-size:92px auto;background-position:center;transform:rotate(-12deg) scale(1.12);filter:grayscale(1) contrast(1.15)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(circle at 50% 15%,rgba(255,255,255,.035),transparent 38%),linear-gradient(rgba(5,5,5,.88),rgba(5,5,5,.94))}
+.page-view,.hero,.footer{background-color:transparent}
+
+
+/* Product photography polish */
+.product-link,.product{isolation:isolate}
+.product-link{transition:transform .42s cubic-bezier(.2,.75,.2,1),filter .42s ease,box-shadow .42s ease}
+.product-link:hover{transform:translateY(-8px) scale(1.012);filter:brightness(1.04);z-index:3}
+.product-link img,.product img{display:block;width:100%;height:100%;object-fit:cover;border:0;outline:0;box-shadow:none;mix-blend-mode:normal;transition:transform .65s cubic-bezier(.2,.7,.2,1),filter .45s ease}
+.product-link:hover img,.product:hover img{transform:scale(1.035);filter:saturate(1.04) contrast(1.03)}
+.product-link::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(135deg,rgba(255,255,255,.12),transparent 28%,transparent 70%,rgba(0,0,0,.18));opacity:0;transition:opacity .4s ease}
+.product-link:hover::after{opacity:1}
+
+
+/* Navigation, search and account */
+.top-controls{position:fixed;top:18px;right:18px;z-index:300;display:flex;gap:8px}
+.top-icon{position:relative;width:44px;height:44px;border:1px solid rgba(255,255,255,.16);border-radius:13px;background:rgba(10,10,10,.72);backdrop-filter:blur(12px);color:#fff;font-size:20px;cursor:pointer;transition:.25s ease}
+.top-icon:hover{transform:translateY(-2px) scale(1.05);border-color:rgba(255,255,255,.55);background:#fff;color:#000}
+.cart-top span{position:absolute;right:-4px;top:-5px;min-width:18px;height:18px;border-radius:99px;background:#fff;color:#000;font-size:10px;font-weight:900;display:grid;place-items:center}
+.search-panel{position:fixed;top:0;left:0;right:0;z-index:290;padding:14px 84px;background:rgba(5,5,5,.88);backdrop-filter:blur(18px);transform:translateY(-110%);transition:.35s ease;border-bottom:1px solid rgba(255,255,255,.1)}
+.search-panel.open{transform:none}.search-inner{max-width:800px;margin:auto;display:flex;gap:8px}.search-inner input{flex:1;height:48px;border:1px solid rgba(255,255,255,.18);border-radius:14px;background:#101010;color:#fff;padding:0 16px;font-size:15px;outline:none}.search-inner input:focus{border-color:#fff}.search-inner button{width:48px;border:1px solid rgba(255,255,255,.16);border-radius:14px;background:#111;color:#fff;font-size:22px}
+.side-menu{position:fixed;top:0;right:0;z-index:310;width:min(390px,92vw);height:100vh;background:linear-gradient(160deg,#171717,#080808);border-left:1px solid rgba(255,255,255,.14);padding:22px;transform:translateX(110%);transition:.38s cubic-bezier(.2,.7,.2,1);box-shadow:-30px 0 80px rgba(0,0,0,.5)}.side-menu.open{transform:none}.side-menu-head{display:flex;justify-content:space-between;align-items:center;font-weight:900;font-size:20px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.09)}.side-menu-head button{border:1px solid rgba(255,255,255,.14);background:#111;color:#fff;border-radius:50%;width:38px;height:38px;font-size:20px}.side-menu nav{display:grid;gap:8px;margin-top:24px}.side-menu nav button{padding:16px;border:1px solid rgba(255,255,255,.09);border-radius:14px;background:#101010;color:#fff;text-align:left;font-size:14px;cursor:pointer;transition:.22s}.side-menu nav button:hover{background:#fff;color:#000;transform:translateX(-4px)}.side-menu-overlay{position:fixed;inset:0;z-index:305;background:rgba(0,0,0,.7);backdrop-filter:blur(5px);opacity:0;pointer-events:none;transition:.3s}.side-menu-overlay.open{opacity:1;pointer-events:auto}
+.info-view{padding-top:90px}.info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.info-card,.info-panel{border:1px solid rgba(255,255,255,.11);border-radius:22px;background:rgba(15,15,15,.8);padding:22px;box-shadow:0 18px 50px rgba(0,0,0,.22)}.info-card b{font-size:11px;color:#777}.info-card h3,.info-panel h3{margin:9px 0 8px}.info-card p,.info-panel p{color:#aaa;line-height:1.65;margin:0}.info-panel{margin-top:14px}.info-panel.large{font-size:17px}.muted{color:#777!important;font-size:12px}.info-actions{display:flex;gap:10px;margin-top:16px}.primary-action,.secondary-action{border-radius:13px;padding:12px 16px;cursor:pointer;font-weight:850}.primary-action{background:#fff;color:#000;border:2px solid #000}.secondary-action{background:#111;color:#fff;border:1px solid rgba(255,255,255,.18)}.contact-detail-grid,.account-layout{display:grid;grid-template-columns:1fr 1fr;gap:14px}.contact-links{display:grid;gap:8px}.contact-links a{display:flex;justify-content:space-between;padding:13px;border:1px solid rgba(255,255,255,.09);border-radius:12px;background:#101010;color:#fff;text-decoration:none}.contact-links span{color:#888}.clean-list{margin:0;padding-left:18px;color:#bbb;line-height:2}.account-layout form{display:grid;gap:12px}.account-layout .field{display:grid;gap:7px}.account-layout .field span{font-size:11px;color:#aaa}.account-layout input{height:44px;border:1px solid rgba(255,255,255,.13);border-radius:12px;background:#0f0f0f;color:#fff;padding:0 12px}.order-history{display:grid;gap:9px}.history-item{border:1px solid rgba(255,255,255,.08);border-radius:13px;padding:12px;background:#101010}.history-item strong{display:block}.history-item small{color:#888}.history-item div{margin-top:5px;color:#bbb;font-size:12px}
+@media(max-width:700px){.top-controls{top:10px;right:10px}.top-icon{width:40px;height:40px}.search-panel{padding:12px 10px}.info-grid,.contact-detail-grid,.account-layout{grid-template-columns:1fr}.info-actions{flex-direction:column}}
+
 </style></head>
 <body id="top">
 
@@ -1430,6 +1459,121 @@ renderCart();
   apply();
 })();
 
+
+/* Search, navigation and local account */
+(function(){
+  const searchPanel=document.getElementById('searchPanel'), searchInput=document.getElementById('siteSearch');
+  const side=document.getElementById('sideMenu'), overlay=document.getElementById('sideMenuOverlay');
+  const cartTop=document.getElementById('cartTop'), topCount=document.getElementById('topCartCount');
+  function updateTopCart(){const c=JSON.parse(localStorage.getItem('plp_cart_v2')||'[]').reduce((s,i)=>s+i.qty,0);if(topCount)topCount.textContent=c}
+  document.getElementById('searchToggle')?.addEventListener('click',()=>{searchPanel.classList.add('open');setTimeout(()=>searchInput.focus(),80)});
+  document.getElementById('searchClose')?.addEventListener('click',()=>{searchPanel.classList.remove('open');searchInput.value='';searchInput.dispatchEvent(new Event('input'))});
+  document.getElementById('menuToggle')?.addEventListener('click',()=>{side.classList.add('open');overlay.classList.add('open');side.setAttribute('aria-hidden','false')});
+  function closeMenu(){side.classList.remove('open');overlay.classList.remove('open');side.setAttribute('aria-hidden','true')}
+  document.getElementById('menuClose')?.addEventListener('click',closeMenu);overlay?.addEventListener('click',closeMenu);
+  cartTop?.addEventListener('click',()=>{document.getElementById('cartFab')?.click()});
+  document.addEventListener('click',e=>{
+    const nav=e.target.closest('[data-nav]'); if(!nav)return;
+    closeMenu(); const key=nav.dataset.nav;
+    if(key==='catalog'){showHome?.();return}
+    const id={delivery:'delivery-view',about:'about-view',contacts:'contacts-view',account:'account-view'}[key];
+    if(id)openView?.(id);
+  });
+  document.querySelectorAll('[data-back]').forEach(b=>b.addEventListener('click',()=>showHome?.()));
+
+  searchInput?.addEventListener('input',()=>{
+    const q=searchInput.value.toLowerCase().trim();
+    const cards=[...document.querySelectorAll('#all-products .product-link')];
+    cards.forEach(card=>{card.style.display=!q||card.textContent.toLowerCase().includes(q)?'':'none'});
+  });
+
+  // Local account + order history. This is a front-end-ready layer; production auth should use a backend.
+  const form=document.getElementById('accountForm'), email=document.getElementById('accountEmail'), name=document.getElementById('accountName'), status=document.getElementById('accountStatus'), hist=document.getElementById('orderHistory');
+  function loadAccount(){
+    const a=JSON.parse(localStorage.getItem('plp_account')||'null');
+    if(a){name.value=a.name||'';email.value=a.email||'';status.textContent='Аккаунт сохранён: '+a.email}
+    const orders=JSON.parse(localStorage.getItem('plp_orders')||'[]');
+    hist.innerHTML=orders.length?orders.map(o=>`<div class="history-item"><strong>${o.id}</strong><small>${o.date} · ${o.country}</small><div>${o.items} · Итого ${o.total}</div></div>`).join(''):'<p class="muted">После оформления здесь появится история заказов.</p>';
+  }
+  form?.addEventListener('submit',e=>{e.preventDefault();localStorage.setItem('plp_account',JSON.stringify({name:name.value,email:email.value}));status.textContent='Аккаунт сохранён: '+email.value;loadAccount()});
+  loadAccount(); updateTopCart();
+  setInterval(updateTopCart,800);
+})();
+
 </script>
+
+<section class="page-view info-view" id="delivery-view" aria-hidden="true">
+  <div class="view-inner">
+    <div class="view-top"><button class="view-back" data-back>← Каталог</button></div>
+    <div class="view-title"><span class="view-kicker">PLP SHOP</span><h2>Доставка и оплата</h2>
+      <p>Стоимость доставки показывается до оформления заказа и рассчитывается по стране назначения и выбранному весу.</p>
+    </div>
+    <div class="info-grid">
+      <article class="info-card"><b>01</b><h3>Выбор страны</h3><p>Выберите страну доставки и расчётный вес. Сайт сразу показывает стоимость DHL и итоговую сумму заказа.</p></article>
+      <article class="info-card"><b>02</b><h3>Проверка заказа</h3><p>Перед отправкой проверьте состав товаров, количество, адрес, телефон, страну доставки и выбранный способ оплаты.</p></article>
+      <article class="info-card"><b>03</b><h3>Подтверждение</h3><p>После подтверждения формируется прозрачная заявка с товарами, стоимостью доставки и общей суммой.</p></article>
+      <article class="info-card"><b>04</b><h3>Отправка DHL</h3><p>Заказ передаётся в DHL в соответствии с выбранной страной и доступным тарифом.</p></article>
+    </div>
+    <div class="info-panel"><h3>Оплата</h3><p>Доступные способы оплаты отображаются при оформлении. Visa, Mastercard и PayPal. Данные банковских карт сайт не хранит.</p><p class="muted">Мы не храним информацию о платёжных картах. Проверяйте сумму и способ оплаты до подтверждения заявки.</p></div>
+    <div class="info-actions"><button class="primary-action" data-back>Перейти в каталог</button></div>
+  </div>
+</section>
+
+<section class="page-view info-view" id="about-view" aria-hidden="true">
+  <div class="view-inner">
+    <div class="view-top"><button class="view-back" data-back>← Каталог</button></div>
+    <div class="view-title"><span class="view-kicker">ABOUT PLP</span><h2>О магазине</h2>
+      <p>PLP Shop — тёмный премиальный каталог без лишней витрины.</p>
+    </div>
+    <div class="info-panel large"><p>PLP Shop — тёмный премиальный каталог аксессуаров, колпаков, чехлов для клиппер, китайского чая и эксклюзивных позиций. Сайт сделан для быстрого выбора: от поиска товара до понятного оформления заказа.</p></div>
+    <div class="info-actions"><button class="primary-action" data-back>Каталог</button><button class="secondary-action" data-nav="delivery">Доставка и оплата</button></div>
+  </div>
+</section>
+
+<section class="page-view info-view" id="contacts-view" aria-hidden="true">
+  <div class="view-inner">
+    <div class="view-top"><button class="view-back" data-back>← Каталог</button></div>
+    <div class="view-title"><span class="view-kicker">CONTACT</span><h2>Контакты</h2>
+      <p>Связь по делу — быстро и с деталями.</p>
+    </div>
+    <div class="contact-detail-grid">
+      <div class="info-panel"><h3>Связаться</h3><div class="contact-links">
+        <a href="https://t.me/plp_shop1" target="_blank" rel="noopener">Telegram <span>@plp_shop1</span></a>
+        <a href="mailto:REPLACE_EMAIL">Email <span>REPLACE_EMAIL</span></a>
+        <a href="https://instagram.com/REPLACE_INSTAGRAM" target="_blank" rel="noopener">Instagram <span>@REPLACE_INSTAGRAM</span></a>
+        <a href="https://wa.me/REPLACE_WHATSAPP" target="_blank" rel="noopener">WhatsApp <span>REPLACE_WHATSAPP</span></a>
+      </div></div>
+      <div class="info-panel"><h3>С чем можно обратиться</h3><ul class="clean-list">
+        <li>Подбор товара или категории</li><li>Уточнение наличия и фото</li><li>Вопросы по DHL и стране доставки</li><li>Выбранный способ оплаты</li><li>Изменение контактных данных</li><li>Обращение после получения</li>
+      </ul></div>
+    </div>
+    <div class="info-panel"><h3>Если вопрос по заказу</h3><p>Укажите номер заказа, имя, email/телефон и кратко опишите вопрос. Это ускорит обработку обращения.</p></div>
+  </div>
+</section>
+
+<section class="page-view info-view" id="account-view" aria-hidden="true">
+  <div class="view-inner">
+    <div class="view-top"><button class="view-back" data-back>← Каталог</button></div>
+    <div class="view-title"><span class="view-kicker">ACCOUNT</span><h2>Личный кабинет</h2>
+      <p>Регистрация и вход по электронной почте. Данные аккаунта хранятся для доступа к истории заказов.</p>
+    </div>
+    <div class="account-layout">
+      <div class="info-panel">
+        <h3>Войти / зарегистрироваться</h3>
+        <form id="accountForm">
+          <label class="field"><span>Имя</span><input id="accountName" autocomplete="name" placeholder="Ваше имя"></label>
+          <label class="field"><span>Email</span><input id="accountEmail" type="email" autocomplete="email" required placeholder="you@example.com"></label>
+          <button class="primary-action" type="submit">Сохранить аккаунт</button>
+        </form>
+        <p id="accountStatus" class="muted"></p>
+      </div>
+      <div class="info-panel">
+        <h3>Мои заказы</h3>
+        <div id="orderHistory" class="order-history"><p class="muted">После оформления здесь появится история заказов.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 </body>
 </html>
