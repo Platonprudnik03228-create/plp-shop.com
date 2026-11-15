@@ -102,6 +102,8 @@ public sealed class Simulation
         }
     }
 
+    static double Frac(double v) => v - Math.Floor(v);
+
     void Add(Particle p) { if (P.Count < 6000) P.Add(p); }
 
     Particle Spawn(bool anywhere)
@@ -176,9 +178,12 @@ public sealed class Simulation
             if (p.Kind is Kind.Flake or Kind.Drop)
             {
                 var s = SurfaceUnder(p.X, p.Y);
+                // most flakes and drops fly past a window in front of it (the overlay is in front of the windows);
+                // about one in six settles on its top edge. Everything settles on the taskbar / the bottom of the screen.
+                if (s != null && s.Id >= 0 && Frac(p.Phase * 7.31) > 0.17) s = null;
                 if (s != null)
                 {
-                    if (p.Kind == Kind.Flake && Season == Season.Winter) Deposit(s, p.X, p.Size * 0.5);
+                    if (p.Kind == Kind.Flake && Season == Season.Winter) Deposit(s, p.X, p.Size * (s.Id >= 0 ? 1.4 : 0.5));
                     else if (p.Kind == Kind.Drop && rng.NextDouble() < 0.35) Add(new Particle { Kind = Kind.Splash, X = p.X, Y = s.TopAt(p.X), Size = 3 + rng.NextDouble() * 3, Life = 0.18, Alive = true });
                     p = Spawn(false);
                 }

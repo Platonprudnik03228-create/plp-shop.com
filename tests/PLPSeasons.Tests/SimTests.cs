@@ -29,6 +29,12 @@ public class SimTests
         Assert.All(top.Depth, d => Assert.True(d <= top.MaxDepth + 0.01));
     }
 
+    [Fact] public void SnowFallsInFrontOfWindows()
+    {
+        var s = Winter(10, (1, new RectI(200, 200, 1700, 1000), 8));
+        Assert.True(s.P.Count(p => p.Alive && p.Kind == Kind.Flake && p.Y > 400 && p.Y < 900 && p.X > 300 && p.X < 1600) > 100);
+    }
+
     [Fact] public void ClosingAWindowDropsItsSnow()
     {
         var s = Winter(30, (1, new RectI(400, 300, 1300, 900), 8));
