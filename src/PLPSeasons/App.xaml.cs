@@ -44,7 +44,7 @@ public partial class App : Application
         BuildTray();
         Microsoft.Win32.SystemEvents.DisplaySettingsChanged += (_, _) => Dispatcher.BeginInvoke(BuildOverlays);
         CompositionTarget.Rendering += OnFrame;
-        if (set.Wallpaper && !set.Paused) wall.Update(set.Season);
+        if (set.Wallpaper && !set.Paused) UpdateWallpaper(set.Season);
         ShowWidgets(set.Widgets || demo);
         if (!demo) StartUpdateChecks();
         if (!demo && !set.Paused) tray.ShowBalloonTip(4000, "PLP Seasons", L.T("Работает. Настройки — в значке у часов.", "Running. Settings are in the tray icon next to the clock."), Forms.ToolTipIcon.None);
@@ -79,7 +79,7 @@ public partial class App : Application
         if (demo) DemoScript(now);
         if (now - lastScan > 0.2) { lastScan = now; ScanWindows(); }
         if (now - lastTop > 2) { lastTop = now; foreach (var o in overlays) o.KeepOnTop(); }
-        if (now - lastWall > 60) { lastWall = now; wall.Update(set.Season); }
+        if (now - lastWall > 60) { lastWall = now; UpdateWallpaper(set.Season); }
         foreach (var o in overlays) { o.Sim.Step(dt); o.Redraw(); }
     }
 
@@ -170,7 +170,7 @@ public partial class App : Application
         wg.Click += (_, _) => { set.Widgets = !set.Widgets; ShowWidgets(set.Widgets); Save(); };
         m.Items.Add(wg);
         var wp = new Forms.ToolStripMenuItem(L.T("Живые обои по времени суток", "Wallpaper by time of day")) { Checked = set.Wallpaper };
-        wp.Click += (_, _) => { set.Wallpaper = !set.Wallpaper; if (set.Wallpaper) wall.Update(set.Season); else wall.Restore(); Save(); };
+        wp.Click += (_, _) => { set.Wallpaper = !set.Wallpaper; if (set.Wallpaper) UpdateWallpaper(set.Season); else wall.Restore(); Save(); };
         m.Items.Add(wp);
         m.Items.Add(new Forms.ToolStripSeparator());
         var pause = new Forms.ToolStripMenuItem(set.Paused ? L.T("▶ Включить", "▶ Resume") : L.T("⏸ Пауза", "⏸ Pause"));
@@ -213,7 +213,7 @@ public partial class App : Application
     void ChangeSeason(Season s, bool keepAuto)
     {
         if (!keepAuto) set.AutoSeason = false;
-        set.Season = s; ApplyAll(); wall.Update(s); Save(); remoteCard?.Refresh();
+        set.Season = s; ApplyAll(); UpdateWallpaper(s); Save(); remoteCard?.Refresh();
     }
     public void SetSeason(Season s) => ChangeSeason(s, keepAuto: false);
     public void SetIntensity(double v) { set.Intensity = Math.Round(v, 2); ApplyAll(); Save(); }
@@ -228,6 +228,9 @@ public partial class App : Application
         }
         else { weatherCard?.Hide(); remoteCard?.Hide(); }
     }
+    // Setting the Windows wallpaper takes ~0.2 s; off the UI thread so the snow never stutters.
+    System.Threading.Tasks.Task wallTask = System.Threading.Tasks.Task.CompletedTask;
+    void UpdateWallpaper(Season s) { var prev = wallTask; wallTask = System.Threading.Tasks.Task.Run(async () => { await prev; wall.Update(s); }); }
     void ApplyAll() { foreach (var o in overlays) Apply(o.Sim); }
     void Save() => Store.Save(set);
 
@@ -263,7 +266,7 @@ public partial class App : Application
         if (demoStart == 0) demoStart = now;
         double t = now - demoStart;
         Season want = t switch { < 26 => Season.Winter, < 32 => Season.Rain, < 38 => Season.Storm, < 46 => Season.Autumn, < 54 => Season.Spring, _ => Season.Winter };
-        if (want != set.Season) { set.Season = want; ApplyAll(); wall.Update(want); remoteCard?.Refresh(); }
+        if (want != set.Season) { set.Season = want; ApplyAll(); UpdateWallpaper(want); remoteCard?.Refresh(); }
         if (t > demoLength) Quit();
     }
 }
