@@ -27,5 +27,6 @@
     <ProjectReference Include="..\PLPSeasons.Core\PLPSeasons.Core.csproj" />
     <Content Include="Wallpapers\*.jpg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     <Resource Include="Assets\app.ico" />
+    <Resource Include="Assets\plow\*.png" />
   </ItemGroup>
 </Project>

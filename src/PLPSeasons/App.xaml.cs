@@ -24,7 +24,7 @@ public partial class App : Application
     WeatherCard? weatherCard;
     RemoteCard? remoteCard;
     System.Windows.Threading.DispatcherTimer? updTimer;
-    double demoStart, demoLength = 80; bool demoMan, demoPlow;
+    double demoStart, demoLength = 80; bool demoMan, demoPlow, demoFill;
     int frames; double fpsT; readonly List<double> gaps = new();
 
     protected override void OnStartup(StartupEventArgs e)
@@ -295,8 +295,9 @@ public partial class App : Application
     {
         if (demoStart == 0) demoStart = now;
         double t = now - demoStart;
-        if (t > 9 && !demoMan && overlays.Count > 0) { demoMan = true; var sim0 = overlays[0].Sim; if (sim0.Floor != null) sim0.AddSnowman(sim0.Width * 0.62, 34); }
-        if (t > 13 && !demoPlow) { demoPlow = true; CallPlow(); }
+        if (t > 2 && !demoFill && overlays.Count > 0 && overlays[0].Sim.Floor is { } fl) { demoFill = true; for (int c = 0; c < fl.Depth.Length; c++) fl.Depth[c] = 22 * overlays[0].Sim.Scale; }
+        if (t > 3 && !demoMan && overlays.Count > 0) { demoMan = true; var sim0 = overlays[0].Sim; if (sim0.Floor != null) sim0.AddSnowman(sim0.Width * 0.62, 34 * sim0.Scale); }
+        if (t > 4 && !demoPlow) { demoPlow = true; CallPlow(); }
         Season want = t switch { < 50 => Season.Winter, < 55 => Season.Rain, < 60 => Season.Storm, < 66 => Season.Autumn, < 71 => Season.Spring, _ => Season.Winter };
         if (want != set.Season) { set.Season = want; ApplyAll(); UpdateWallpaper(want); remoteCard?.Refresh(); }
         if (t > demoLength) Quit();

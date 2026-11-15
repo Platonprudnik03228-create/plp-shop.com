@@ -123,63 +123,77 @@ public class WinterPlayTests
 {
     static Simulation Snowy()
     {
-        var s = new Simulation(1920, 1080, 5) { Season = Season.Winter, Intensity = 1 };
+        var s = new Simulation(1920, 1080, 5) { Season = Season.Winter, Intensity = 0.05 };
         s.PlowEnabled = false;
         s.SetSurfaces(new[] { (-1L, new RectI(0, 1032, 1920, 1081), 0.0) });
         s.Step(1 / 60.0);
         var f = s.Floor!; for (int c = 0; c < f.Depth.Length; c++) f.Depth[c] = 30;
         return s;
     }
-    static void Place(Simulation s, double x, double y) { for (int i = 0; i < 12; i++) { s.Step(1 / 60.0); s.MouseMove(x, y); } s.MouseUp(x, y); }
     static void Run(Simulation s, double sec) { for (int i = 0; i < sec * 60; i++) s.Step(1 / 60.0); }
+    /// press on the snow at x0, roll to x1 (60 px/s steps like a hand), keep holding
     static Ball Roll(Simulation s, double x0, double x1)
     {
-        s.MouseDown(x0, 1032 - 25, 1);
-        Assert.True(s.Holding);
-        for (double x = x0; Math.Abs(x - x1) > 1; x += Math.Sign(x1 - x0) * 4) { s.MouseMove(x, 1032 - 10); s.Step(1 / 60.0); }
-        var b = s.Balls.Single(b => b.Held);
-        return b;
+        s.MouseDown(x0, 1032 - 20, 1);
+        Assert.NotNull(s.HeldBall);
+        for (double x = x0; Math.Abs(x - x1) > 3; x += Math.Sign(x1 - x0) * 6) { s.Step(1 / 60.0); s.MouseMove(x, 1032 - 5); }
+        return s.HeldBall!;
     }
+    static void Place(Simulation s, double x, double y) { for (int i = 0; i < 20; i++) { s.Step(1 / 60.0); s.MouseMove(x, y); } s.MouseUp(x, y); }
 
-    [Fact] public void ScoopAndRollGrowsABall()
+    [Fact] public void ScoopAndRollGrowsABallAndLeavesATrench()
     {
         var s = Snowy();
         Assert.True(s.IsInteractive(500, 1032 - 20));
         Assert.False(s.IsInteractive(500, 500));
+        Assert.False(s.IsInteractive(500, 1050));          // the taskbar itself stays clickable
         var b = Roll(s, 300, 900);
-        Assert.True(b.R > 25, $"r={b.R}");
-        Place(s, 900, 990); Run(s, 1);
-        Assert.True(b.Rest);
+        Assert.True(b.R > 30, $"r={b.R}");
+        Assert.True(s.Floor!.Depth[s.Floor.ColAt(600)] < 25, "trench");
+        Place(s, 900, b.Y); Run(s, 1);
+        Assert.True(Math.Abs(b.Y + b.R * 0.9 - s.SnowTop(b.X)) < 3, "rests on the snow");
     }
 
     [Fact] public void ThreeBallsMakeASnowmanAndAThrowKnocksItDown()
     {
         var s = Snowy();
-        var big = Roll(s, 200, 900); Place(s, 900, 990); Run(s, 1);
-        var mid = Roll(s, 1000, 1400); Place(s, big.X, big.Y - big.R - mid.R - 30); Run(s, 1.5);
+        var big = Roll(s, 100, 800); Place(s, 800, big.Y); Run(s, 1);
+        var mid = Roll(s, 950, 1350); Place(s, big.X, big.Y - big.R - mid.R - 30); Run(s, 1.5);
         Assert.Equal(big.Id, mid.On);
-        var top = Roll(s, 1500, 1700); Place(s, big.X, mid.Y - mid.R - top.R - 30); Run(s, 1.5);
+        var top = Roll(s, 1450, 1650); Place(s, big.X, mid.Y - mid.R - top.R - 30); Run(s, 1.5);
         Assert.Single(s.Snowmen);
         Assert.Empty(s.Balls);
-        // throw a ball at it
-        var ball = Roll(s, 1700, 1600);
-        for (int i = 0; i < 8; i++) { s.Step(1 / 60.0); s.MouseMove(1560, 950); }
-        s.Step(0.02); s.MouseMove(1500, 950); s.Step(0.02); s.MouseMove(1400, 950); s.MouseUp(1400, 950);
-        var sm = s.Snowmen[0]; var trail = new System.Text.StringBuilder($"man x={sm.X:0} y={sm.Y:0} r={sm.R[0]:0}; ball vx={ball.VX:0} ");
-        for (int i = 0; i < 60 && s.Snowmen.Count > 0; i++) { s.Step(1 / 60.0); if (i % 3 == 0) trail.Append($"({ball.X:0},{ball.Y:0},{ball.R:0},{ball.Rest}) "); }
-        Assert.True(s.Snowmen.Count == 0, trail.ToString());
+        var man = s.Snowmen[0];
+        // throw: scoop a ball at 1700, lift it, flick it left at the snowman
+        var ball = Roll(s, 1750, 1700);
+        for (int i = 0; i < 10; i++) { s.Step(1 / 60.0); s.MouseMove(1700, 900); }
+        for (int i = 1; i <= 6; i++) { s.Step(1 / 60.0); s.MouseMove(1700 - i * 40, 900 - i * 4); }
+        s.MouseUp(1460, 876);
+        Assert.True(ball.VX < -320, $"vx={ball.VX}");
+        Run(s, 3);
+        Assert.Empty(s.Snowmen);
     }
 
-    [Fact] public void PlowClearsTheTaskbarSnow()
+    [Fact] public void PlowGathersTheSnowIntoAHeapAndClearsTheTaskbar()
     {
-        var s = Snowy(); s.Intensity = 0.05;
+        var s = Snowy();
         s.CallPlow();
         Assert.Equal(PlowState.Driving, s.Plow);
-        var log = new System.Text.StringBuilder();
-        for (int t = 0; t < 40; t++) { Run(s, 1); if (t % 5 == 0) log.Append($"t{t}:{s.Plow} x={s.PlowX:0} load={s.PlowLoad:0} | "); }
-        var d = s.Floor!.Depth;
-        for (int c = 0; c < d.Length; c += 64) log.Append($"{d[c]:0} ");
-        Assert.True(d.Average() < 5, $"avg {d.Average()} {log}");
+        Run(s, 20);
+        Assert.True(s.PlowPileH > 30, $"heap {s.PlowPileH}");
+        Run(s, 40);
+        Assert.Equal(PlowState.Idle, s.Plow);
+        Assert.True(s.Floor!.Depth.Average() < 3, $"avg {s.Floor!.Depth.Average()}");
+    }
+
+    [Fact] public void PlowStopsForASnowman()
+    {
+        var s = Snowy();
+        s.AddSnowman(900, 40);
+        s.CallPlow();
+        Run(s, 25);
+        Assert.Single(s.Snowmen);
+        Assert.NotEqual(PlowState.Driving, s.Plow);
     }
 
     [Fact] public void GarlandsHangOnFrontWindows()

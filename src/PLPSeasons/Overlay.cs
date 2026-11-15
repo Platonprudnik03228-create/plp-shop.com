@@ -63,7 +63,12 @@ sealed class Overlay : Window
         Native.SetWindowLongPtr(Handle, Native.GWL_EXSTYLE, new IntPtr(ex));
     }
 
-    public void Place() => Native.SetWindowPos(Handle, Native.HWND_TOPMOST, Screen.Left, Screen.Top, Screen.Width, Screen.Height, Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
+    public void Place()
+    {
+        try { Sim.Scale = VisualTreeHelper.GetDpi(this).DpiScaleX; } catch { }
+        PlaceRaw();
+    }
+    void PlaceRaw() => Native.SetWindowPos(Handle, Native.HWND_TOPMOST, Screen.Left, Screen.Top, Screen.Width, Screen.Height, Native.SWP_NOACTIVATE | Native.SWP_SHOWWINDOW);
 
     public void Redraw() => painter.InvalidateVisual();
     public void KeepOnTop() => Native.SetWindowPos(Handle, Native.HWND_TOPMOST, 0, 0, 0, 0, 0x1 | 0x2 | Native.SWP_NOACTIVATE);
@@ -199,7 +204,7 @@ sealed class Painter : FrameworkElement
                 double baseY = s.Rect.Top + 1.5;
                 c.BeginFigure(new Point(s.Rect.Left, baseY), true, true);
                 var pts = new List<Point>(d.Length + 1);
-                for (int i = 0; i < d.Length; i++) pts.Add(new Point(s.Rect.Left + i * Surface.Col, baseY - d[i]));
+                for (int i = 0; i < d.Length; i++) { double v = (d[Math.Max(0, i - 1)] + d[i] * 2 + d[Math.Min(d.Length - 1, i + 1)]) / 4; pts.Add(new Point(s.Rect.Left + i * Surface.Col, baseY - v)); }
                 pts.Add(new Point(s.Rect.Right, baseY - d[^1]));
                 c.PolyLineTo(pts, true, true);
                 c.LineTo(new Point(s.Rect.Right, baseY), true, true);
@@ -249,9 +254,37 @@ sealed class Painter : FrameworkElement
         }
     }
 
-    void DrawBall(DrawingContext dc, double x, double y, double r)
+    static readonly ImageSource[] PlowFrames = LoadPlow();
+    static ImageSource[] LoadPlow()
     {
-        dc.DrawEllipse(BallFill, BallEdge, new Point(x, y), r, r);
+        var list = new List<ImageSource>();
+        for (int i = 0; i < 12; i++)
+            try
+            {
+                var b = new System.Windows.Media.Imaging.BitmapImage();
+                b.BeginInit(); b.UriSource = new Uri($"pack://application:,,,/Assets/plow/plow{i}.png"); b.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad; b.EndInit(); b.Freeze();
+                list.Add(b);
+            }
+            catch { }
+        return list.ToArray();
+    }
+    static readonly Brush BallShade = F(new RadialGradientBrush { GradientOrigin = new Point(0.32, 0.28), Center = new Point(0.45, 0.42), RadiusX = 0.62, RadiusY = 0.62,
+        GradientStops = new GradientStopCollection { new GradientStop(Color.FromRgb(255, 255, 255), 0), new GradientStop(Color.FromRgb(246, 249, 253), 0.45), new GradientStop(Color.FromRgb(214, 226, 241), 0.85), new GradientStop(Color.FromRgb(188, 204, 226), 1) } });
+    static readonly Brush Dimple = F(new SolidColorBrush(Color.FromArgb(38, 90, 120, 160)));
+    static readonly Brush Sparkle = F(new SolidColorBrush(Color.FromArgb(200, 255, 255, 255)));
+
+    /// <summary>A packed snowball: shaded sphere with lumps that turn as it rolls.</summary>
+    void DrawBall(DrawingContext dc, double x, double y, double r, double ang)
+    {
+        dc.DrawEllipse(BallShade, BallEdge, new Point(x, y), r, r);
+        for (int k = 0; k < 9; k++)
+        {
+            double a = ang + k * 2.399, rr = r * (0.25 + 0.6 * ((k * 0.618) % 1));
+            double px = x + Math.Cos(a) * rr, py = y + Math.Sin(a) * rr * 0.92;
+            double sz = r * (0.08 + 0.05 * (k % 3));
+            dc.DrawEllipse(Dimple, null, new Point(px, py), sz * 1.3, sz);
+            if (k % 3 == 0) dc.DrawEllipse(Sparkle, null, new Point(px - sz * 0.4, py - sz * 0.4), sz * 0.35, sz * 0.3);
+        }
     }
 
     void DrawWinter(DrawingContext dc, Simulation sim)
@@ -262,27 +295,27 @@ sealed class Painter : FrameworkElement
         {
             double r0 = m.R[0], r1 = m.R[1], r2 = m.R[2];
             double c0 = m.Y - r0 * 0.9, c1 = c0 - r0 * 0.78 - r1 * 0.75, c2 = c1 - r1 * 0.8 - r2 * 0.75;
-            double lean = Math.Sin(t * 0.9 + m.X * 0.01) * 0.025;
+            double lean = Math.Sin(t * 0.9 + m.X * 0.01) * 0.025 + m.Spin * 0.2;
             double Px(double y) => m.X - (y - m.Y) * lean;
-            dc.DrawEllipse(Shadow, null, new Point(m.X, m.Y + 1), r0 * 1.3, r0 * 0.28);
-            // arms: twigs, the right one waves when the snowman is new
+            dc.DrawEllipse(Shadow, null, new Point(m.X, m.Y - 1), r0 * 1.3, r0 * 0.25);
             double wave = m.Wave > 0 ? Math.Sin((2.6 - m.Wave) * 9) * 0.45 + 0.7 : 0;
             dc.DrawLine(Twig, new Point(Px(c1) - r1 * 0.7, c1 - r1 * 0.1), new Point(Px(c1) - r1 * 1.9, c1 - r1 * 0.75));
+            dc.DrawLine(Twig, new Point(Px(c1) - r1 * 1.55, c1 - r1 * 0.55), new Point(Px(c1) - r1 * 1.75, c1 - r1 * 0.95));
             double a = -0.5 - wave;
-            dc.DrawLine(Twig, new Point(Px(c1) + r1 * 0.7, c1 - r1 * 0.1), new Point(Px(c1) + r1 * 0.7 + Math.Cos(a) * r1 * 1.3, c1 - r1 * 0.1 + Math.Sin(a) * r1 * 1.3));
-            DrawBall(dc, Px(c0), c0, r0); DrawBall(dc, Px(c1), c1, r1); DrawBall(dc, Px(c2), c2, r2);
+            var hand = new Point(Px(c1) + r1 * 0.7 + Math.Cos(a) * r1 * 1.3, c1 - r1 * 0.1 + Math.Sin(a) * r1 * 1.3);
+            dc.DrawLine(Twig, new Point(Px(c1) + r1 * 0.7, c1 - r1 * 0.1), hand);
+            DrawBall(dc, Px(c0), c0, r0, r0); DrawBall(dc, Px(c1), c1, r1, r1); DrawBall(dc, Px(c2), c2, r2, r2);
             for (int k = 0; k < 3; k++) dc.DrawEllipse(Coal, null, new Point(Px(c1), c1 - r1 * (0.45 - k * 0.4)), r1 * 0.1, r1 * 0.1);
-            // scarf
             dc.DrawRoundedRectangle(Scarf, null, new Rect(Px(c2) - r2 * 1.05, c2 + r2 * 0.62, r2 * 2.1, r2 * 0.36), r2 * 0.15, r2 * 0.15);
+            dc.PushTransform(new RotateTransform(-7 + Math.Sin(t * 1.3) * 3, Px(c2) + r2 * 0.42, c2 + r2 * 0.75));
             dc.DrawRoundedRectangle(Scarf, null, new Rect(Px(c2) + r2 * 0.25, c2 + r2 * 0.7, r2 * 0.35, r2 * 1.2), r2 * 0.12, r2 * 0.12);
-            // face
+            dc.Pop();
             dc.DrawEllipse(Coal, null, new Point(Px(c2) - r2 * 0.3, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
             dc.DrawEllipse(Coal, null, new Point(Px(c2) + r2 * 0.3, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
             for (int k = 0; k < 5; k++) { double an = Math.PI * (0.2 + 0.6 * k / 4.0); dc.DrawEllipse(Coal, null, new Point(Px(c2) + Math.Cos(an) * r2 * 0.42, c2 + r2 * 0.05 + Math.Sin(an) * r2 * 0.35), r2 * 0.05, r2 * 0.05); }
             var nose = new StreamGeometry();
             using (var c = nose.Open()) { c.BeginFigure(new Point(Px(c2) + r2 * 0.05, c2 - r2 * 0.05), true, true); c.LineTo(new Point(Px(c2) + r2 * 0.95, c2 + r2 * 0.08), true, true); c.LineTo(new Point(Px(c2) + r2 * 0.05, c2 + r2 * 0.18), true, true); }
             nose.Freeze(); dc.DrawGeometry(Carrot, null, nose);
-            // knitted hat with a pompom
             var hat = m.Hat == 0 ? HatA : HatB;
             dc.DrawRoundedRectangle(hat, null, new Rect(Px(c2) - r2 * 0.8, c2 - r2 * 1.45, r2 * 1.6, r2 * 0.75), r2 * 0.35, r2 * 0.35);
             dc.DrawRoundedRectangle(HeapFill, null, new Rect(Px(c2) - r2 * 0.88, c2 - r2 * 0.82, r2 * 1.76, r2 * 0.24), r2 * 0.1, r2 * 0.1);
@@ -290,32 +323,46 @@ sealed class Painter : FrameworkElement
         }
         foreach (var b in sim.Balls)
         {
-            if (b.Rest) dc.DrawEllipse(Shadow, null, new Point(b.X, b.Y + b.R * 0.85), b.R * 1.1, b.R * 0.25);
-            DrawBall(dc, b.X, b.Y, b.R);
-            // a couple of marks so you can see it roll
-            for (int k = 0; k < 3; k++) { double an = b.Ang + k * 2.1; dc.DrawEllipse(Shadow, null, new Point(b.X + Math.Cos(an) * b.R * 0.55, b.Y + Math.Sin(an) * b.R * 0.55), b.R * 0.12, b.R * 0.09); }
+            double g = sim.SnowTop(b.X);
+            if (Math.Abs(b.Y + b.R * 0.9 - g) < 3) dc.DrawEllipse(Shadow, null, new Point(b.X, g + 1), b.R * 1.05, b.R * 0.22);
+            DrawBall(dc, b.X, b.Y, b.R, b.Ang);
         }
         if (sim.Plow != PlowState.Idle && sim.Floor is { } f) DrawPlow(dc, sim, f);
     }
 
     void DrawPlow(DrawingContext dc, Simulation sim, Surface f)
     {
-        double x = sim.PlowX, d = sim.PlowDir, ground = f.Rect.Top + 1, t = Tm;
-        double S(double v) => x + v * d;          // mirror for the direction it drives
-        // heap pushed in front of the blade
-        double h = sim.PlowPileH;
-        if (h > 1) dc.DrawEllipse(HeapFill, BallEdge, new Point(S(52 + h * 0.6), ground - h * 0.35), h * 0.95, h * 0.6);
-        // body, cab, wheels, blade, beacon
-        dc.DrawRoundedRectangle(PlowBody, null, new Rect(Math.Min(S(-40), S(30)), ground - 26, 70, 18), 4, 4);
-        dc.DrawRoundedRectangle(PlowBody, null, new Rect(Math.Min(S(-34), S(-2)), ground - 46, 32, 22), 4, 4);
-        dc.DrawRoundedRectangle(PlowGlass, null, new Rect(Math.Min(S(-28), S(-6)), ground - 42, 22, 12), 2, 2);
-        dc.DrawEllipse(PlowDark, null, new Point(S(-24), ground - 6), 8, 8);
-        dc.DrawEllipse(PlowDark, null, new Point(S(18), ground - 6), 8, 8);
-        dc.DrawRectangle(PlowDark, null, new Rect(Math.Min(S(30), S(40)), ground - 18, 10, 4));
-        dc.DrawRoundedRectangle(PlowBlade, null, new Rect(Math.Min(S(40), S(48)), ground - 30, 8, 30), 3, 3);
-        bool on = ((int)(t * 3)) % 2 == 0;
-        var beacon = new RadialGradientBrush(Color.FromArgb((byte)(on ? 200 : 60), 255, 170, 30), Color.FromArgb(0, 255, 170, 30)); beacon.Freeze();
-        dc.DrawEllipse(beacon, null, new Point(S(-18), ground - 50), 14, 14);
-        dc.DrawEllipse(PlowBlade, null, new Point(S(-18), ground - 49), 3.5, 3.5);
+        double y = f.Rect.Top + 0.5, h = sim.PlowPileH, dir = sim.PlowDir, t = Tm, w = sim.PlowW;
+        if (sim.Plow == PlowState.Driving && h > 0.8)
+        {
+            // the heap: steep against the blade, running out forwards, lumpy like freshly pushed snow
+            double xb = sim.PlowX + dir * (w * 0.36 - Math.Min(6, h * 0.25)), hw = Math.Max(5, h * 1.8);
+            var geo = new StreamGeometry();
+            using (var c = geo.Open())
+            {
+                c.BeginFigure(new Point(xb, y), true, true);
+                int n = Math.Max(4, (int)(hw / 2));
+                for (int k = 0; k <= n; k++)
+                {
+                    double u = (double)k / n, wob = 1 + 0.06 * Math.Sin(u * 9 + sim.PlowX * 0.05);
+                    c.LineTo(new Point(xb + dir * u * hw, y - h * (1 - Math.Pow(u, 1.6)) * wob), true, true);
+                }
+            }
+            geo.Freeze(); dc.DrawGeometry(SnowFill, SnowLine, geo);
+        }
+        if (PlowFrames.Length > 0)
+        {
+            int frame = (int)Math.Floor(sim.PlowWheel / (0.98 * sim.Scale)) % PlowFrames.Length; if (frame < 0) frame += PlowFrames.Length;
+            var img = PlowFrames[frame];
+            double ph = w * img.Height / img.Width;
+            dc.PushTransform(new ScaleTransform(dir, 1, sim.PlowX, 0));
+            dc.DrawImage(img, new Rect(sim.PlowX - w / 2, y - ph + ph * 0.06, w, ph));
+            dc.Pop();
+            if ((int)(t * 2.6) % 2 == 0)
+            {
+                var beacon = new RadialGradientBrush(Color.FromArgb(150, 255, 140, 25), Color.FromArgb(0, 255, 140, 25)); beacon.Freeze();
+                dc.DrawEllipse(beacon, null, new Point(sim.PlowX - dir * w * 0.133, y - ph * 0.866), 15 * sim.Scale, 15 * sim.Scale);
+            }
+        }
     }
 }

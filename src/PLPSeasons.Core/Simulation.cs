@@ -235,7 +235,7 @@ public sealed partial class Simulation
         for (int c = 1; c < d.Length; c++)
         {
             double diff = d[c] - d[c - 1];
-            if (Math.Abs(diff) > 2.2) { double m = (Math.Abs(diff) - 2.2) * 0.25 * Math.Sign(diff); d[c] -= m; d[c - 1] += m; }
+            if (Math.Abs(diff) > 1.3) { double m = (Math.Abs(diff) - 1.3) * 0.3 * Math.Sign(diff); d[c] -= m; d[c - 1] += m; }
         }
         for (int c = 0; c < d.Length; c++) d[c] = Math.Min(d[c], s.Limit(c));
     }
