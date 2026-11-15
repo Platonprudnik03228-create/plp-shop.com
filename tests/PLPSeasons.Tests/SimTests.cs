@@ -136,10 +136,10 @@ public class WinterPlayTests
     {
         s.MouseDown(x0, 1032 - 20, 1);
         Assert.NotNull(s.HeldBall);
-        for (double x = x0; Math.Abs(x - x1) > 3; x += Math.Sign(x1 - x0) * 6) { s.Step(1 / 60.0); s.MouseMove(x, 1032 - 5); }
+        for (double x = x0; Math.Abs(x - x1) > 3; x += Math.Sign(x1 - x0) * 6) { s.Step(1 / 60.0); s.Pointer(x, 1032 - 5); s.MouseMove(x, 1032 - 5); }
         return s.HeldBall!;
     }
-    static void Place(Simulation s, double x, double y) { for (int i = 0; i < 20; i++) { s.Step(1 / 60.0); s.MouseMove(x, y); } s.MouseUp(x, y); }
+    static void Place(Simulation s, double x, double y) { for (int i = 0; i < 20; i++) { s.Step(1 / 60.0); s.Pointer(x, y); s.MouseMove(x, y); } s.MouseUp(x, y); }
 
     [Fact] public void ScoopAndRollGrowsABallAndLeavesATrench()
     {
@@ -166,8 +166,8 @@ public class WinterPlayTests
         var man = s.Snowmen[0];
         // throw: scoop a ball at 1700, lift it, flick it left at the snowman
         var ball = Roll(s, 1750, 1700);
-        for (int i = 0; i < 10; i++) { s.Step(1 / 60.0); s.MouseMove(1700, 900); }
-        for (int i = 1; i <= 6; i++) { s.Step(1 / 60.0); s.MouseMove(1700 - i * 40, 900 - i * 4); }
+        for (int i = 0; i < 10; i++) { s.Step(1 / 60.0); s.Pointer(1700, 900); s.MouseMove(1700, 900); }
+        for (int i = 1; i <= 6; i++) { s.Step(1 / 60.0); s.Pointer(1700 - i * 40, 900 - i * 4); s.MouseMove(1700 - i * 40, 900 - i * 4); }
         s.MouseUp(1460, 876);
         Assert.True(ball.VX < -320, $"vx={ball.VX}");
         Run(s, 3);

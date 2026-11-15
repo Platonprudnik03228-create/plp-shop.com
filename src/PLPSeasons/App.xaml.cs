@@ -92,7 +92,7 @@ public partial class App : Application
         {
             var sc = o.Screen; double x = c.X - sc.Left, y = c.Y - sc.Top;
             bool inside = sc.Contains(c.X, c.Y);
-            if (!o.Sim.Holding && inside) o.Sim.MouseMove(x, y);          // garlands feel the pointer passing by
+            if (inside || o.Sim.Holding) o.Sim.Pointer(x, y);               // throw speed + garlands feel the pointer passing by
             o.SetInteractive(o.Sim.Holding || (inside && o.Sim.IsInteractive(x, y) && !Forms.Control.IsKeyLocked(Forms.Keys.Scroll)));
         }
     }

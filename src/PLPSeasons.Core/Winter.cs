@@ -100,7 +100,7 @@ public sealed partial class Simulation
     public void MouseDown(double x, double y, int clicks)
     {
         if (Season != Season.Winter) return;
-        mx = x; my = y; mvx = mvy = 0; mt = Time;
+        mx = x; my = y; mt = Time;
         if (clicks >= 2)
         {
             var sm = SnowmanAt(x, y); if (sm != null) { CrumbleSnowman(sm); hold = Hold.None; return; }
@@ -135,12 +135,22 @@ public sealed partial class Simulation
         Balls.Add(b); hold = Hold.Ball; heldBall = b.Id;
     }
 
+    readonly Queue<(double t, double x, double y)> trail = new();
+    /// <summary>The pointer as sampled once per frame (also while it is not over the snow): gives a steady throw speed.</summary>
+    public void Pointer(double x, double y)
+    {
+        trail.Enqueue((Time, x, y));
+        while (trail.Count > 2 && Time - trail.Peek().t > 0.09) trail.Dequeue();
+        var (t0, x0, y0) = trail.Peek();
+        double dt = Time - t0;
+        if (dt > 0.012) { mvx = (x - x0) / dt; mvy = (y - y0) / dt; } else if (trail.Count <= 1) { mvx = mvy = 0; }
+        if (hold == Hold.None) MouseMove(x, y);
+    }
+
     public void MouseMove(double x, double y)
     {
         if (mx >= 0)
         {
-            double dt = Math.Max(0.008, Time - mt);
-            mvx = mvx * 0.5 + (x - mx) / dt * 0.5; mvy = mvy * 0.5 + (y - my) / dt * 0.5;
             double sp = Math.Sqrt(mvx * mvx + mvy * mvy);
             if (sp > 60) foreach (var g in Garlands) if (x > g.X0 - 10 && x < g.X1 + 10 && Math.Abs(y - (g.Top + 6)) < 16 * Scale) g.Amp = Math.Min(9, Math.Max(g.Amp, 2 + sp / 160));
             foreach (var m in Snowmen) if (Math.Abs(x - m.X) < 160 * Scale && Math.Abs(y - m.Y) < 220 * Scale && Time - m.LastWave > 7) { m.Wave = 2.2; m.LastWave = Time; }
@@ -185,7 +195,6 @@ public sealed partial class Simulation
 
     public void MouseUp(double x, double y)
     {
-        if (Time - mt > 0.1) mvx = mvy = 0;            // held still before letting go: it is put down, not thrown
         switch (hold)
         {
             case Hold.Ball:

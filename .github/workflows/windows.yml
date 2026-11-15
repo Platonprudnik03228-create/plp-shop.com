@@ -63,7 +63,7 @@ jobs:
           Start-Sleep 2
           # throw a snowball at the other snowman
           [W]::Drag(1560, 1022, 1530, 1022, 500)
-          [W]::Throw(1530, 1000, 1430, 935, 50)
+          [W]::Throw(1530, 1000, 1330, 930, 150)
           Start-Sleep 4
           # move a window so its snow falls off
           $n = (Get-Process notepad | Select-Object -First 1).MainWindowHandle
