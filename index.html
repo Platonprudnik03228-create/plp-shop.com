@@ -468,6 +468,13 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .help-alt p { margin: 0 0 8px; color: var(--muted); }
 .help-cmd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .help-cmd code { padding: 10px 12px; border-radius: 10px; background: #0d1117; color: #d7e3ff; font-size: 13px; overflow-x: auto; max-width: 100%; }
+
+.top-alert { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 8px 14px; background: #ffd76a; color: #0b1220 !important;
+  font-weight: 700; font-size: 14px; text-decoration: none; text-align: center; }
+.top-alert:hover { background: #ffe08a; }
+.top, .top.solid { padding-top: 0 !important; }
+.top-alert { margin-bottom: 10px; }
+#open-help { scroll-margin-top: 130px; }
 </style>
   <script defer>// PLP Seasons — interface text in 7 languages. Keys are the same in every language.
 window.PLP_I18N = {
@@ -1460,6 +1467,7 @@ window.PLP_I18N = {
 </head>
 <body>
   <header class="top" id="top">
+    <a class="top-alert" href="#open-help"><span>⚠️</span> <span data-i18n="helpBadge">Won't open on your Mac? 3 steps →</span></a>
     <div class="wrap">
       <a class="brand" href="./"><svg viewBox="0 0 32 32" aria-hidden="true"><use href="#plpmark"/></svg><span>PLP Seasons</span></a>
       <nav class="nav" aria-label="Main">
