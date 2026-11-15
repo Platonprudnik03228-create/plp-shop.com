@@ -191,7 +191,7 @@ sealed class RemoteCard : DesktopCard
         Body.Children.Add(seasons);
         foreach (var (s, ic) in new[] { (Season.Winter, "❄"), (Season.Rain, "🌧"), (Season.Storm, "⛈"), (Season.Autumn, "🍂"), (Season.Spring, "🌸"), (Season.Summer, "☀") })
         {
-            var b = new Button { Content = ic, Tag = s, FontSize = 17, Width = 38, Height = 38, Margin = new Thickness(0, 0, 6, 6), Cursor = Cursors.Hand, ToolTip = L.Name(s),
+            var b = new Button { Content = ic, Tag = s, FontSize = 16, Width = 34, Height = 34, Margin = new Thickness(0, 0, 4, 4), Cursor = Cursors.Hand, ToolTip = L.Name(s),
                 Foreground = Text, BorderThickness = new Thickness(2), Template = PillTemplate() };
             b.Click += (_, _) => app.SetSeason(s);
             seasons.Children.Add(b);

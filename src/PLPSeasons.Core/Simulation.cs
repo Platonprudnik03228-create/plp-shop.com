@@ -54,7 +54,7 @@ public sealed class Simulation
 
     public int Target => (int)(Season switch
     {
-        Season.Winter => 260, Season.Rain => 420, Season.Storm => 650, Season.Autumn => 46, Season.Spring => 70, _ => 18,
+        Season.Winter => 650, Season.Rain => 420, Season.Storm => 650, Season.Autumn => 46, Season.Spring => 70, _ => 18,
     } * Math.Clamp(Intensity, 0.05, 2) * Math.Clamp(Width * Height / (1920.0 * 1080), 0.5, 3));
 
     /// <summary>Replace the surfaces with the current windows (top first). Snow on a window that moved or disappeared falls off.</summary>
@@ -106,12 +106,12 @@ public sealed class Simulation
 
     Particle Spawn(bool anywhere)
     {
-        var p = new Particle { Alive = true, X = rng.NextDouble() * (Width + 200) - 100, Y = anywhere ? rng.NextDouble() * Height : -20 - rng.NextDouble() * 60, Phase = rng.NextDouble() * 6.28 };
+        var p = new Particle { Alive = true, X = rng.NextDouble() * (Width + 200) - 100, Y = anywhere ? rng.NextDouble() * Height : -20 - rng.NextDouble() * (Season is Season.Autumn or Season.Spring or Season.Summer ? Height * 0.6 : 140), Phase = rng.NextDouble() * 6.28 };
         switch (Season)
         {
             case Season.Winter:
                 p.Kind = Kind.Flake; double depth = rng.NextDouble();
-                p.Size = 1.4 + depth * depth * 4.6; p.VY = 30 + p.Size * 11; p.VX = 0; p.Spin = rng.NextDouble() * 2 - 1; break;
+                p.Size = 1.6 + depth * depth * 5.4; p.VY = 34 + p.Size * 12; p.VX = 0; p.Spin = rng.NextDouble() * 2 - 1; break;
             case Season.Rain: case Season.Storm:
                 p.Kind = Kind.Drop; p.Size = 0.8 + rng.NextDouble() * 1.2; p.VY = 900 + rng.NextDouble() * 500 + (Season == Season.Storm ? 300 : 0); break;
             case Season.Autumn:
@@ -124,9 +124,18 @@ public sealed class Simulation
         return p;
     }
 
+    Season lastSeason = (Season)(-1);
     public void Step(double dt)
     {
         dt = Math.Clamp(dt, 0, 0.05);
+        if (Season != lastSeason)
+        {
+            bool first = (int)lastSeason == -1;
+            lastSeason = Season;
+            P.RemoveAll(x => x.Kind is not Kind.Crumb);
+            int n = first ? Target : Target / 2;
+            for (int i = 0; i < n; i++) Add(Spawn(true));
+        }
         Time += dt;
         int alive = P.Count(x => x.Alive && x.Kind is not Kind.Crumb and not Kind.Splash);
         int target = Target;
@@ -169,7 +178,7 @@ public sealed class Simulation
                 var s = SurfaceUnder(p.X, p.Y);
                 if (s != null)
                 {
-                    if (p.Kind == Kind.Flake && Season == Season.Winter) Deposit(s, p.X, p.Size * 0.22);
+                    if (p.Kind == Kind.Flake && Season == Season.Winter) Deposit(s, p.X, p.Size * 0.5);
                     else if (p.Kind == Kind.Drop && rng.NextDouble() < 0.35) Add(new Particle { Kind = Kind.Splash, X = p.X, Y = s.TopAt(p.X), Size = 3 + rng.NextDouble() * 3, Life = 0.18, Alive = true });
                     p = Spawn(false);
                 }
