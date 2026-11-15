@@ -37,6 +37,10 @@ static class Native
     [DllImport("user32.dll")] public static extern bool GetCursorPos(out POINT p);
     [StructLayout(LayoutKind.Sequential)] public struct POINT { public int X, Y; }
 
+    [StructLayout(LayoutKind.Sequential)] public struct MARGINS { public int L, R, T, B; }
+    [DllImport("dwmapi.dll")] public static extern int DwmExtendFrameIntoClientArea(IntPtr h, ref MARGINS m);
+    [DllImport("user32.dll")] public static extern bool SetLayeredWindowAttributes(IntPtr h, uint key, byte alpha, uint flags);
+
     public static void MakeClickThrough(IntPtr h)
     {
         var ex = (long)GetWindowLongPtr(h, GWL_EXSTYLE);

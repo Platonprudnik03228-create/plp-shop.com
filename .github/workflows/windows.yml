@@ -29,6 +29,10 @@ jobs:
           Start-Sleep 2
           Start-Process explorer "C:\Windows"
           Start-Sleep 3
+          # 1) old renderer for 25 s, only to measure smoothness
+          $p0 = Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo','--legacy','--seconds','25' -PassThru
+          $p0.WaitForExit(60000) | Out-Null
+          Start-Sleep 2
           $rec = Start-Process ffmpeg -ArgumentList '-y -f gdigrab -framerate 30 -i desktop -t 80 -c:v libx264 -preset veryfast -pix_fmt yuv420p windows_test.mp4' -PassThru -RedirectStandardError ffmpeg.log
           Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo'
           Start-Sleep 30
@@ -41,6 +45,9 @@ jobs:
           [W]::MoveWindow($n, 200, 420, 900, 500, $true) | Out-Null
           $rec.WaitForExit()
           Get-Process | Where-Object { $_.ProcessName -like 'PLP*' } | Format-Table ProcessName, Id, CPU, WorkingSet
+          Copy-Item "$env:TEMP\plp_fps.txt" fps.txt -ErrorAction SilentlyContinue
+          if (!(Test-Path fps.txt)) { "no fps log" | Out-File fps.txt }
+          Get-Content fps.txt
       - uses: actions/upload-artifact@v4
         with:
           name: PLP-Seasons-Windows
@@ -53,4 +60,4 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           $tag = "windows-ci-${{ github.run_number }}"
-          gh release create $tag --repo ${{ github.repository }} --target ${{ github.sha }} --prerelease --title "Windows CI ${{ github.run_number }} (test, not for users)" --notes "Automatic test run" PLP-Seasons-Windows-x64.zip windows_test.mp4 ffmpeg.log
+          gh release create $tag --repo ${{ github.repository }} --target ${{ github.sha }} --prerelease --title "Windows CI ${{ github.run_number }} (test, not for users)" --notes "Automatic test run" PLP-Seasons-Windows-x64.zip windows_test.mp4 ffmpeg.log fps.txt

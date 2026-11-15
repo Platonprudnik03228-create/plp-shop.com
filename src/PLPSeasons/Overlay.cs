@@ -11,6 +11,7 @@ namespace PLPSeasons;
 /// <summary>One transparent, click-through, always-on-top window per monitor. Works in physical pixels.</summary>
 sealed class Overlay : Window
 {
+    public static bool Legacy;
     public readonly RectI Screen;            // physical pixels
     public readonly Simulation Sim;
     public IntPtr Handle { get; private set; }
@@ -20,7 +21,10 @@ sealed class Overlay : Window
     {
         Screen = screen;
         Sim = new Simulation(screen.Width, screen.Height, seed);
-        WindowStyle = WindowStyle.None; AllowsTransparency = true; Background = Brushes.Transparent;
+        WindowStyle = WindowStyle.None; Background = Brushes.Transparent;
+        // Fast path (default): a hardware-rendered window made see-through by DWM, instead of WPF's software
+        // "AllowsTransparency" layered window that copies the whole screen every frame. --legacy keeps the old way.
+        AllowsTransparency = Legacy;
         ShowInTaskbar = false; Topmost = true; ShowActivated = false; ResizeMode = ResizeMode.NoResize;
         Title = "PLP Seasons overlay";
         Left = 0; Top = 0; Width = 10; Height = 10;
@@ -29,7 +33,15 @@ sealed class Overlay : Window
         SourceInitialized += (_, _) =>
         {
             Handle = new WindowInteropHelper(this).Handle;
+            if (!Legacy)
+            {
+                var src = HwndSource.FromHwnd(Handle);
+                if (src?.CompositionTarget != null) src.CompositionTarget.BackgroundColor = Colors.Transparent;
+                var m = new Native.MARGINS { L = -1, R = -1, T = -1, B = -1 };
+                Native.DwmExtendFrameIntoClientArea(Handle, ref m);
+            }
             Native.MakeClickThrough(Handle);
+            if (!Legacy) Native.SetLayeredWindowAttributes(Handle, 0, 255, 2 /*LWA_ALPHA*/);
             Place();
         };
         DpiChanged += (_, _) => Place();
@@ -72,10 +84,27 @@ sealed class Painter : FrameworkElement
         PetalBrushes = new[] { Color.FromRgb(255, 196, 214), Color.FromRgb(255, 222, 232), Color.FromRgb(248, 176, 200) }.Select(c => F(new SolidColorBrush(c))).ToArray();
         Leaf = F(Geometry.Parse("M0,-1 C0.55,-0.6 0.6,0.25 0,1 C-0.6,0.25 -0.55,-0.6 0,-1 Z M0,-1 L0,1.25"));
         Petal = F(Geometry.Parse("M0,-1 C0.7,-0.7 0.7,0.6 0,1 C-0.7,0.6 -0.7,-0.7 0,-1 Z"));
+        SoftSprite = Sprite(FlakeSoft, 1);
+        var core = new RadialGradientBrush();
+        core.GradientStops.Add(new GradientStop(Color.FromArgb(250, 255, 255, 255), 0));
+        core.GradientStops.Add(new GradientStop(Color.FromArgb(235, 255, 255, 255), 0.55));
+        core.GradientStops.Add(new GradientStop(Color.FromArgb(0, 255, 255, 255), 1));
+        CoreSprite = Sprite(F(core), 1);
     }
     static T F<T>(T f) where T : Freezable { f.Freeze(); return f; }
+    static readonly ImageSource SoftSprite, CoreSprite;
+    /// <summary>A flake drawn once into a small bitmap; every frame only copies it (much cheaper than gradients).</summary>
+    static ImageSource Sprite(Brush b, double _)
+    {
+        const int N = 32;
+        var v = new DrawingVisual();
+        using (var dc = v.RenderOpen()) dc.DrawEllipse(b, null, new Point(N / 2.0, N / 2.0), N / 2.0, N / 2.0);
+        var bmp = new System.Windows.Media.Imaging.RenderTargetBitmap(N, N, 96, 96, PixelFormats.Pbgra32);
+        bmp.Render(v); bmp.Freeze();
+        return bmp;
+    }
 
-    public Painter(Overlay owner) { o = owner; IsHitTestVisible = false; }
+    public Painter(Overlay owner) { o = owner; IsHitTestVisible = false; RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.Linear); }
 
     protected override void OnRender(DrawingContext dc)
     {
@@ -89,9 +118,11 @@ sealed class Painter : FrameworkElement
             switch (p.Kind)
             {
                 case Kind.Flake:
-                    if (p.Size > 3.2) dc.DrawEllipse(FlakeSoft, null, new Point(p.X, p.Y), p.Size, p.Size);
-                    else dc.DrawEllipse(FlakeCore, null, new Point(p.X, p.Y), p.Size * 0.6, p.Size * 0.6);
+                {
+                    double r = p.Size > 3.2 ? p.Size : p.Size * 0.75;
+                    dc.DrawImage(p.Size > 3.2 ? SoftSprite : CoreSprite, new Rect(p.X - r, p.Y - r, r * 2, r * 2));
                     break;
+                }
                 case Kind.Crumb:
                     dc.DrawEllipse(FlakeCore, null, new Point(p.X, p.Y), p.Size, p.Size); break;
                 case Kind.Drop:

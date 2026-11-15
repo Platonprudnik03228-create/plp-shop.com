@@ -24,7 +24,8 @@ public partial class App : Application
     WeatherCard? weatherCard;
     RemoteCard? remoteCard;
     System.Windows.Threading.DispatcherTimer? updTimer;
-    double demoStart;
+    double demoStart, demoLength = 75;
+    int frames; double fpsT; readonly List<double> gaps = new();
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -32,6 +33,8 @@ public partial class App : Application
         single = new Mutex(true, "PLP.Seasons.Single", out bool first);
         if (!first) { Shutdown(); return; }
         demo = e.Args.Contains("--demo");
+        Overlay.Legacy = e.Args.Contains("--legacy");
+        int ix = Array.IndexOf(e.Args, "--seconds"); if (ix >= 0 && ix + 1 < e.Args.Length) double.TryParse(e.Args[ix + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out demoLength);
         set = Store.Load();
         if (set.AutoSeason) set.Season = Seasons.FromDate(DateTime.Now);
         if (demo) { set.Season = Season.Winter; set.Intensity = 1.0; set.Paused = false; }
@@ -65,12 +68,16 @@ public partial class App : Application
 
     void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; }
 
+    TimeSpan lastRender;
     void OnFrame(object? sender, EventArgs e)
     {
+        // the time WPF will show this frame at - steadier than a stopwatch, so the flakes move without judder
+        if (e is RenderingEventArgs re) { if (re.RenderingTime == lastRender) return; lastRender = re.RenderingTime; }
         double now = clock.Elapsed.TotalSeconds, dt = now - last; last = now;
+        if (demo) FpsLog(now, dt);
         if (set.Paused) return;
         if (demo) DemoScript(now);
-        if (now - lastScan > 0.12) { lastScan = now; ScanWindows(); }
+        if (now - lastScan > 0.2) { lastScan = now; ScanWindows(); }
         if (now - lastTop > 2) { lastTop = now; foreach (var o in overlays) o.KeepOnTop(); }
         if (now - lastWall > 60) { lastWall = now; wall.Update(set.Season); }
         foreach (var o in overlays) { o.Sim.Step(dt); o.Redraw(); }
@@ -240,12 +247,23 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e) { try { tray?.Dispose(); } catch { } base.OnExit(e); }
 
     // ---------- demo for the test video: winter, rain, storm, autumn, spring, back to winter ----------
+    void FpsLog(double now, double dt)
+    {
+        frames++; gaps.Add(dt);
+        if (now - fpsT < 5) return;
+        gaps.Sort();
+        double p95 = gaps[(int)(gaps.Count * 0.95)], max = gaps[^1];
+        try { System.IO.File.AppendAllText(System.IO.Path.Combine(System.IO.Path.GetTempPath(), "plp_fps.txt"),
+            $"{(Overlay.Legacy ? "legacy" : "fast")} t={now:0} fps={frames / (now - fpsT):0.0} p95={p95 * 1000:0.0}ms max={max * 1000:0.0}ms season={set.Season}\n"); } catch { }
+        frames = 0; gaps.Clear(); fpsT = now;
+    }
+
     void DemoScript(double now)
     {
         if (demoStart == 0) demoStart = now;
         double t = now - demoStart;
         Season want = t switch { < 26 => Season.Winter, < 32 => Season.Rain, < 38 => Season.Storm, < 46 => Season.Autumn, < 54 => Season.Spring, _ => Season.Winter };
         if (want != set.Season) { set.Season = want; ApplyAll(); wall.Update(want); remoteCard?.Refresh(); }
-        if (t > 75) Quit();
+        if (t > demoLength) Quit();
     }
 }
