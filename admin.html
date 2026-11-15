@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>PLP — админка</title>
+<style>
+:root{--bg:#090909;--card:#141414;--line:#2b2b2b;--text:#fff;--dim:#9a9a9a;--red:#c60000;--mac:#5aa9ff;--win:#7ad37a}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,sans-serif}
+main{max-width:1060px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:26px;margin:0}h2{font-size:17px;margin:0 0 12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:20px}
+.dim{color:var(--dim)}.small{font-size:13px}
+button,.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding:9px 16px;font:inherit;font-weight:600;cursor:pointer;text-decoration:none;display:inline-block}
+.btn.ghost{background:transparent;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:16px}
+.kpi .v{font-size:30px;font-weight:700;margin-top:4px}.kpi .l{color:var(--dim);font-size:13px}
+.up{color:var(--win);font-size:13px;font-weight:600}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{color:var(--dim);font-weight:500;font-size:13px}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tag{font-size:11px;border-radius:6px;padding:2px 7px;font-weight:600}.tag.mac{background:#16304d;color:var(--mac)}.tag.win{background:#173317;color:var(--win)}
+.note{border-left:3px solid #e0a800;padding:10px 14px;background:#1d1906;border-radius:8px;margin-top:10px}
+#chart{width:100%;height:220px;display:block}
+.legend{display:flex;gap:16px;font-size:13px;color:var(--dim);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
+#err{display:none;background:#3a0b0b;border:1px solid #6b1515;padding:12px;border-radius:10px;margin-bottom:16px}
+ol{margin:6px 0 0;padding-left:20px}li{margin:4px 0}
+</style></head>
+<body><main>
+<div class="top">
+  <div><h1>PLP Seasons — админка</h1><div class="dim small" id="upd">Загрузка…</div></div>
+  <div><button id="reload">Обновить</button></div>
+</div>
+<div id="err"></div>
+
+<div class="grid">
+  <div class="card kpi"><div class="l">Скачиваний всего</div><div class="v" id="kTotal">—</div><div class="up" id="kSince"></div></div>
+  <div class="card kpi"><div class="l">Mac</div><div class="v" id="kMac">—</div></div>
+  <div class="card kpi"><div class="l">Windows</div><div class="v" id="kWin">—</div></div>
+  <div class="card kpi"><div class="l">За последние 24 часа</div><div class="v" id="k24">—</div><div class="dim small" id="k24n"></div></div>
+</div>
+
+<div class="card">
+  <h2>Скачивания по дням</h2>
+  <svg id="chart" viewBox="0 0 1000 220" preserveAspectRatio="none"></svg>
+  <div class="legend"><span><i style="background:var(--mac)"></i>Mac</span><span><i style="background:var(--win)"></i>Windows</span></div>
+  <div class="dim small" id="chartNote"></div>
+</div>
+
+<div class="card">
+  <h2>По версиям</h2>
+  <table><thead><tr><th>Версия</th><th>Файл</th><th>Дата выхода</th><th class="n">Скачиваний</th></tr></thead><tbody id="rows"></tbody></table>
+</div>
+
+<div class="card">
+  <h2>Регистрации (кто именно)</h2>
+  <p>Аккаунты людей хранятся в отдельном сервисе входа. Список зарегистрированных открывается там:</p>
+  <a class="btn" href="https://plp-seasons-preview.juicyrat2.chatgpt.site/owner" target="_blank" rel="noopener">Открыть список аккаунтов</a>
+  <div class="note small">Сейчас кнопки «Скачать» на сайте ведут прямо на файл, без регистрации. Поэтому скачивания выше — это все люди, а в списке аккаунтов только те, кто зарегистрировался сам. Чтобы видеть каждого скачавшего по имени/почте, скачивание нужно пустить через вход (см. ниже).</div>
+</div>
+
+<div class="card">
+  <h2>Почему просмотров много, а скачиваний мало — вероятные причины</h2>
+  <ol class="small">
+    <li><b>Ролики смотрят с телефона</b>, а приложение ставится только на компьютер. Человек с iPhone нажимает «Скачать» и ничего не может сделать — и забывает.</li>
+    <li><b>Нет пути «прислать ссылку на комп»</b>: поле для почты на телефоне вернуло бы часть таких людей.</li>
+    <li><b>Mac — только Apple Silicon (M1 и новее)</b>, и macOS пишет «не удалось проверить разработчика» — часть людей бросает на этом шаге.</li>
+    <li>Нет счётчика визитов сайта, поэтому неизвестно, сколько из 30 тыс. зрителей вообще дошли до сайта.</li>
+  </ol>
+</div>
+<p class="dim small">Цифры скачиваний берутся из GitHub Releases (точные, считает сам GitHub). История по дням пишется автоматически каждые 2 часа.</p>
+</main>
+<script>
+const REPO='Platonprudnik03228-create/plp-shop.com';
+const CSV='https://raw.githubusercontent.com/'+REPO+'/stats/stats/downloads.csv';
+const $=id=>document.getElementById(id);
+const plat=n=>/windows/i.test(n)?'win':'mac';
+const fmt=n=>n.toLocaleString('ru-RU');
+function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
+
+async function releases(){
+  const r=await fetch('https://api.github.com/repos/'+REPO+'/releases?per_page=100',{cache:'no-store'});
+  if(!r.ok) throw new Error('GitHub ответил '+r.status+(r.status==403?' (лимит запросов, попробуйте через час)':''));
+  const out=[];
+  for(const rel of await r.json()){
+    if(rel.tag_name.startsWith('windows-ci-')) continue;
+    for(const a of rel.assets) if(a.name.endsWith('.zip'))
+      out.push({tag:rel.tag_name,name:a.name,count:a.download_count,date:rel.published_at||rel.created_at,p:plat(a.name)});
+  }
+  return out.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+}
+async function history(){
+  try{const r=await fetch(CSV+'?t='+Date.now());if(!r.ok)return[];
+    const lines=(await r.text()).trim().split('\n').slice(1);
+    const snaps={};
+    for(const l of lines){const [t,tag,name,c]=l.split(',');(snaps[t]??={mac:0,win:0})[plat(name)]+=+c}
+    return Object.entries(snaps).map(([t,v])=>({t:new Date(t.replace('Z',':00Z')),...v})).sort((a,b)=>a.t-b.t);
+  }catch(e){return[]}
+}
+function draw(points){
+  const svg=$('chart');svg.innerHTML='';
+  // per-day increase: last snapshot of a day minus last snapshot of the previous day
+  const byDay=new Map();for(const p of points)byDay.set(p.t.toISOString().slice(0,10),p);
+  const days=[...byDay.entries()];const bars=[];
+  for(let i=1;i<days.length;i++){const [d,c]=days[i],p=days[i-1][1];bars.push({d,mac:Math.max(0,c.mac-p.mac),win:Math.max(0,c.win-p.win)})}
+  if(!bars.length){$('chartNote').textContent='История копится с сегодняшнего дня — график появится завтра.';return}
+  $('chartNote').textContent='';
+  const last=bars.slice(-30),max=Math.max(1,...last.map(b=>b.mac+b.win)),w=1000/last.length,H=190;
+  last.forEach((b,i)=>{const x=i*w+w*.15,bw=w*.7,hm=b.mac/max*H,hw=b.win/max*H;
+    svg.insertAdjacentHTML('beforeend',`<rect x="${x}" y="${H-hm}" width="${bw}" height="${hm}" fill="#5aa9ff" rx="2"><title>${b.d}: Mac ${b.mac}, Windows ${b.win}</title></rect><rect x="${x}" y="${H-hm-hw}" width="${bw}" height="${hw}" fill="#7ad37a" rx="2"><title>${b.d}: Mac ${b.mac}, Windows ${b.win}</title></rect><text x="${x+bw/2}" y="212" fill="#9a9a9a" font-size="11" text-anchor="middle">${b.d.slice(8)}.${b.d.slice(5,7)}</text>`)});
+}
+async function load(){
+  $('err').style.display='none';$('upd').textContent='Загрузка…';
+  try{
+    const [rel,hist]=await Promise.all([releases(),history()]);
+    const mac=rel.filter(r=>r.p=='mac').reduce((s,r)=>s+r.count,0),win=rel.filter(r=>r.p=='win').reduce((s,r)=>s+r.count,0),tot=mac+win;
+    $('kTotal').textContent=fmt(tot);$('kMac').textContent=fmt(mac);$('kWin').textContent=fmt(win);
+    const prev=store('plp_admin_last');
+    $('kSince').textContent=prev&&tot>=prev.tot?`+${tot-prev.tot} с прошлого захода (${new Date(prev.at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})})`:'';
+    store('plp_admin_last',{tot,at:Date.now()});
+    const now={t:new Date(),mac,win};const pts=[...hist,now];
+    const dayAgo=pts.filter(p=>p.t<=Date.now()-864e5).pop();
+    if(dayAgo){$('k24').textContent='+'+fmt(tot-dayAgo.mac-dayAgo.win);$('k24n').textContent='Mac +'+(mac-dayAgo.mac)+' · Windows +'+(win-dayAgo.win)}
+    else{$('k24').textContent='…';$('k24n').textContent='история копится, цифра появится через сутки'}
+    draw(pts);
+    $('rows').innerHTML=rel.map(r=>`<tr><td><span class="tag ${r.p}">${r.p=='mac'?'Mac':'Windows'}</span> ${r.tag}</td><td class="dim small">${r.name}</td><td class="dim small">${r.date?new Date(r.date).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td><td class="n">${fmt(r.count)}</td></tr>`).join('');
+    $('upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU');
+  }catch(e){$('err').style.display='block';$('err').textContent='Не удалось загрузить: '+e.message;$('upd').textContent=''}
+}
+$('reload').onclick=load;load();setInterval(()=>{if(!document.hidden)load()},300000);
+</script>
+</body></html>

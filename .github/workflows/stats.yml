@@ -1,0 +1,34 @@
+name: download-stats
+# Every 2 hours: save the download counters of the public releases to the
+# `stats` branch (stats/downloads.csv). The admin page draws the trend from it.
+on:
+  schedule:
+    - cron: "17 */2 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency: download-stats
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Snapshot release download counts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          git init -q s && cd s
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${REPO}.git"
+          if git fetch -q --depth 1 origin stats; then git checkout -q -b stats FETCH_HEAD; else git checkout -q --orphan stats; fi
+          mkdir -p stats
+          [ -f stats/downloads.csv ] || echo "time,tag,asset,count" > stats/downloads.csv
+          now=$(date -u +%Y-%m-%dT%H:%MZ)
+          gh api "repos/${REPO}/releases" --paginate \
+            -q '.[] | select(.tag_name|startswith("windows-ci-")|not) | .tag_name as $t | .assets[] | select(.name|endswith(".zip")) | "\($t),\(.name),\(.download_count)"' \
+            | sed "s/^/${now},/" >> stats/downloads.csv
+          git config user.name "plp-stats-bot"
+          git config user.email "plp-stats-bot@users.noreply.github.com"
+          git add stats/downloads.csv
+          git commit -q -m "stats ${now}"
+          git push -q origin HEAD:stats
