@@ -86,3 +86,12 @@ jobs:
         run: |
           $tag = "windows-ci-${{ github.run_number }}"
           gh release create $tag --repo ${{ github.repository }} --target ${{ github.sha }} --prerelease --title "Windows CI ${{ github.run_number }} (test, not for users)" --notes "Automatic test run" PLP-Seasons-Windows-x64.zip windows_test.mp4 ffmpeg.log fps.txt
+      - name: Public release (only for commits marked [release])
+        if: contains(github.event.head_commit.message, '[release]')
+        shell: pwsh
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          $v = ([xml](Get-Content src/PLPSeasons/PLPSeasons.csproj)).Project.PropertyGroup.Version | Select-Object -First 1
+          Copy-Item PLP-Seasons-Windows-x64.zip "PLP-Seasons-$v-Windows-x64.zip"
+          (Get-FileHash "PLP-Seasons-$v-Windows-x64.zip" -Algorithm SHA256).Hash.ToLower() + "  PLP-Seasons-$v-Windows-x64.zip" | Out-File -Encoding ascii SHA256SUMS-windows.txt
+          gh release create "windows-v$v" --repo ${{ github.repository }} --target ${{ github.sha }} --title "PLP Seasons $v for Windows (preview)" --notes "PLP Seasons for Windows 10/11 (64-bit). Unzip, run 'PLP Seasons.exe'. Not code-signed yet: Windows SmartScreen asks once — More info → Run anyway." "PLP-Seasons-$v-Windows-x64.zip" SHA256SUMS-windows.txt

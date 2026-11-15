@@ -174,6 +174,31 @@ public class WinterPlayTests
         Assert.Empty(s.Snowmen);
     }
 
+    static void BuildMan(Simulation s, double a, double b, double c, double at)
+    {
+        var big = Roll(s, a, at); Place(s, at, big.Y); Run(s, 1);
+        var mid = Roll(s, b, b + 300); Place(s, big.X, big.Y - big.R - mid.R - 30); Run(s, 1.5);
+        var top = Roll(s, c, c + 150); Place(s, big.X, mid.Y - mid.R - top.R - 30); Run(s, 1.5);
+    }
+
+    [Fact] public void SeveralSnowmen()
+    {
+        var s = Snowy();
+        BuildMan(s, 50, 650, 1000, 500);
+        BuildMan(s, 1200, 50, 1750, 1500);
+        Assert.Equal(2, s.Snowmen.Count);
+    }
+
+    [Fact] public void PointerOverAWindowBelongsToTheWindow()
+    {
+        var s = Snowy();
+        s.Windows = new List<RectI> { new RectI(400, 300, 1200, 1040) };
+        Assert.False(s.IsInteractive(800, 1032 - 20));
+        Assert.True(s.IsInteractive(1500, 1032 - 20));
+        s.OverWindows = true;
+        Assert.True(s.IsInteractive(800, 1032 - 20));
+    }
+
     [Fact] public void PlowGathersTheSnowIntoAHeapAndClearsTheTaskbar()
     {
         var s = Snowy();

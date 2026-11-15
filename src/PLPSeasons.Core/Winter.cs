@@ -26,6 +26,11 @@ public sealed partial class Simulation
     public readonly List<Ball> Balls = new();
     public readonly List<Snowman> Snowmen = new();
     public readonly List<Garland> Garlands = new();
+    /// <summary>App windows on this screen (screen-local). Unless <see cref="OverWindows"/>, the snow falls behind them
+    /// and the pointer over a window always belongs to the window.</summary>
+    public List<RectI> Windows = new();
+    public bool OverWindows;
+    public bool OverAWindow(double x, double y) => !OverWindows && Windows.Any(w => w.Contains(x, y));
     public double Scale = 1;                  // physical pixels per point (Windows display scaling)
     public int GarlandMode = 1;               // 0 off, 1 coloured, 2 warm
     public bool PlowEnabled = true;
@@ -54,6 +59,7 @@ public sealed partial class Simulation
     {
         if (Season != Season.Winter) return false;
         if (hold != Hold.None) return true;
+        if (OverAWindow(x, y)) return false;
         if (NearestBall(x, y) != null || SnowmanAt(x, y) != null) return true;
         var f = Floor;
         if (f != null && x >= f.Rect.Left && x < f.Rect.Right)

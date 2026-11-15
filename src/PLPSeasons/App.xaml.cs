@@ -66,7 +66,7 @@ public partial class App : Application
         lastScan = -1;
     }
 
-    void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; }
+    void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; s.OverWindows = set.SnowOverWindows; }
 
     TimeSpan lastRender;
     void OnFrame(object? sender, EventArgs e)
@@ -126,6 +126,8 @@ public partial class App : Application
             if (bar.Width > 0 && IsCovered(wins, bar)) floor = sc.Height;   // full-screen app covers the taskbar
             list.Add((-1 - overlays.IndexOf(o), new RectI(0, floor, sc.Width, sc.Height + 1), 0));
             o.Sim.SetSurfaces(list);
+            o.Sim.Windows = wins.Where(w => w.rect.Right > sc.Left && w.rect.Left < sc.Right && w.rect.Bottom > sc.Top && w.rect.Top < sc.Bottom)
+                .Select(w => new RectI(w.rect.Left - sc.Left, w.rect.Top - sc.Top, w.rect.Right - sc.Left, w.rect.Bottom - sc.Top)).ToList();
         }
     }
 
@@ -179,7 +181,10 @@ public partial class App : Application
             wind.DropDownItems.Add(it);
         }
         m.Items.Add(wind);
-        var onWin = new Forms.ToolStripMenuItem(L.T("Снег на окнах", "Snow on windows")) { Checked = set.SnowOnWindows };
+        var over = new Forms.ToolStripMenuItem(L.T("Снег идёт поверх окон", "Snow falls over windows")) { Checked = set.SnowOverWindows };
+        over.Click += (_, _) => { set.SnowOverWindows = !set.SnowOverWindows; ApplyAll(); Save(); };
+        m.Items.Add(over);
+        var onWin = new Forms.ToolStripMenuItem(L.T("Сугробы на окнах", "Snow piles on windows")) { Checked = set.SnowOnWindows };
         onWin.Click += (_, _) => { set.SnowOnWindows = !set.SnowOnWindows; Save(); };
         m.Items.Add(onWin);
         var plow = new Forms.ToolStripMenuItem(L.T("🚜 Вызвать снегоуборщик", "🚜 Call the snowplow")) { Enabled = set.Season == Season.Winter };

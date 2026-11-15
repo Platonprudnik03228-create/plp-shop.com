@@ -148,6 +148,17 @@ sealed class Painter : FrameworkElement
         var sim = o.Sim;
         dc.DrawRectangle(HitBrush, null, new Rect(0, 0, sim.Width, sim.Height));   // 1/255 alpha: lets the window take the mouse when asked
         DrawGarlands(dc, sim);
+        // the snow falls behind the app windows (unless "snow over windows" is on): everything below is clipped
+        // to the parts of the screen no window covers
+        bool clip = !sim.OverWindows && sim.Windows.Count > 0;
+        if (clip)
+        {
+            var holes = new GeometryGroup { FillRule = FillRule.Nonzero };
+            foreach (var w in sim.Windows) holes.Children.Add(new RectangleGeometry(new Rect(w.Left, w.Top, w.Width, w.Height)));
+            var free = new CombinedGeometry(GeometryCombineMode.Exclude, new RectangleGeometry(new Rect(-50, -50, sim.Width + 100, sim.Height + 100)), holes);
+            free.Freeze();
+            dc.PushClip(free);
+        }
         DrawSnowCaps(dc, sim);
         DrawWinter(dc, sim);
         foreach (ref readonly var p in System.Runtime.InteropServices.CollectionsMarshal.AsSpan(sim.P))
@@ -183,6 +194,7 @@ sealed class Painter : FrameworkElement
                 }
             }
         }
+        if (clip) dc.Pop();
         dc.Pop();
     }
 
