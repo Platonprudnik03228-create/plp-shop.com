@@ -118,3 +118,77 @@ public class WeatherTests
         Assert.Null(new WeatherNow(20, 20, 0, 1, 0, 22, 15, "UTC", DateTime.UtcNow).Effect);
     }
 }
+
+public class WinterPlayTests
+{
+    static Simulation Snowy()
+    {
+        var s = new Simulation(1920, 1080, 5) { Season = Season.Winter, Intensity = 1 };
+        s.PlowEnabled = false;
+        s.SetSurfaces(new[] { (-1L, new RectI(0, 1032, 1920, 1081), 0.0) });
+        s.Step(1 / 60.0);
+        var f = s.Floor!; for (int c = 0; c < f.Depth.Length; c++) f.Depth[c] = 30;
+        return s;
+    }
+    static void Place(Simulation s, double x, double y) { for (int i = 0; i < 12; i++) { s.Step(1 / 60.0); s.MouseMove(x, y); } s.MouseUp(x, y); }
+    static void Run(Simulation s, double sec) { for (int i = 0; i < sec * 60; i++) s.Step(1 / 60.0); }
+    static Ball Roll(Simulation s, double x0, double x1)
+    {
+        s.MouseDown(x0, 1032 - 25, 1);
+        Assert.True(s.Holding);
+        for (double x = x0; Math.Abs(x - x1) > 1; x += Math.Sign(x1 - x0) * 4) { s.MouseMove(x, 1032 - 10); s.Step(1 / 60.0); }
+        var b = s.Balls.Single(b => b.Held);
+        return b;
+    }
+
+    [Fact] public void ScoopAndRollGrowsABall()
+    {
+        var s = Snowy();
+        Assert.True(s.IsInteractive(500, 1032 - 20));
+        Assert.False(s.IsInteractive(500, 500));
+        var b = Roll(s, 300, 900);
+        Assert.True(b.R > 25, $"r={b.R}");
+        Place(s, 900, 990); Run(s, 1);
+        Assert.True(b.Rest);
+    }
+
+    [Fact] public void ThreeBallsMakeASnowmanAndAThrowKnocksItDown()
+    {
+        var s = Snowy();
+        var big = Roll(s, 200, 900); Place(s, 900, 990); Run(s, 1);
+        var mid = Roll(s, 1000, 1400); Place(s, big.X, big.Y - big.R - mid.R - 30); Run(s, 1.5);
+        Assert.Equal(big.Id, mid.On);
+        var top = Roll(s, 1500, 1700); Place(s, big.X, mid.Y - mid.R - top.R - 30); Run(s, 1.5);
+        Assert.Single(s.Snowmen);
+        Assert.Empty(s.Balls);
+        // throw a ball at it
+        var ball = Roll(s, 1700, 1600);
+        for (int i = 0; i < 8; i++) { s.Step(1 / 60.0); s.MouseMove(1560, 950); }
+        s.Step(0.02); s.MouseMove(1500, 950); s.Step(0.02); s.MouseMove(1400, 950); s.MouseUp(1400, 950);
+        var sm = s.Snowmen[0]; var trail = new System.Text.StringBuilder($"man x={sm.X:0} y={sm.Y:0} r={sm.R[0]:0}; ball vx={ball.VX:0} ");
+        for (int i = 0; i < 60 && s.Snowmen.Count > 0; i++) { s.Step(1 / 60.0); if (i % 3 == 0) trail.Append($"({ball.X:0},{ball.Y:0},{ball.R:0},{ball.Rest}) "); }
+        Assert.True(s.Snowmen.Count == 0, trail.ToString());
+    }
+
+    [Fact] public void PlowClearsTheTaskbarSnow()
+    {
+        var s = Snowy(); s.Intensity = 0.05;
+        s.CallPlow();
+        Assert.Equal(PlowState.Driving, s.Plow);
+        var log = new System.Text.StringBuilder();
+        for (int t = 0; t < 40; t++) { Run(s, 1); if (t % 5 == 0) log.Append($"t{t}:{s.Plow} x={s.PlowX:0} load={s.PlowLoad:0} | "); }
+        var d = s.Floor!.Depth;
+        for (int c = 0; c < d.Length; c += 64) log.Append($"{d[c]:0} ");
+        Assert.True(d.Average() < 5, $"avg {d.Average()} {log}");
+    }
+
+    [Fact] public void GarlandsHangOnFrontWindows()
+    {
+        var s = Snowy();
+        s.SetSurfaces(new[] { (-1L, new RectI(0, 1032, 1920, 1081), 0.0), (7L, new RectI(300, 200, 1300, 800), 8.0) });
+        s.Step(1 / 60.0);
+        Assert.Single(s.Garlands);
+        s.Season = Season.Rain; s.Step(1 / 60.0);
+        Assert.Empty(s.Garlands);
+    }
+}

@@ -37,14 +37,25 @@ jobs:
           $p1 = Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo','--seconds','25' -PassThru
           $p1.WaitForExit(60000) | Out-Null
           Start-Sleep 2
-          $rec = Start-Process ffmpeg -ArgumentList '-y -f gdigrab -framerate 30 -i desktop -t 80 -c:v libx264 -preset veryfast -pix_fmt yuv420p windows_test.mp4' -PassThru -RedirectStandardError ffmpeg.log
+          $rec = Start-Process ffmpeg -ArgumentList '-y -f gdigrab -framerate 30 -i desktop -t 84 -c:v libx264 -preset veryfast -pix_fmt yuv420p windows_test.mp4' -PassThru -RedirectStandardError ffmpeg.log
           Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo'
-          Start-Sleep 30
-          # move a window so its snow falls off
           Add-Type @"
-          using System; using System.Runtime.InteropServices;
-          public static class W { [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h,int x,int y,int w,int ht,bool r); }
+          using System; using System.Runtime.InteropServices; using System.Threading;
+          public static class W {
+            [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h,int x,int y,int w,int ht,bool r);
+            [DllImport("user32.dll")] public static extern bool SetCursorPos(int x,int y);
+            [DllImport("user32.dll")] public static extern void mouse_event(uint f,uint dx,uint dy,uint d,UIntPtr e);
+            public static void Drag(int x0,int y0,int x1,int y1,int ms){ SetCursorPos(x0,y0); Thread.Sleep(120); mouse_event(2,0,0,0,UIntPtr.Zero); int n=ms/16; for(int i=1;i<=n;i++){ SetCursorPos(x0+(x1-x0)*i/n, y0+(y1-y0)*i/n); Thread.Sleep(16);} Thread.Sleep(150); mouse_event(4,0,0,0,UIntPtr.Zero); }
+          }
           "@
+          Start-Sleep 18
+          # roll a snowball along the snow above the taskbar, then a second one and put it on top of the first
+          [W]::Drag(500, 1026, 1000, 1026, 2600)
+          Start-Sleep 1
+          [W]::Drag(1150, 1026, 1400, 1026, 1500)
+          [W]::Drag(1400, 1020, 1000, 900, 900)
+          Start-Sleep 6
+          # move a window so its snow falls off
           $n = (Get-Process notepad | Select-Object -First 1).MainWindowHandle
           [W]::MoveWindow($n, 200, 420, 900, 500, $true) | Out-Null
           $rec.WaitForExit()

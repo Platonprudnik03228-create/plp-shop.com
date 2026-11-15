@@ -24,7 +24,7 @@ public partial class App : Application
     WeatherCard? weatherCard;
     RemoteCard? remoteCard;
     System.Windows.Threading.DispatcherTimer? updTimer;
-    double demoStart, demoLength = 75;
+    double demoStart, demoLength = 80; bool demoMan, demoPlow;
     int frames; double fpsT; readonly List<double> gaps = new();
 
     protected override void OnStartup(StartupEventArgs e)
@@ -66,7 +66,7 @@ public partial class App : Application
         lastScan = -1;
     }
 
-    void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; }
+    void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; }
 
     TimeSpan lastRender;
     void OnFrame(object? sender, EventArgs e)
@@ -80,8 +80,24 @@ public partial class App : Application
         if (now - lastScan > 0.2) { lastScan = now; ScanWindows(); }
         if (now - lastTop > 2) { lastTop = now; foreach (var o in overlays) o.KeepOnTop(); }
         if (now - lastWall > 60) { lastWall = now; UpdateWallpaper(set.Season); }
+        PointerToSnow();
         foreach (var o in overlays) { o.Sim.Step(dt); o.Redraw(); }
     }
+
+    /// <summary>Over snow you can play with, the overlay takes the mouse; everywhere else clicks go to the windows below.</summary>
+    void PointerToSnow()
+    {
+        if (!Native.GetCursorPos(out var c)) return;
+        foreach (var o in overlays)
+        {
+            var sc = o.Screen; double x = c.X - sc.Left, y = c.Y - sc.Top;
+            bool inside = sc.Contains(c.X, c.Y);
+            if (!o.Sim.Holding && inside) o.Sim.MouseMove(x, y);          // garlands feel the pointer passing by
+            o.SetInteractive(o.Sim.Holding || (inside && o.Sim.IsInteractive(x, y) && !Forms.Control.IsKeyLocked(Forms.Keys.Scroll)));
+        }
+    }
+
+    public void CallPlow() { foreach (var o in overlays) o.Sim.CallPlow(); }
 
     void ScanWindows()
     {
@@ -166,6 +182,20 @@ public partial class App : Application
         var onWin = new Forms.ToolStripMenuItem(L.T("Снег на окнах", "Snow on windows")) { Checked = set.SnowOnWindows };
         onWin.Click += (_, _) => { set.SnowOnWindows = !set.SnowOnWindows; Save(); };
         m.Items.Add(onWin);
+        var plow = new Forms.ToolStripMenuItem(L.T("🚜 Вызвать снегоуборщик", "🚜 Call the snowplow")) { Enabled = set.Season == Season.Winter };
+        plow.Click += (_, _) => CallPlow();
+        m.Items.Add(plow);
+        var gar = new Forms.ToolStripMenuItem(L.T("Гирлянды", "Garlands"));
+        foreach (var (name, v) in new[] { (L.T("Цветные", "Coloured"), 1), (L.T("Тёплые", "Warm"), 2), (L.T("Выключить", "Off"), 0) })
+        {
+            var it = new Forms.ToolStripMenuItem(name) { Checked = set.Garlands == v };
+            it.Click += (_, _) => { set.Garlands = v; ApplyAll(); Save(); };
+            gar.DropDownItems.Add(it);
+        }
+        m.Items.Add(gar);
+        var clear = new Forms.ToolStripMenuItem(L.T("Сломать снеговиков и снежки", "Knock down snowmen and balls"));
+        clear.Click += (_, _) => { foreach (var o in overlays) { foreach (var sm in o.Sim.Snowmen.ToList()) o.Sim.CrumbleSnowman(sm); foreach (var b in o.Sim.Balls.ToList()) o.Sim.CrumbleBall(b); } };
+        m.Items.Add(clear);
         var wg = new Forms.ToolStripMenuItem(L.T("Виджеты на рабочем столе", "Desktop widgets")) { Checked = set.Widgets };
         wg.Click += (_, _) => { set.Widgets = !set.Widgets; ShowWidgets(set.Widgets); Save(); };
         m.Items.Add(wg);
@@ -265,7 +295,9 @@ public partial class App : Application
     {
         if (demoStart == 0) demoStart = now;
         double t = now - demoStart;
-        Season want = t switch { < 26 => Season.Winter, < 32 => Season.Rain, < 38 => Season.Storm, < 46 => Season.Autumn, < 54 => Season.Spring, _ => Season.Winter };
+        if (t > 9 && !demoMan && overlays.Count > 0) { demoMan = true; var sim0 = overlays[0].Sim; if (sim0.Floor != null) sim0.AddSnowman(sim0.Width * 0.62, 34); }
+        if (t > 13 && !demoPlow) { demoPlow = true; CallPlow(); }
+        Season want = t switch { < 50 => Season.Winter, < 55 => Season.Rain, < 60 => Season.Storm, < 66 => Season.Autumn, < 71 => Season.Spring, _ => Season.Winter };
         if (want != set.Season) { set.Season = want; ApplyAll(); UpdateWallpaper(want); remoteCard?.Refresh(); }
         if (t > demoLength) Quit();
     }

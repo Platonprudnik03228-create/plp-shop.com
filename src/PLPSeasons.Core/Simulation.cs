@@ -37,7 +37,7 @@ public sealed class Surface
 }
 
 /// <summary>Everything that moves: particles of the season, snow on surfaces, melting, falling clumps.</summary>
-public sealed class Simulation
+public sealed partial class Simulation
 {
     public readonly List<Particle> P = new();
     public readonly Dictionary<long, Surface> Surfaces = new();
@@ -100,6 +100,13 @@ public sealed class Simulation
                 Add(new Particle { Kind = Kind.Crumb, X = s.Rect.Left + c * Surface.Col + rng.NextDouble() * 3, Y = s.Rect.Top - rng.NextDouble() * d,
                     VX = (rng.NextDouble() - 0.5) * (moved ? 120 : 50), VY = rng.NextDouble() * -40, Size = 1.5 + rng.NextDouble() * Math.Min(5, d * 0.35), Alive = true, Life = 4 });
         }
+    }
+
+    /// <summary>A particle that finished its fall starts again at the top - unless there are more than the intensity
+    /// asks for (the slider was moved down), then it simply ends.</summary>
+    void Recycle(ref Particle p, ref int alive, int target)
+    {
+        if (alive > target * 1.05) { p.Alive = false; alive--; } else p = Spawn(false);
     }
 
     static double Frac(double v) => v - Math.Floor(v);
@@ -173,7 +180,7 @@ public sealed class Simulation
                 case Kind.Splash:
                     p.Life -= dt; if (p.Life <= 0) p.Alive = false; continue;
             }
-            if (p.Y > Height + 30 || p.X < -150 || p.X > Width + 150) { p = Spawn(false); continue; }
+            if (p.Y > Height + 30 || p.X < -150 || p.X > Width + 150) { Recycle(ref p, ref alive, target); continue; }
             // landing
             if (p.Kind is Kind.Flake or Kind.Drop)
             {
@@ -185,7 +192,7 @@ public sealed class Simulation
                 {
                     if (p.Kind == Kind.Flake && Season == Season.Winter) Deposit(s, p.X, p.Size * (s.Id >= 0 ? 1.4 : 0.5));
                     else if (p.Kind == Kind.Drop && rng.NextDouble() < 0.35) Add(new Particle { Kind = Kind.Splash, X = p.X, Y = s.TopAt(p.X), Size = 3 + rng.NextDouble() * 3, Life = 0.18, Alive = true });
-                    p = Spawn(false);
+                    Recycle(ref p, ref alive, target);
                 }
             }
         }
@@ -196,6 +203,7 @@ public sealed class Simulation
             if (Season != Season.Winter) for (int c = 0; c < s.Depth.Length; c++) s.Depth[c] = Math.Max(0, s.Depth[c] - dt * (Season is Season.Rain or Season.Storm ? 4 : 1.5));
             Relax(s);
         }
+        StepWinter(dt);
     }
 
     /// <summary>The highest surface whose snow top a falling particle at (x,y) has just reached.</summary>

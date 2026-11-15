@@ -43,6 +43,8 @@ public sealed class AppSettings
     public bool StartWithWindows { get; set; }
     public string? OriginalWallpaper { get; set; }
     public bool Widgets { get; set; } = true;
+    public int Garlands { get; set; } = 1;
+    public bool AutoPlow { get; set; } = true;
     public string? City { get; set; }
     public double CityLat { get; set; }
     public double CityLon { get; set; }
