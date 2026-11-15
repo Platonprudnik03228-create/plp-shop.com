@@ -425,6 +425,49 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
   .hero-plan { grid-template-columns: 64px minmax(0,1fr); }
   .plan-content { padding: 16px 12px; }
 }
+
+/* "won't open" help, right under the hero */
+.help-badge { display: inline-flex; margin-top: 14px; padding: 9px 14px; border-radius: 999px; font-weight: 700; font-size: 14px; color: #0b1220;
+  background: #ffd76a; text-decoration: none; box-shadow: 0 6px 20px rgba(255,200,60,.35); }
+.help-badge:hover { filter: brightness(1.05); }
+.open-help { padding: 64px 20px 40px; }
+.open-help h2 { font-size: clamp(26px, 3.4vw, 40px); margin: 0 0 10px; }
+.help-intro { color: var(--muted); margin: 0 0 26px; max-width: 760px; }
+.help-steps { list-style: none; padding: 0; margin: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; }
+.help-steps li { border: 1px solid var(--line); border-radius: 18px; padding: 16px; background: color-mix(in srgb, var(--bg2) 70%, transparent); display: flex; flex-direction: column; gap: 14px; }
+.help-text { display: flex; gap: 12px; align-items: flex-start; }
+.help-text b { flex: none; width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: var(--accent-ink); font-family: 'Manrope', sans-serif; }
+.help-text p { margin: 3px 0 0; font-size: 15px; line-height: 1.45; }
+.mock { margin-top: auto; border-radius: 14px; background: #ececee; color: #1d1d1f; font: 12px/1.35 -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; padding: 14px; min-height: 150px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+.mock-finder { display: flex; align-items: center; justify-content: center; gap: 8px; background: #f6f6f8; }
+.mf-zip, .mf-folder, .mf-app { padding: 8px 9px; border-radius: 9px; background: #fff; border: 1px solid #d9d9de; font-weight: 600; font-size: 11px; text-align: center; }
+.mf-folder { background: #cfe4ff; border-color: #9cc6ff; }
+.mf-app { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+.mf-icon { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(140deg, #3a6ac9, #2b3d78); box-shadow: inset 0 0 0 2px rgba(255,255,255,.35); }
+.mf-arrow { color: #6b6b72; font-weight: 800; }
+.mock-dialog { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 7px; background: #f2f2f4; }
+.mock-dialog strong { font-size: 13px; }
+.mock-dialog small { color: #4a4a50; font-size: 11px; }
+.md-icon { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #ffcc00; color: #1d1d1f; font-weight: 900; font-size: 18px; }
+.md-icon.snow { background: #2f5fc0; color: #fff; border-radius: 9px; }
+.md-btn { display: block; width: 100%; padding: 5px 8px; border-radius: 7px; background: #fff; border: 1px solid #d0d0d6; font-weight: 600; font-size: 11.5px; }
+.md-btn.hl { background: #0a84ff; border-color: #0a84ff; color: #fff; outline: 3px solid #ffd76a; outline-offset: 2px; }
+.mock-settings { padding: 0; overflow: hidden; background: #f6f6f8; }
+.ms-bar { display: flex; align-items: center; gap: 5px; padding: 7px 9px; background: #e4e4e8; font-weight: 600; font-size: 11px; }
+.ms-bar i { width: 9px; height: 9px; border-radius: 50%; background: #ff5f57; } .ms-bar i:nth-child(2) { background: #febc2e; } .ms-bar i:nth-child(3) { background: #28c840; }
+.ms-bar span { margin-left: 6px; }
+.ms-body { display: flex; min-height: 124px; }
+.ms-side { width: 38%; padding: 8px 6px; background: #ebebef; display: flex; flex-direction: column; gap: 5px; }
+.ms-side span { height: 10px; border-radius: 5px; background: #d6d6dc; }
+.ms-side span.on { height: auto; padding: 4px 6px; background: #0a84ff; color: #fff; font-size: 10px; font-weight: 600; border-radius: 6px; }
+.ms-main { flex: 1; padding: 9px; display: flex; flex-direction: column; gap: 6px; }
+.ms-main p { margin: 0; font-size: 10.5px; color: #3a3a40; }
+.ms-main .md-btn { width: auto; align-self: flex-start; }
+.help-alt { margin-top: 22px; }
+.help-alt p { margin: 0 0 8px; color: var(--muted); }
+.help-cmd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.help-cmd code { padding: 10px 12px; border-radius: 10px; background: #0d1117; color: #d7e3ff; font-size: 13px; overflow-x: auto; max-width: 100%; }
 </style>
   <script defer>// PLP Seasons — interface text in 7 languages. Keys are the same in every language.
 window.PLP_I18N = {
@@ -833,6 +876,7 @@ window.PLP_I18N = {
 (() => {
   const texts = {
     en: {
+      helpBadge:"Won't open on your Mac? 3 steps →", helpKicker:"If the app does not open", helpTitle:"Mac says “PLP Snow” can't be opened? Here is the fix", helpIntro:"That is normal for a new app that is not yet notarized by Apple. It takes 30 seconds, once.", help0:"Open the downloaded ZIP and drag “PLP Snow” into Applications. Double-click it.", help1:"Mac shows a warning. Press “Done” — not “Move to Trash”.", help2:"Open System Settings → Privacy & Security, scroll down and press “Open Anyway”.", help3:"Press “Open” and enter your Mac password. A snowflake appears in the menu bar — done.", helpAlt:"Or paste this into Terminal (Applications → Utilities → Terminal) and press Enter:", helpCopy:"Copy", helpCopied:"Copied", helpReq:"Needs a Mac with Apple M1 or newer and macOS 13+. Windows version is coming soon.", mockD1T:"“PLP Snow” Not Opened", mockD1B:"Apple could not verify “PLP Snow” is free of malware that may harm your Mac or compromise your privacy.", mockDone:"Done", mockTrash:"Move to Trash", mockPS:"Privacy & Security", mockSec:"Security", mockBlocked:"“PLP Snow” was blocked to protect your Mac.", mockOpenAnyway:"Open Anyway", mockD3T:"Open “PLP Snow”?", mockOpen:"Open", mockCancel:"Cancel", mockSettings:"System Settings",
       freeCta:"Download free — $0", ctaDownload:"Download for Mac",
       installGuide:'Installation guide', installTitle:'Install on your Mac',
       buildNote:'Free preview 0.4.85 · Apple Silicon, macOS 13+. Not notarized by Apple; first launch may require manual approval. Pro payments are not enabled.',
@@ -844,6 +888,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Release and file verification', downloadRelease:'Release details', downloadIntel:'Intel Macs, Windows, iPhone and Android are not supported by this download.'
     },
     ru: {
+      helpBadge:"Не открывается на Mac? 3 шага →", helpKicker:"Если приложение не открывается", helpTitle:"Mac пишет, что «PLP Snow» не открыть? Вот как исправить", helpIntro:"Так бывает с новыми приложениями, которые ещё не заверены Apple. Делается один раз, 30 секунд.", help0:"Открой скачанный ZIP и перетащи «PLP Snow» в папку «Программы». Открой двойным кликом.", help1:"Mac покажет предупреждение. Нажми «Готово» — не «Переместить в Корзину».", help2:"Открой Системные настройки → Конфиденциальность и безопасность, пролистай вниз и нажми «Всё равно открыть».", help3:"Нажми «Открыть» и введи пароль от Mac. В строке меню появится снежинка — готово.", helpAlt:"Или вставь это в Терминал (Программы → Утилиты → Терминал) и нажми Enter:", helpCopy:"Копировать", helpCopied:"Скопировано", helpReq:"Нужен Mac на Apple M1 или новее и macOS 13+. Версия для Windows скоро.", mockD1T:"«PLP Snow» не открыт", mockD1B:"Apple не удалось проверить, что «PLP Snow» не содержит вредоносного ПО, которое может навредить Mac или нарушить конфиденциальность.", mockDone:"Готово", mockTrash:"Переместить в Корзину", mockPS:"Конфиденциальность и безопасность", mockSec:"Безопасность", mockBlocked:"Использование «PLP Snow» было заблокировано для защиты Mac.", mockOpenAnyway:"Всё равно открыть", mockD3T:"Открыть «PLP Snow»?", mockOpen:"Открыть", mockCancel:"Отменить", mockSettings:"Системные настройки",
       freeCta:"Скачать бесплатно — $0", ctaDownload:"Скачать для Mac",
       installGuide:'Инструкция установки', installTitle:'Установка на Mac',
       buildNote:'Бесплатная тестовая версия 0.4.85 · Apple Silicon, macOS 13+. Нет нотариального заверения Apple: первый запуск может потребовать ручного разрешения. Оплата Pro пока не подключена.',
@@ -855,6 +900,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Версия и проверка файла', downloadRelease:'Описание релиза', downloadIntel:'Эта загрузка не поддерживает Mac с Intel, Windows, iPhone и Android.'
     },
     uk: {
+      helpBadge:"Не відкривається на Mac? 3 кроки →", helpKicker:"Якщо застосунок не відкривається", helpTitle:"Mac пише, що «PLP Snow» не відкрити? Ось як виправити", helpIntro:"Так буває з новими застосунками, які ще не нотаризовані Apple. Робиться один раз, 30 секунд.", help0:"Відкрий завантажений ZIP і перетягни «PLP Snow» у «Програми». Відкрий подвійним кліком.", help1:"Mac покаже попередження. Натисни «Готово» — не «Перемістити в Смітник».", help2:"Відкрий Системні параметри → Приватність і безпека, прогорни вниз і натисни «Усе одно відкрити».", help3:"Натисни «Відкрити» і введи пароль від Mac. У рядку меню з’явиться сніжинка — готово.", helpAlt:"Або встав це в Термінал (Програми → Утиліти → Термінал) і натисни Enter:", helpCopy:"Копіювати", helpCopied:"Скопійовано", helpReq:"Потрібен Mac на Apple M1 або новіший і macOS 13+. Версія для Windows незабаром.", mockD1T:"«PLP Snow» не відкрито", mockD1B:"Apple не вдалося перевірити, що «PLP Snow» не містить шкідливого ПЗ.", mockDone:"Готово", mockTrash:"Перемістити в Смітник", mockPS:"Приватність і безпека", mockSec:"Безпека", mockBlocked:"«PLP Snow» заблоковано для захисту Mac.", mockOpenAnyway:"Усе одно відкрити", mockD3T:"Відкрити «PLP Snow»?", mockOpen:"Відкрити", mockCancel:"Скасувати", mockSettings:"Системні параметри",
       freeCta:"Завантажити безкоштовно — $0", ctaDownload:"Завантажити для Mac",
       installGuide:'Інструкція встановлення', installTitle:'Встановлення на Mac',
       buildNote:'Безкоштовна тестова версія 0.4.85 · Apple Silicon, macOS 13+. Без нотаризації Apple: перший запуск може потребувати ручного дозволу. Оплату Pro ще не підключено.',
@@ -866,6 +912,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Версія та перевірка файлу', downloadRelease:'Опис випуску', downloadIntel:'Це завантаження не підтримує Mac з Intel, Windows, iPhone та Android.'
     },
     de: {
+      helpBadge:"Lässt sich nicht öffnen? 3 Schritte →", helpKicker:"Wenn die App sich nicht öffnet", helpTitle:"Mac sagt, „PLP Snow“ kann nicht geöffnet werden? So geht’s", helpIntro:"Das ist normal bei neuen Apps, die Apple noch nicht notarisiert hat. Einmalig, 30 Sekunden.", help0:"Öffne die geladene ZIP und ziehe „PLP Snow“ in „Programme“. Per Doppelklick öffnen.", help1:"Der Mac zeigt eine Warnung. Klicke „Fertig“ — nicht „In den Papierkorb legen“.", help2:"Öffne Systemeinstellungen → Datenschutz & Sicherheit, scrolle nach unten und klicke „Dennoch öffnen“.", help3:"Klicke „Öffnen“ und gib dein Mac-Passwort ein. In der Menüleiste erscheint eine Schneeflocke — fertig.", helpAlt:"Oder füge das im Terminal ein (Programme → Dienstprogramme → Terminal) und drücke Enter:", helpCopy:"Kopieren", helpCopied:"Kopiert", helpReq:"Benötigt einen Mac mit Apple M1 oder neuer und macOS 13+. Windows-Version kommt bald.", mockD1T:"„PLP Snow“ nicht geöffnet", mockD1B:"Apple konnte nicht überprüfen, ob „PLP Snow“ frei von Schadsoftware ist.", mockDone:"Fertig", mockTrash:"In den Papierkorb legen", mockPS:"Datenschutz & Sicherheit", mockSec:"Sicherheit", mockBlocked:"„PLP Snow“ wurde blockiert, um deinen Mac zu schützen.", mockOpenAnyway:"Dennoch öffnen", mockD3T:"„PLP Snow“ öffnen?", mockOpen:"Öffnen", mockCancel:"Abbrechen", mockSettings:"Systemeinstellungen",
       freeCta:"Kostenlos laden — $0", ctaDownload:"Für Mac laden",
       installGuide:'Installationsanleitung', installTitle:'Auf deinem Mac installieren',
       buildNote:'Kostenlose Vorschau 0.4.85 · Apple Silicon, macOS 13+. Nicht von Apple notarisiert; der erste Start kann eine manuelle Freigabe erfordern. Pro-Zahlungen sind noch nicht aktiviert.',
@@ -877,6 +924,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Version und Dateiprüfung', downloadRelease:'Versionshinweise', downloadIntel:'Dieser Download unterstützt keine Intel-Macs, Windows, iPhone oder Android.'
     },
     pl: {
+      helpBadge:"Nie otwiera się na Macu? 3 kroki →", helpKicker:"Jeśli aplikacja się nie otwiera", helpTitle:"Mac mówi, że nie można otworzyć „PLP Snow”? Oto rozwiązanie", helpIntro:"To normalne dla nowych aplikacji, których Apple jeszcze nie poświadczył. Raz, 30 sekund.", help0:"Otwórz pobrany ZIP i przeciągnij „PLP Snow” do „Aplikacji”. Otwórz dwukrotnym kliknięciem.", help1:"Mac pokaże ostrzeżenie. Kliknij „Gotowe” — nie „Przenieś do kosza”.", help2:"Otwórz Ustawienia systemowe → Prywatność i ochrona, przewiń w dół i kliknij „Otwórz mimo to”.", help3:"Kliknij „Otwórz” i wpisz hasło do Maca. Na pasku menu pojawi się płatek śniegu — gotowe.", helpAlt:"Albo wklej to w Terminalu (Aplikacje → Narzędzia → Terminal) i naciśnij Enter:", helpCopy:"Kopiuj", helpCopied:"Skopiowano", helpReq:"Wymaga Maca z Apple M1 lub nowszym i macOS 13+. Wersja na Windows wkrótce.", mockD1T:"Nie otwarto „PLP Snow”", mockD1B:"Apple nie może sprawdzić, czy „PLP Snow” nie zawiera złośliwego oprogramowania.", mockDone:"Gotowe", mockTrash:"Przenieś do kosza", mockPS:"Prywatność i ochrona", mockSec:"Ochrona", mockBlocked:"„PLP Snow” zablokowano, aby chronić Maca.", mockOpenAnyway:"Otwórz mimo to", mockD3T:"Otworzyć „PLP Snow”?", mockOpen:"Otwórz", mockCancel:"Anuluj", mockSettings:"Ustawienia systemowe",
       freeCta:"Pobierz bezpłatnie — $0", ctaDownload:"Pobierz na Maca",
       installGuide:'Instrukcja instalacji', installTitle:'Zainstaluj na Macu',
       buildNote:'Bezpłatna wersja testowa 0.4.85 · Apple Silicon, macOS 13+. Bez notaryzacji Apple; pierwszy start może wymagać ręcznej zgody. Płatności Pro nie są aktywne.',
@@ -888,6 +936,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Wersja i weryfikacja pliku', downloadRelease:'Szczegóły wydania', downloadIntel:'Ten plik nie obsługuje Maców z Intelem, Windows, iPhone ani Androida.'
     },
     fr: {
+      helpBadge:"Ne s’ouvre pas sur votre Mac ? 3 étapes →", helpKicker:"Si l’app ne s’ouvre pas", helpTitle:"Le Mac dit que « PLP Snow » ne peut pas être ouvert ? Voici la solution", helpIntro:"C’est normal pour une nouvelle app pas encore notariée par Apple. Une seule fois, 30 secondes.", help0:"Ouvrez le ZIP téléchargé et glissez « PLP Snow » dans Applications. Double-cliquez dessus.", help1:"Le Mac affiche un avertissement. Cliquez sur « Terminé » — pas « Placer dans la corbeille ».", help2:"Ouvrez Réglages Système → Confidentialité et sécurité, faites défiler et cliquez sur « Ouvrir quand même ».", help3:"Cliquez sur « Ouvrir » et saisissez le mot de passe du Mac. Un flocon apparaît dans la barre des menus — c’est fait.", helpAlt:"Ou collez ceci dans le Terminal (Applications → Utilitaires → Terminal) et appuyez sur Entrée :", helpCopy:"Copier", helpCopied:"Copié", helpReq:"Nécessite un Mac Apple M1 ou plus récent et macOS 13+. Version Windows bientôt.", mockD1T:"« PLP Snow » n’a pas été ouvert", mockD1B:"Apple n’a pas pu vérifier que « PLP Snow » ne contient pas de logiciel malveillant.", mockDone:"Terminé", mockTrash:"Placer dans la corbeille", mockPS:"Confidentialité et sécurité", mockSec:"Sécurité", mockBlocked:"« PLP Snow » a été bloqué pour protéger votre Mac.", mockOpenAnyway:"Ouvrir quand même", mockD3T:"Ouvrir « PLP Snow » ?", mockOpen:"Ouvrir", mockCancel:"Annuler", mockSettings:"Réglages Système",
       freeCta:"Télécharger gratuitement — 0 $", ctaDownload:"Télécharger pour Mac",
       installGuide:'Guide d’installation', installTitle:'Installer sur votre Mac',
       buildNote:'Version test gratuite 0.4.85 · Apple Silicon, macOS 13+. Non notariée par Apple ; le premier lancement peut demander une autorisation manuelle. Les paiements Pro sont désactivés.',
@@ -899,6 +948,7 @@ window.PLP_I18N = {
       downloadVerifyTitle:'Version et vérification du fichier', downloadRelease:'Détails de la version', downloadIntel:'Ce téléchargement ne prend pas en charge les Mac Intel, Windows, iPhone ou Android.'
     },
     es: {
+      helpBadge:"¿No se abre en tu Mac? 3 pasos →", helpKicker:"Si la app no se abre", helpTitle:"¿El Mac dice que no se puede abrir “PLP Snow”? Así se arregla", helpIntro:"Es normal en apps nuevas que Apple aún no ha notarizado. Una sola vez, 30 segundos.", help0:"Abre el ZIP descargado y arrastra “PLP Snow” a Aplicaciones. Ábrelo con doble clic.", help1:"El Mac muestra un aviso. Pulsa “Aceptar” — no “Trasladar a la papelera”.", help2:"Abre Ajustes del Sistema → Privacidad y seguridad, baja y pulsa “Abrir igualmente”.", help3:"Pulsa “Abrir” e introduce la contraseña del Mac. Aparece un copo en la barra de menús — listo.", helpAlt:"O pega esto en Terminal (Aplicaciones → Utilidades → Terminal) y pulsa Intro:", helpCopy:"Copiar", helpCopied:"Copiado", helpReq:"Requiere un Mac con Apple M1 o posterior y macOS 13+. Versión para Windows pronto.", mockD1T:"“PLP Snow” no se ha abierto", mockD1B:"Apple no ha podido verificar que “PLP Snow” no contenga software malicioso.", mockDone:"Aceptar", mockTrash:"Trasladar a la papelera", mockPS:"Privacidad y seguridad", mockSec:"Seguridad", mockBlocked:"Se ha bloqueado “PLP Snow” para proteger tu Mac.", mockOpenAnyway:"Abrir igualmente", mockD3T:"¿Abrir “PLP Snow”?", mockOpen:"Abrir", mockCancel:"Cancelar", mockSettings:"Ajustes del Sistema",
       freeCta:"Descargar gratis — 0 $", ctaDownload:"Descargar para Mac",
       installGuide:'Guía de instalación', installTitle:'Instalar en tu Mac',
       buildNote:'Versión de prueba gratuita 0.4.85 · Apple Silicon, macOS 13+. Sin notarización de Apple; el primer inicio puede requerir aprobación manual. Los pagos Pro aún no están activos.',
@@ -1458,6 +1508,7 @@ window.PLP_I18N = {
             <span class="release-dot" aria-hidden="true"></span>
             <span data-i18n="releaseMeta">Preview build · macOS 13+ · Apple Silicon</span>
           </div>
+          <a class="help-badge" href="#open-help" data-i18n="helpBadge">Won't open on your Mac? 3 steps →</a>
         </div>
       </div>
       <div class="scene-stage">
@@ -1484,6 +1535,23 @@ window.PLP_I18N = {
         <button class="iconbtn" type="button" id="pause" aria-label="Pause"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 5h3v14H7zM14 5h3v14h-3z"/></svg></button>
       </div>
       </div>
+    </section>
+    <section class="open-help wrap" id="open-help" aria-labelledby="helpTitle">
+      <p class="kicker" data-i18n="helpKicker">If the app does not open</p>
+      <h2 id="helpTitle" data-i18n="helpTitle">Mac says “PLP Snow” can't be opened? Here is the fix</h2>
+      <p class="help-intro" data-i18n="helpIntro"></p>
+      <ol class="help-steps">
+        <li><div class="help-text"><b>1</b><p data-i18n="help0"></p></div>
+          <div class="mock mock-finder" aria-hidden="true"><div class="mf-zip">PLP-Seasons.zip</div><div class="mf-arrow">→</div><div class="mf-app"><span class="mf-icon"></span>PLP Snow</div><div class="mf-arrow">→</div><div class="mf-folder">Applications</div></div></li>
+        <li><div class="help-text"><b>2</b><p data-i18n="help1"></p></div>
+          <div class="mock mock-dialog" aria-hidden="true"><span class="md-icon">!</span><strong data-i18n="mockD1T"></strong><small data-i18n="mockD1B"></small><span class="md-btn hl" data-i18n="mockDone"></span><span class="md-btn" data-i18n="mockTrash"></span></div></li>
+        <li><div class="help-text"><b>3</b><p data-i18n="help2"></p></div>
+          <div class="mock mock-settings" aria-hidden="true"><div class="ms-bar"><i></i><i></i><i></i><span data-i18n="mockSettings"></span></div><div class="ms-body"><div class="ms-side"><span></span><span></span><span class="on" data-i18n="mockPS"></span><span></span></div><div class="ms-main"><b data-i18n="mockSec"></b><p data-i18n="mockBlocked"></p><span class="md-btn hl" data-i18n="mockOpenAnyway"></span></div></div></div></li>
+        <li><div class="help-text"><b>4</b><p data-i18n="help3"></p></div>
+          <div class="mock mock-dialog small" aria-hidden="true"><span class="md-icon snow">❄</span><strong data-i18n="mockD3T"></strong><span class="md-btn hl" data-i18n="mockOpen"></span><span class="md-btn" data-i18n="mockCancel"></span></div></li>
+      </ol>
+      <div class="help-alt"><p data-i18n="helpAlt"></p><div class="help-cmd"><code id="helpCmd">xattr -dr com.apple.quarantine "/Applications/PLP Snow.app"</code><button type="button" class="btn small" id="helpCopyBtn" data-i18n="helpCopy">Copy</button></div></div>
+      <p class="note" data-i18n="helpReq"></p>
     </section>
 
     <section class="section showcase" id="showcase">
@@ -1588,5 +1656,15 @@ window.PLP_I18N = {
   </footer>
 
   <svg width="0" height="0" class="sr" aria-hidden="true"><symbol id="plpmark" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#287bea"/><path d="M9 20V11.5h6.1a4 4 0 0 1 0 8H12.5M20.5 11.5V20H25" fill="none" stroke="#fff" stroke-width="2.35" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
+<script>
+document.addEventListener('click', e => {
+  const b = e.target.closest('#helpCopyBtn'); if (!b) return;
+  const t = document.getElementById('helpCmd').textContent;
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(() => {
+    b.textContent = (window.PLP && PLP.t) ? PLP.t('helpCopied') : 'Copied';
+    setTimeout(() => { b.textContent = (window.PLP && PLP.t) ? PLP.t('helpCopy') : 'Copy'; }, 1800);
+  }).catch(() => {});
+});
+</script>
 </body>
 </html>
