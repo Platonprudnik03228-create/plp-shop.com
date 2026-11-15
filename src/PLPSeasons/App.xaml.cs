@@ -126,7 +126,11 @@ public partial class App : Application
             if (bar.Width > 0 && IsCovered(wins, bar)) floor = sc.Height;   // full-screen app covers the taskbar
             list.Add((-1 - overlays.IndexOf(o), new RectI(0, floor, sc.Width, sc.Height + 1), 0));
             o.Sim.SetSurfaces(list);
-            o.Sim.Windows = wins.Where(w => w.rect.Right > sc.Left && w.rect.Left < sc.Right && w.rect.Bottom > sc.Top && w.rect.Top < sc.Bottom)
+            var mine = new List<(long id, RectI rect)>();
+            foreach (var wdg in new Window?[] { weatherCard, remoteCard })
+                if (wdg != null && wdg.IsVisible && new System.Windows.Interop.WindowInteropHelper(wdg).Handle is var hw && hw != IntPtr.Zero && Native.GetWindowRect(hw, out var wr))
+                    mine.Add((hw.ToInt64(), new RectI(wr.Left, wr.Top, wr.Right, wr.Bottom)));
+            o.Sim.Windows = wins.Concat(mine).Where(w => w.rect.Right > sc.Left && w.rect.Left < sc.Right && w.rect.Bottom > sc.Top && w.rect.Top < sc.Bottom)
                 .Select(w => new RectI(w.rect.Left - sc.Left, w.rect.Top - sc.Top, w.rect.Right - sc.Left, w.rect.Bottom - sc.Top)).ToList();
         }
     }
