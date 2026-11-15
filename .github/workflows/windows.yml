@@ -1,5 +1,7 @@
 name: windows
 on: [push, workflow_dispatch]
+permissions:
+  contents: write
 jobs:
   build-and-film:
     runs-on: windows-latest
@@ -46,3 +48,9 @@ jobs:
             PLP-Seasons-Windows-x64.zip
             windows_test.mp4
             ffmpeg.log
+      - name: Publish test files to a release
+        shell: pwsh
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          $tag = "windows-ci-${{ github.run_number }}"
+          gh release create $tag --repo ${{ github.repository }} --target ${{ github.sha }} --prerelease --title "Windows CI ${{ github.run_number }} (test, not for users)" --notes "Automatic test run" PLP-Seasons-Windows-x64.zip windows_test.mp4 ffmpeg.log
