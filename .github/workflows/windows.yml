@@ -33,6 +33,10 @@ jobs:
           $p0 = Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo','--legacy','--seconds','25' -PassThru
           $p0.WaitForExit(60000) | Out-Null
           Start-Sleep 2
+          # 2) new renderer for 25 s, also without recording (fair comparison)
+          $p1 = Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo','--seconds','25' -PassThru
+          $p1.WaitForExit(60000) | Out-Null
+          Start-Sleep 2
           $rec = Start-Process ffmpeg -ArgumentList '-y -f gdigrab -framerate 30 -i desktop -t 80 -c:v libx264 -preset veryfast -pix_fmt yuv420p windows_test.mp4' -PassThru -RedirectStandardError ffmpeg.log
           Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo'
           Start-Sleep 30
