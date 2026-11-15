@@ -1,0 +1,48 @@
+name: windows
+on: [push, workflow_dispatch]
+jobs:
+  build-and-film:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - name: Tests
+        run: dotnet test tests/PLPSeasons.Tests -c Release
+      - name: Publish
+        run: dotnet publish src/PLPSeasons -c Release -o out/PLP-Seasons
+      - name: Zip
+        shell: pwsh
+        run: Compress-Archive -Path "out/PLP-Seasons/*" -DestinationPath "PLP-Seasons-Windows-x64.zip"
+      - name: Screen resolution
+        shell: pwsh
+        continue-on-error: true
+        run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
+      - name: Film it on real Windows
+        shell: pwsh
+        run: |
+          choco install ffmpeg -y --no-progress | Out-Null
+          $env:Path += ";C:\ProgramData\chocolatey\bin"
+          Start-Process notepad
+          Start-Sleep 2
+          Start-Process explorer "C:\Windows"
+          Start-Sleep 3
+          $rec = Start-Process ffmpeg -ArgumentList '-y -f gdigrab -framerate 30 -i desktop -t 80 -c:v libx264 -preset veryfast -pix_fmt yuv420p windows_test.mp4' -PassThru -RedirectStandardError ffmpeg.log
+          Start-Process "out/PLP-Seasons/PLP Seasons.exe" -ArgumentList '--demo'
+          Start-Sleep 30
+          # move a window so its snow falls off
+          Add-Type @"
+          using System; using System.Runtime.InteropServices;
+          public static class W { [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h,int x,int y,int w,int ht,bool r); }
+          "@
+          $n = (Get-Process notepad | Select-Object -First 1).MainWindowHandle
+          [W]::MoveWindow($n, 200, 420, 900, 500, $true) | Out-Null
+          $rec.WaitForExit()
+          Get-Process | Where-Object { $_.ProcessName -like 'PLP*' } | Format-Table ProcessName, Id, CPU, WorkingSet
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PLP-Seasons-Windows
+          path: |
+            PLP-Seasons-Windows-x64.zip
+            windows_test.mp4
+            ffmpeg.log
