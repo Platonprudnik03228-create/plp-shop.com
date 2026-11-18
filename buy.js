@@ -9,11 +9,11 @@
   const ru = /^(ru|uk|be)/i.test(document.documentElement.lang || navigator.language || '');
   const T = ru ? {
     wait: 'Оплата прошла. Готовим ключ…', title: 'Спасибо! Ваш ключ PLP Pro', copy: 'Скопировать ключ', copied: 'Скопировано',
-    how: 'Откройте PLP Seasons → снежинка в строке меню → «Ввести ключ…» → вставьте ключ. Ключ продлевается сам каждый месяц, пока идёт подписка. Письмо с чеком Paddle пришлёт на вашу почту — сохраните его. Нужна версия 0.4.86 или новее: <a href="https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.86/PLP-Seasons-0.4.86-macOS-arm64.zip">скачать</a>.',
+    how: 'Откройте PLP Seasons → снежинка в строке меню → «Ввести ключ…» → вставьте ключ. Ключ продлевается сам каждый месяц, пока идёт подписка. Письмо с чеком Paddle пришлёт на вашу почту — сохраните его. Нужна версия 0.4.87 или новее: <a href="https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.87/PLP-Seasons-0.4.87-macOS-arm64.zip">скачать</a>.',
     fail: 'Оплата прошла, но ключ не удалось получить. Напишите нам (страница «Контакты») и укажите номер заказа:', close: 'Закрыть',
   } : {
     wait: 'Payment received. Preparing your key…', title: 'Thank you! Your PLP Pro key', copy: 'Copy key', copied: 'Copied',
-    how: 'Open PLP Seasons → snowflake in the menu bar → “Enter key…” → paste the key. It renews by itself every month while the subscription runs. Paddle emails you the receipt — keep it. Needs version 0.4.86 or newer: <a href="https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.86/PLP-Seasons-0.4.86-macOS-arm64.zip">download</a>.',
+    how: 'Open PLP Seasons → snowflake in the menu bar → “Enter key…” → paste the key. It renews by itself every month while the subscription runs. Paddle emails you the receipt — keep it. Needs version 0.4.87 or newer: <a href="https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.87/PLP-Seasons-0.4.87-macOS-arm64.zip">download</a>.',
     fail: 'Payment went through, but the key could not be fetched. Write to us (Contact page) with your order number:', close: 'Close',
   };
   const ready = CFG.token && CFG.price && CFG.api;
@@ -78,6 +78,8 @@
       Paddle.Checkout.open({ items: [{ priceId: CFG.price, quantity: 1 }], settings: { displayMode: 'overlay', theme: 'light', locale: ru ? 'ru' : 'en' } });
     } catch (err) { location.href = a.getAttribute('href'); }
   });
+  // the app's "Get Pro" button opens plp-shop.com/?buy=pro → checkout right away
+  if (ready && /[?&]buy=pro\b/.test(location.search)) load().then(() => Paddle.Checkout.open({ items: [{ priceId: CFG.price, quantity: 1 }], settings: { displayMode: 'overlay', theme: 'light', locale: ru ? 'ru' : 'en' } })).catch(() => {});
   // show the real price from Paddle on the buttons (currency of the visitor)
   if (ready) load().then(() => Paddle.PricePreview({ items: [{ priceId: CFG.price, quantity: 1 }] })).then((r) => {
     const li = r && r.data && r.data.details && r.data.details.lineItems && r.data.details.lineItems[0];
