@@ -21,7 +21,7 @@ static class WindowScanner
             if (Native.DwmGetWindowAttribute(h, Native.DWMWA_CLOAKED, out int cloaked, 4) == 0 && cloaked != 0) return true;   // on another virtual desktop / hidden UWP
             long ex = (long)Native.GetWindowLongPtr(h, Native.GWL_EXSTYLE);
             if ((ex & Native.WS_EX_TOOLWINDOW) != 0 && (ex & Native.WS_EX_APPWINDOW) == 0) return true;
-            if (Native.GetWindowTextLength(h) == 0) return true;
+            if (!Native.HasTitle(h)) return true;   // no message to the window: a hung app cannot freeze us
             if (Skip.Contains(Native.ClassOf(h))) return true;
             if (Native.DwmGetWindowAttribute(h, Native.DWMWA_EXTENDED_FRAME_BOUNDS, out Native.RECT r, 16) != 0) Native.GetWindowRect(h, out r);
             var rect = new RectI(r.Left, r.Top, r.Right, r.Bottom);

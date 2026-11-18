@@ -30,6 +30,7 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        DispatcherUnhandledException += (_, ev) => { ev.Handled = true; };   // one bad frame never closes the app (0.5.2)
         single = new Mutex(true, "PLP.Seasons.Single", out bool first);
         if (!first) { Shutdown(); return; }
         demo = e.Args.Contains("--demo");
@@ -73,7 +74,9 @@ public partial class App : Application
     {
         // the time WPF will show this frame at - steadier than a stopwatch, so the flakes move without judder
         if (e is RenderingEventArgs re) { if (re.RenderingTime == lastRender) return; lastRender = re.RenderingTime; }
-        double now = clock.Elapsed.TotalSeconds, dt = now - last; last = now;
+        double now = clock.Elapsed.TotalSeconds;
+        if (now - last < 1.0 / 62) return;   // at most ~60 redraws a second, also on 120-144 Hz screens (0.5.2)
+        double dt = Math.Min(0.1, now - last); last = now;
         if (demo) FpsLog(now, dt);
         if (set.Paused) return;
         if (demo) DemoScript(now);

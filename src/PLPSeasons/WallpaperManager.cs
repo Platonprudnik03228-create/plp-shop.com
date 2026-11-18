@@ -41,8 +41,8 @@ sealed class WallpaperManager
             Directory.CreateDirectory(Store.Dir);
             var dst = Path.Combine(Store.Dir, "wallpaper_" + Path.GetFileName(f));
             if (!File.Exists(dst)) File.Copy(f, dst, true);
-            Native.SystemParametersInfo(Native.SPI_SETDESKWALLPAPER, 0, dst, Native.SPIF_UPDATEINIFILE | Native.SPIF_SENDCHANGE);
             current = f;
+            System.Threading.Tasks.Task.Run(() => { try { Native.SystemParametersInfo(Native.SPI_SETDESKWALLPAPER, 0, dst, Native.SPIF_UPDATEINIFILE | Native.SPIF_SENDCHANGE); } catch { } });
         }
         catch { }
     }
@@ -51,7 +51,8 @@ sealed class WallpaperManager
     {
         current = null;
         if (string.IsNullOrEmpty(s.OriginalWallpaper)) return;
-        Native.SystemParametersInfo(Native.SPI_SETDESKWALLPAPER, 0, s.OriginalWallpaper, Native.SPIF_UPDATEINIFILE | Native.SPIF_SENDCHANGE);
+        var orig = s.OriginalWallpaper;
+        System.Threading.Tasks.Task.Run(() => { try { Native.SystemParametersInfo(Native.SPI_SETDESKWALLPAPER, 0, orig, Native.SPIF_UPDATEINIFILE | Native.SPIF_SENDCHANGE); } catch { } });
         s.OriginalWallpaper = null; Store.Save(s);
     }
 }
