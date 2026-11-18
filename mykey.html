@@ -1,0 +1,26 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>PLP Seasons — Мой ключ / My key</title><link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+CiAgPGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iNCIgeTE9IjMiIHgyPSIyOCIgeTI9IjI5Ij48c3RvcCBzdG9wLWNvbG9yPSIjNjViN2ZmIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMjM2OGU4Ii8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+CiAgPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTQiIGZpbGw9InVybCgjZykiLz4KICA8cGF0aCBkPSJNOSAyMFYxMS41aDYuMWE0IDQgMCAwIDEgMCA4SDEyLjUiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSIyLjM1IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cGF0aCBkPSJNMjAuNSAxMS41VjIwSDI1IiBmaWxsPSJub25lIiBzdHJva2U9IiNkZmYyZmYiIHN0cm9rZS13aWR0aD0iMi4zNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+Cjwvc3ZnPgo=" type="image/svg+xml">
+<style>body{margin:0;font:16px/1.55 Inter,system-ui,-apple-system,sans-serif;background:#eef3fb;color:#0b1220}main{max-width:620px;margin:0 auto;padding:34px 20px}.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 10px 40px rgba(20,40,80,.08);margin:0 0 18px}h1{margin:0 0 6px}h2{font-size:18px;margin:0 0 10px}input{width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #cdd6e4;border-radius:10px;font:inherit;margin:4px 0 10px}button.go{padding:10px 16px;border:0;border-radius:10px;background:#1769d2;color:#fff;font-weight:700;cursor:pointer}small{color:#5a6577}.err{color:#c0392b}a{color:#1769d2}</style></head>
+<body><main>
+<h1 id="t1">Мой ключ PLP Seasons</h1><p id="t2"><small></small></p>
+<div class="card" id="have" hidden></div>
+<div class="card" id="buy" hidden><h2 id="t3"></h2><p id="t4"></p><p><a class="buy-pro" href="index.html" style="display:inline-block;padding:12px 18px;border-radius:10px;background:#f2ad33;color:#0b1220;font-weight:800;text-decoration:none" id="t5"></a></p></div>
+<div class="card"><h2 id="t6"></h2><p id="t7"><small></small></p>
+<label id="l1"></label><input id="email" type="email" autocomplete="email"><label id="l2"></label><input id="last4" inputmode="numeric" maxlength="4" placeholder="1234">
+<button class="go" id="r1"></button> <span id="m1"></span>
+<hr style="border:0;border-top:1px solid #e3e8f0;margin:18px 0"><label id="l3"></label><input id="order" placeholder="txn_..."><button class="go" id="r2"></button> <span id="m2"></span></div>
+<p><a href="index.html">← PLP Seasons</a></p>
+</main>
+<script src="buy.js"></script>
+<script>
+(function(){const P=window.PLPBuy,ru=P.ru;const t=ru?{t1:'Мой ключ PLP Seasons',t2:'Ключ хранится в этом браузере. Он подходит для Mac и Windows и работает навсегда.',t3:'Ключа пока нет',t4:'PLP Seasons покупается один раз за $4.99 — Mac и Windows, все функции, навсегда.',t5:'Купить — $4.99',t6:'Восстановить ключ',t7:'Купили в другом браузере или потеряли ключ? Введите почту, указанную при оплате, и последние 4 цифры карты. Или номер заказа из письма Paddle.',l1:'Почта',l2:'Последние 4 цифры карты',l3:'Или номер заказа (txn_…)',r1:'Найти ключ',r2:'Найти по заказу',nf:'Покупка не найдена. Проверьте почту и цифры карты.',wait:'Ищу…'}:{t1:'My PLP Seasons key',t2:'Your key is kept in this browser. It works on Mac and Windows, forever.',t3:'No key yet',t4:'PLP Seasons is bought once for $4.99 — Mac and Windows, every feature, forever.',t5:'Buy — $4.99',t6:'Restore your key',t7:'Bought in another browser or lost the key? Enter the email you paid with and the last 4 digits of the card. Or the order number from the Paddle email.',l1:'Email',l2:'Last 4 digits of the card',l3:'Or order number (txn_…)',r1:'Find my key',r2:'Find by order',nf:'No purchase found. Check the email and card digits.',wait:'Looking…'};
+for(const k in t){const e=document.getElementById(k);if(e)(e.querySelector('small')||e).textContent=t[k];}
+document.documentElement.lang=ru?'ru':'en';
+function show(key){P.save(key);const h=document.getElementById('have');h.hidden=false;document.getElementById('buy').hidden=true;h.innerHTML=P.keyHtml(key);P.wire(h,key);}
+let k=null;try{k=localStorage.getItem('plpLicense');}catch(e){}
+if(k)show(k);else document.getElementById('buy').hidden=false;
+async function post(path,body){const r=await fetch(P.CFG.api+path,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json();}
+document.getElementById('r1').onclick=async()=>{const m=document.getElementById('m1');m.textContent=t.wait;try{const j=await post('/api/restore',{email:document.getElementById('email').value,last4:document.getElementById('last4').value});if(j.license){m.textContent='';show(j.license);scrollTo(0,0);}else{m.innerHTML='<span class="err">'+t.nf+'</span>';}}catch(e){m.innerHTML='<span class="err">'+t.nf+'</span>';}};
+document.getElementById('r2').onclick=async()=>{const m=document.getElementById('m2');m.textContent=t.wait;try{const j=await P.claim(document.getElementById('order').value.trim());if(j.license){m.textContent='';show(j.license);scrollTo(0,0);}else{m.innerHTML='<span class="err">'+t.nf+'</span>';}}catch(e){m.innerHTML='<span class="err">'+t.nf+'</span>';}};
+try{const o=localStorage.getItem('plpOrder');if(o)document.getElementById('order').value=o;}catch(e){}
+})();
+</script></body></html>
