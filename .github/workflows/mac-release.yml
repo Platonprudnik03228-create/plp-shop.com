@@ -13,9 +13,9 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cat parts/z.* > PLP-Seasons-0.4.87-macOS-arm64.zip
-          echo "961aed96a7e45e5e280cc8c7ac50cf1eaf20ab99ca1ca45e0c29621765f6c65c  PLP-Seasons-0.4.87-macOS-arm64.zip" | sha256sum -c -
-          sha256sum PLP-Seasons-0.4.87-macOS-arm64.zip > SHA256SUMS.txt
-          gh release create v0.4.87 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.87 for Mac" \
-            --notes "PLP Seasons 0.4.87 for macOS 13+ (Apple Silicon). Checks for updates by itself and shows a clear window when a new version is out. PLP Pro keys from plp-shop.com work. Not notarized yet: on first launch right-click the app → Open." \
-            PLP-Seasons-0.4.87-macOS-arm64.zip SHA256SUMS.txt
+          cat parts/z.* > PLP-Seasons-0.4.89-macOS-arm64.zip
+          echo "ac752bd888f24156154bd6082bd55da635caf2b5c061e540b9de9b8be07a6d4d  PLP-Seasons-0.4.89-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.89-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.89 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.89 for Mac" \
+            --notes "PLP Seasons 0.4.89 for macOS 13+ (Apple Silicon). Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.89-macOS-arm64.zip SHA256SUMS.txt
