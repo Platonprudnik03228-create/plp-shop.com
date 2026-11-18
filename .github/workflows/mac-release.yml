@@ -13,9 +13,9 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cat parts/z.* > PLP-Seasons-0.4.89-macOS-arm64.zip
-          echo "ac752bd888f24156154bd6082bd55da635caf2b5c061e540b9de9b8be07a6d4d  PLP-Seasons-0.4.89-macOS-arm64.zip" | sha256sum -c -
-          sha256sum PLP-Seasons-0.4.89-macOS-arm64.zip > SHA256SUMS.txt
-          gh release create v0.4.89 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.89 for Mac" \
-            --notes "PLP Seasons 0.4.89 for macOS 13+ (Apple Silicon). Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
-            PLP-Seasons-0.4.89-macOS-arm64.zip SHA256SUMS.txt
+          cat parts/z.* > PLP-Seasons-0.4.90-macOS-arm64.zip
+          echo "9dea67020ed671f0c631156cb4018e6976d266055b7eaa4280afcc3f4415c033  PLP-Seasons-0.4.90-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.90-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.90 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.90 for Mac" \
+            --notes "PLP Seasons 0.4.90 for macOS 13+ (Apple Silicon). Snow lies exactly on the Dock and follows it as it grows or shrinks; snow hugs app windows without hanging off their corners. Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.90-macOS-arm64.zip SHA256SUMS.txt
