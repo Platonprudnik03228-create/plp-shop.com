@@ -1,0 +1,21 @@
+name: mac-release
+on:
+  push:
+    branches: [mac-release]
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Put the zip back together and publish it
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          set -e
+          cat parts/z.* > PLP-Seasons-0.4.86-macOS-arm64.zip
+          echo "3da3cf6dfddddbfa1d8abdaa9b696883c1780da1a08050d0dd9384c94cc922d0  PLP-Seasons-0.4.86-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.86-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.86 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.86 for Mac" \
+            --notes "PLP Seasons 0.4.86 for macOS 13+ (Apple Silicon). PLP Pro keys bought on plp-shop.com work from this version on. Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.86-macOS-arm64.zip SHA256SUMS.txt
