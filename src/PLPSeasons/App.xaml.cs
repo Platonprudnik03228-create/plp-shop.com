@@ -37,6 +37,13 @@ public partial class App : Application
         Overlay.Legacy = e.Args.Contains("--legacy");
         int ix = Array.IndexOf(e.Args, "--seconds"); if (ix >= 0 && ix + 1 < e.Args.Length) double.TryParse(e.Args[ix + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out demoLength);
         set = Store.Load();
+        // 0.5.3: PLP Seasons is bought once; without a valid key only the activation window shows
+        if (!demo && !License.Valid(set.License))
+        {
+            var aw = new ActivationWindow();
+            if (aw.ShowDialog() != true || aw.Key == null) { Shutdown(); return; }
+            set.License = aw.Key; Store.Save(set);
+        }
         if (set.AutoSeason) set.Season = Seasons.FromDate(DateTime.Now);
         if (demo) { set.Season = Season.Winter; set.Intensity = 1.0; set.Paused = false; }
         wall = new WallpaperManager(set);
@@ -161,6 +168,7 @@ public partial class App : Application
     {
         var m = tray.ContextMenuStrip!; m.Items.Clear();
         m.Items.Add(new Forms.ToolStripLabel("PLP Seasons") { Font = new System.Drawing.Font(m.Font, System.Drawing.FontStyle.Bold) });
+        if (!string.IsNullOrEmpty(set.License)) m.Items.Add(new Forms.ToolStripMenuItem(L.T("Мой ключ…", "My key…"), null, (_, _) => ActivationWindow.ShowKey(set.License)));
         m.Items.Add(new Forms.ToolStripSeparator());
         var auto = new Forms.ToolStripMenuItem(L.T("По календарю", "Follow the calendar")) { Checked = set.AutoSeason };
         auto.Click += (_, _) => { set.AutoSeason = !set.AutoSeason; if (set.AutoSeason) ChangeSeason(Seasons.FromDate(DateTime.Now), keepAuto: true); Save(); };

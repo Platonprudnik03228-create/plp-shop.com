@@ -54,4 +54,5 @@ public sealed class AppSettings
     public double WeatherY { get; set; } = double.NaN;
     public double RemoteX { get; set; } = double.NaN;
     public double RemoteY { get; set; } = double.NaN;
+    public string License { get; set; } = "";      // 0.5.3: bought once, same key as the Mac app
 }
