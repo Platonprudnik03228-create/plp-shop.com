@@ -1348,6 +1348,7 @@ window.PLP_I18N = {
       return p;
     }
     function fit() { const n = target(); while (ps.length < n) ps.push(spawn({}, false)); if (ps.length > n) ps.length = n; }
+    window.PLPGround = () => ground;           // fest.js rolls snowballs in this drift
     function resetParticles() { ps = []; landed = []; ground.fill(0); ledge.fill(0); fit(); kick(); }
 
     // wind: drifts by itself, the cursor pushes
@@ -1709,5 +1710,6 @@ document.addEventListener('click', e => {
 });
 </script>
 <script src="buy.js" defer></script>
+<script src="fest.js" defer></script>
 </body>
 </html>
