@@ -153,13 +153,15 @@ async function load(){
 const API='https://plp-license.prudnyk0369.workers.dev';
 let lastTot=0;
 async function loadSales(){
-  const tok=store('plp_admin_tok');const login=(m)=>{$('sLogin').style.display='block';$('sMsg').textContent=m};
-  if(!tok){login('Чтобы видеть продажи, введи пароль админки один раз — он запомнится на этом устройстве.');return}
+  const tok=store('plp_admin_tok');const login=(m)=>{$('sLogin').style.display='block';$('sTok').style.display=$('sGo').style.display='';$('sMsg').textContent=m};
+  if(!tok){const p=await fetch(API+'/api/admin/sales',{cache:'no-store'}).then(r=>r.status).catch(()=>0);if(p==404){$('sLogin').style.display='block';$('sTok').style.display=$('sGo').style.display='none';$('sMsg').textContent='Продажи ещё не подключены: сервер на Cloudflare не обновлён. Пароль вводить пока не нужно.';return}
+    login(p==503?'На сервере ещё не задан пароль ADMIN_TOKEN (Cloudflare → plp-license → Settings → Variables).':'Введи пароль ADMIN_TOKEN, который ты сам задал в Cloudflare. Он запомнится на этом устройстве.');return}
   try{
     const r=await fetch(API+'/api/admin/sales',{headers:{Authorization:'Bearer '+tok},cache:'no-store'});
     if(r.status==403){store('plp_admin_tok',null);login('Пароль не подошёл — введи ещё раз.');return}
     if(r.status==503){login('На сервере ещё не задан пароль ADMIN_TOKEN (Cloudflare → plp-license → Settings → Variables).');return}
-    if(!r.ok){login('Сервер продаж ответил '+r.status+'. Если это 404 — на Cloudflare ещё старая версия сервера.');return}
+    if(r.status==404){store('plp_admin_tok',null);$('sLogin').style.display='block';$('sTok').style.display=$('sGo').style.display='none';$('sMsg').textContent='Продажи ещё не подключены: сервер на Cloudflare не обновлён. Пароль тут ни при чём — после обновления сервера ты сам задашь пароль ADMIN_TOKEN в Cloudflare и введёшь его здесь.';return}
+    if(!r.ok){login('Сервер продаж ответил '+r.status);return}
     const d=await r.json();$('sLogin').style.display='none';
     const real=d.paid.filter(x=>!x.refunded),day=Date.now()-864e5;
     $('sTotal').textContent=fmt(real.length);
