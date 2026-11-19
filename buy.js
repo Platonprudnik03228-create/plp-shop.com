@@ -1,4 +1,4 @@
-// PLP Seasons: bought once ($4.99, Mac + Windows, forever). Paddle overlay → key from the PLP licence server,
+// PLP Seasons: bought once ($4.99, Mac + Windows + Android, forever). Paddle overlay → key from the PLP licence server,
 // shown at once with the downloads, kept in this browser and always reachable on mykey.html.
 (function () {
   const CFG = {
@@ -9,18 +9,19 @@
   };
   const DL = {
     mac: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.93/PLP-Seasons-0.4.93-macOS-arm64.zip',
-    win: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/windows-v0.5.5/PLP-Seasons-0.5.5-Windows-x64.zip',
+    win: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/windows-v0.5.7/PLP-Seasons-0.5.7-Windows-x64.zip',
+    android: 'android.html',
   };
   const ru = /^(ru|uk|be)/i.test(document.documentElement.lang || navigator.language || '');
   const T = ru ? {
     wait: 'Оплата прошла. Готовим ключ…', title: 'Спасибо! Ваш ключ PLP Seasons', copy: 'Скопировать ключ', copied: 'Скопировано ✓',
-    open: 'Открыть в PLP Seasons (Mac)', mac: 'Скачать для Mac', win: 'Скачать для Windows',
-    how: 'Ключ подходит для Mac и Windows и работает навсегда. Скачайте приложение, откройте его и вставьте ключ (на Mac можно просто нажать «Открыть в PLP Seasons»). Ключ сохранён на этом сайте: <a href="mykey.html">«Мой ключ»</a>.',
+    open: 'Открыть в PLP Seasons (Mac / Android)', mac: 'Скачать для Mac', win: 'Скачать для Windows', android: 'Android (.apk)',
+    how: 'Ключ подходит для Mac, Windows и Android и работает навсегда. Скачайте приложение, откройте его и вставьте ключ (на Mac можно просто нажать «Открыть в PLP Seasons»). Ключ сохранён на этом сайте: <a href="mykey.html">«Мой ключ»</a>.',
     fail: 'Оплата прошла, но ключ не удалось получить сразу. Откройте <a href="mykey.html">«Мой ключ»</a> и введите номер заказа:', close: 'Закрыть',
   } : {
     wait: 'Payment received. Preparing your key…', title: 'Thank you! Your PLP Seasons key', copy: 'Copy key', copied: 'Copied ✓',
-    open: 'Open in PLP Seasons (Mac)', mac: 'Download for Mac', win: 'Download for Windows',
-    how: 'The key works on Mac and Windows, forever. Download the app, open it and paste the key (on a Mac you can just press “Open in PLP Seasons”). Your key is saved on this site: <a href="mykey.html">“My key”</a>.',
+    open: 'Open in PLP Seasons (Mac / Android)', mac: 'Download for Mac', win: 'Download for Windows', android: 'Android (.apk)',
+    how: 'The key works on Mac, Windows and Android, forever. Download the app, open it and paste the key (on a Mac you can just press “Open in PLP Seasons”). Your key is saved on this site: <a href="mykey.html">“My key”</a>.',
     fail: 'Payment went through, but the key could not be fetched right away. Open <a href="mykey.html">“My key”</a> and enter your order number:', close: 'Close',
   };
   const ready = CFG.token && CFG.price && CFG.api;
@@ -40,7 +41,7 @@
     return '<textarea readonly class="plpKeyText" style="width:100%;height:96px;font:12px/1.4 ui-monospace,Menlo,monospace;border:1px solid #cdd6e4;border-radius:10px;padding:10px;resize:none;box-sizing:border-box">' + key + '</textarea>' +
       '<p style="margin:10px 0"><button class="plpKeyCopy" style="padding:8px 14px;border:1px solid #cdd6e4;border-radius:10px;background:#fff;color:#0b1220;cursor:pointer">' + T.copy + '</button></p>' +
       '<p style="margin:6px 0"><a style="' + btn + 'background:#1769d2;color:#fff" href="plpseasons://activate?key=' + encodeURIComponent(key) + '">' + T.open + '</a></p>' +
-      '<p style="margin:6px 0"><a style="' + btn + 'background:#0b1220;color:#fff" href="' + DL.mac + '">' + T.mac + '</a><a style="' + btn + 'background:#0b1220;color:#fff" href="' + DL.win + '">' + T.win + '</a></p>';
+      '<p style="margin:6px 0"><a style="' + btn + 'background:#0b1220;color:#fff" href="' + DL.mac + '">' + T.mac + '</a><a style="' + btn + 'background:#0b1220;color:#fff" href="' + DL.win + '">' + T.win + '</a><a style="' + btn + 'background:#2e8b57;color:#fff" href="' + DL.android + '">' + T.android + '</a></p>';
   }
   function wire(root, key) {
     root.querySelectorAll('.plpKeyCopy').forEach((b) => b.onclick = () => { navigator.clipboard.writeText(key); b.textContent = T.copied; });
