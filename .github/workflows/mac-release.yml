@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Put the zip back together and publish it
+      - name: Publish the Android app
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cat parts/z.* > PLP-Seasons-0.4.93-macOS-arm64.zip
-          echo "af997e2567a600a35455f929ccbedd290abfee6635fa95d5d1f9a5cb98feae43  PLP-Seasons-0.4.93-macOS-arm64.zip" | sha256sum -c -
-          sha256sum PLP-Seasons-0.4.93-macOS-arm64.zip > SHA256SUMS.txt
-          gh release create v0.4.93 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.93 for Mac" \
-            --notes "PLP Seasons 0.4.93 for macOS 13+ (Apple Silicon). A short welcome with pictures on the first launch; a wish comes out of every gift; snow follows the Dock exactly once Accessibility is on. New Year: throw snowballs that splat on windows (each splat different), snow as a clean line along the Dock, double-click the drift for a snowman, fireworks with a countdown, icicles, Santa's sleigh with gifts. Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
-            PLP-Seasons-0.4.93-macOS-arm64.zip SHA256SUMS.txt
+          cd parts
+          echo "5b21572e6f1721ceaf675a31486b92eea143d62211c0f3992ca73f738634da79  PLP-Seasons-1.0.0-Android.apk" | sha256sum -c -
+          sha256sum PLP-Seasons-1.0.0-Android.apk > SHA256SUMS-android.txt
+          gh release create android-v1.0.0 --repo ${{ github.repository }} --target main --title "PLP Seasons 1.0.0 for Android" \
+            --notes "PLP Seasons for Android 8+: a live wallpaper with the real weather (snow, rain), a weather widget with snow, and the New Year tricks. Works with the same key as Mac and Windows ($4.99, bought once on plp-shop.com). How to install: https://plp-shop.com/android.html" \
+            PLP-Seasons-1.0.0-Android.apk SHA256SUMS-android.txt
