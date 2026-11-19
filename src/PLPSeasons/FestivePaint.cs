@@ -179,7 +179,39 @@ sealed partial class Painter
         DrawCountdown(dc, sim);
     }
 
+    static ImageSource? Img(string n)
+    {
+        try { var b = new System.Windows.Media.Imaging.BitmapImage(); b.BeginInit(); b.UriSource = new Uri($"pack://application:,,,/Assets/festive/{n}.png"); b.CacheOption = System.Windows.Media.Imaging.BitmapCacheOption.OnLoad; b.EndInit(); b.Freeze(); return b; }
+        catch { return null; }
+    }
+    static readonly ImageSource? SleighImg = Img("sleigh"), Deer0 = Img("deer0"), Deer1 = Img("deer1");
+
+    /// <summary>0.5.7 (owner: "Santa with a proper face, proper reindeer"): the painted art, the same as on the Mac.</summary>
     void DrawSleigh(DrawingContext dc, Simulation sim, double t)
+    {
+        if (sim.Sleigh is not { } s || sim.SleighPos is not { } p) return;
+        if (SleighImg == null || Deer0 == null || Deer1 == null) { DrawSleighVector(dc, sim, t); return; }
+        double k = 1.15 * sim.Scale, d = s.Dir;
+        dc.PushTransform(new ScaleTransform(d, 1, p.x, 0));
+        var harness = new List<Point> { new Point(p.x + 32 * k, p.y - 4 * k) };
+        for (int i = 0; i < 4; i++)
+        {
+            double x = p.x + (72 + i * 47) * k, y = p.y - (8 + Math.Sin(t * 9 + i * 1.1) * 3 + i * 2) * k;
+            double w = 58 * k, h = w * 0.75;
+            harness.Add(new Point(x - w * 0.3, y + h * 0.04));
+            dc.DrawImage(((int)(t * 9) + i) % 2 == 0 ? Deer0 : Deer1, new Rect(x - w / 2, y - h / 2, w, h));
+            if (i == 3) { double nx = x + w * 0.402, ny = y - h * 0.197; dc.DrawEllipse(Glow(255, 50, 30, 0.8 + 0.2 * Math.Sin(t * 8)), null, new Point(nx, ny), 8 * k, 8 * k); }
+        }
+        var rein = new StreamGeometry();
+        using (var c = rein.Open()) { c.BeginFigure(harness[0], false, false); for (int i = 1; i < harness.Count; i++) c.LineTo(harness[i], true, true); }
+        rein.Freeze(); dc.DrawGeometry(null, new Pen(Fz(new SolidColorBrush(Color.FromRgb(140, 90, 40))), 1.4 * sim.Scale), rein);
+        double sw = 110 * k, sh = sw * 0.692;
+        dc.DrawImage(SleighImg, new Rect(p.x - sw / 2, p.y - sh / 2, sw, sh));
+        dc.Pop();
+    }
+
+    void DrawSleighVector(DrawingContext dc, Simulation sim, double t)
+
     {
         if (sim.Sleigh is not { } s || sim.SleighPos is not { } p) return;
         double k = 1.55 * sim.Scale, d = s.Dir;

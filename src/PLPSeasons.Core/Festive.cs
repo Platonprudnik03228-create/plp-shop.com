@@ -209,9 +209,9 @@ public sealed partial class Simulation
     public bool SleighHit(double x, double y)
     {
         if (Sleigh is not { } s || SleighPos is not { } q) return false;
-        double k = 1.55 * Scale;
-        double left = s.Dir > 0 ? q.x - 40 * k : q.x - 190 * k;
-        return x > left && x < left + 230 * k && y > q.y - 30 * k && y < q.y + 30 * k;
+        double k = 1.15 * Scale;
+        double left = s.Dir > 0 ? q.x - 70 * k : q.x - 300 * k;
+        return x > left && x < left + 370 * k && y > q.y - 48 * k && y < q.y + 48 * k;
     }
     public void DropGift()
     {

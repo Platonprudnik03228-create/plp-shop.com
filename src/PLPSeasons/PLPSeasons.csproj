@@ -12,7 +12,7 @@
     <RootNamespace>PLPSeasons</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
-    <Version>0.5.6</Version>
+    <Version>0.5.7</Version>
     <Company>PLP</Company>
     <Product>PLP Seasons</Product>
     <Copyright>PLP</Copyright>
@@ -28,5 +28,6 @@
     <Content Include="Wallpapers\*.jpg" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
     <Resource Include="Assets\app.ico" />
     <Resource Include="Assets\plow\*.png" />
+    <Resource Include="Assets\festive\*.png" />
   </ItemGroup>
 </Project>
