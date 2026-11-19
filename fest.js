@@ -133,7 +133,7 @@
         if (c.falling) { c.vy += 1500 * dt; c.y += c.vy * dt; c.rot += dt * 1.4; if (c.y + c.len / 2 >= top(c.x)) { for (let i = 0; i < 10; i++) spark(c.x, top(c.x) - 2, rnd(-140, 140), -rnd(40, 240), rnd(0.4, 0.9), rnd(1.5, 3.5), '#d8f2ff', 3, 900); c.falling = false; c.len = 0; c.regrow = 20; } }
         else if (c.regrow > 0) c.regrow -= dt; else c.len = Math.min(c.max, c.len + dt * 2);
       }
-      if (t > 4 && t < 4.1 && !shownRoll) hint(T_().ice, W * 0.4, 92, 4);
+      if (t > 4 && t < 4.1 && !shownRoll) hint(T_().ice, W * 0.3, 92, 4);
       // Santa every 20–30 s
       if (!sleigh) { nextSleigh -= dt; if (nextSleigh <= 0) { nextSleigh = rnd(20, 30); const dir = Math.random() < 0.5 ? 1 : -1; sleigh = { x: dir > 0 ? -320 : W + 320, y0: H * rnd(0.18, 0.3), y: 0, dir, age: 0, dropped: false }; } }
       else {
@@ -274,7 +274,7 @@
     }
     resize(); floor(); addEventListener('resize', resize);
     if (location.hash === '#festdemo') {                   // a scripted check of every trick
-      nextSleigh = 99; sleigh = { x: W * 0.42, y0: H * 0.22, y: 0, dir: 1, age: 0, dropped: false };
+      nextSleigh = 99; sleigh = { x: W * 0.2, y0: H * 0.22, y: 0, dir: 1, age: 0, dropped: false };
       setTimeout(() => { raise(W * 0.3); balls.push({ x: W * 0.55, y: top(W * 0.55) - 20, r: 22, vx: 0, vy: 0, ang: 0, fly: 9 }); splat(W * 0.7, H * 0.4, 1, 0.3); splat(W * 0.2, H * 0.3, -1, 0.5); icicles.forEach((c, i) => { if (i % 4 === 0) { c.falling = true; c.y = c.len / 2; c.vy = 0; } }); openGift({ x: W * 0.8, y: top(W * 0.8) - 15 }); }, 1500);
     }
     requestAnimationFrame(frame);
