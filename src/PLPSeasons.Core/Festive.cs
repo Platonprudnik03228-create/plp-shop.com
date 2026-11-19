@@ -249,8 +249,8 @@ public sealed partial class Simulation
             AddSpark(g.X, g.Y - 4 * Scale, Math.Cos(a) * R(80, 330), -Math.Sin(a) * R(160, 520), R(1.6, 2.8), R(4, 7), c, 2, 420, 0.35, R(-14, 14));
         }
         for (int k = 0; k < 14; k++) AddSpark(g.X + R(-14, 14) * Scale, g.Y - R(-6, 18) * Scale, R(-40, 40), -R(20, 120), R(0.6, 1.2), R(5, 10), (255, 235, 153), 6, 30, 0.4);
-        int k = rng.Next(WishList.Length); if (k == lastWish) k = (k + 1) % WishList.Length; lastWish = k;
-        Wishes.Add((g.X, g.Y - 26 * Scale, 0, Russian ? WishList[k].ru : WishList[k].en));
+        int wi = rng.Next(WishList.Length); if (wi == lastWish) wi = (wi + 1) % WishList.Length; lastWish = wi;
+        Wishes.Add((g.X, g.Y - 26 * Scale, 0, Russian ? WishList[wi].ru : WishList[wi].en));
         if (Wishes.Count > 3) Wishes.RemoveAt(0);
         if (Season == Season.Winter && rng.NextDouble() < 0.35) RaiseSnowman(g.X);
     }
