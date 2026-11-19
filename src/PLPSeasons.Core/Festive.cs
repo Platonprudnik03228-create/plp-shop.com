@@ -4,7 +4,7 @@ namespace PLPSeasons.Core;
 /// snowballs that splat on windows, a snowman raised by a double-click (it looks at the pointer; a snowball knocks its
 /// head off), fireworks with a New Year countdown, icicles along the top of the screen, Santa's sleigh dropping gifts,
 /// and grooves the pointer leaves in the drift. Physical pixels, y down.</summary>
-public sealed class Splat { public RectI Win; public double X, Y, R, Age, Slide; public int Seed; }
+public sealed class Splat { public RectI Win; public double X, Y, R, Age, Slide, Dir, Speed; public int Seed; }
 public sealed class Spark { public double X, Y, VX, VY, Age, Life, Size, Grav, Drag, Rot, Spin; public byte R, G, B; public int Kind; }
 public sealed class Rocket { public double X, Y, VX, VY; public int C, Pattern; }
 public sealed class Icicle { public double X, Len, Max, W, Y, VY, Rot, Wob, Regrow; public bool Falling; }
@@ -84,7 +84,8 @@ public sealed partial class Simulation
         foreach (var w in Windows)
         {
             if (!w.Contains(b.X, b.Y)) continue;
-            Splats.Add(new Splat { Win = w, X = b.X, Y = b.Y, R = Math.Max(30 * Scale, b.R * 3.4), Seed = rng.Next(3) });
+            // each splat is drawn anew: a packed clump and a spray thrown on along the flight (0.5.5)
+            Splats.Add(new Splat { Win = w, X = b.X, Y = b.Y, R = Math.Max(30 * Scale, b.R * 3.4), Seed = rng.Next(), Dir = Math.Atan2(b.VY, b.VX), Speed = Math.Min(1, Math.Sqrt(b.VX * b.VX + b.VY * b.VY) / (900 * Scale)) });
             for (int k = 0; k < Math.Min(14, 5 + (int)(b.R / Scale)); k++)
             {
                 double a = R(0, Math.PI * 2);
@@ -98,7 +99,13 @@ public sealed partial class Simulation
     void StepSplats(double dt)
     {
         Splats.RemoveAll(s => s.Age > 14 || !Windows.Contains(s.Win));
-        foreach (var s in Splats) { s.Age += dt; if (s.Age > 1.2) s.Slide += dt * Math.Max(0, 9 - (s.Age - 1.2) * 0.7) * Scale; }
+        foreach (var s in Splats)
+        {
+            // it sticks; after a while the heavy clump creeps down a little, slower and slower; now and then a crumb drops off
+            s.Age += dt; if (s.Age > 2.5) s.Slide += dt * Math.Max(0, 5 - (s.Age - 2.5) * 0.45) * Scale;
+            if (s.Age < 9 && rng.NextDouble() < dt * (s.Age < 1 ? 3 : 0.7))
+                Add(new Particle { Kind = Kind.Crumb, X = s.X + R(-0.3, 0.3) * s.R, Y = s.Y + s.Slide + s.R * 0.28, VX = R(-10, 10), VY = R(-5, 10), Size = R(0.9, 1.8) * Scale, Life = 3, Alive = true });
+        }
     }
 
     // ---------- grooves in the drift ----------

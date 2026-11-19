@@ -11,6 +11,37 @@ namespace PLPSeasons;
 sealed partial class Painter
 {
     static readonly Geometry[] SplatGeo = MakeSplats();
+    static readonly System.Runtime.CompilerServices.ConditionalWeakTable<Splat, Geometry> splatShapes = new();
+    static readonly Brush SplatShadow = Fz(new SolidColorBrush(Color.FromArgb(70, 40, 60, 95)));
+    /// <summary>One splat's own shape (0.5.5): overlapping lumps where it hit, blobs and streaks thrown on along its
+    /// flight, fine specks. Unit size: the splat spans -1 … 1.</summary>
+    static Geometry SplatShape(Splat s)
+    {
+        if (splatShapes.TryGetValue(s, out var g)) return g;
+        var r = new Random(s.Seed);
+        double Rn(double a, double b) => a + (b - a) * r.NextDouble();
+        var grp = new GeometryGroup { FillRule = FillRule.Nonzero };
+        double ca = Math.Cos(s.Dir), sa = Math.Sin(s.Dir), core = Rn(0.3, 0.38), sq = Rn(0.75, 1);
+        void Put(double u, double v, double rad, double stretch = 1, double ang = 0)
+        {
+            var e = new EllipseGeometry(new Point(0, 0), rad * stretch, rad);
+            var m = new Matrix(); m.Rotate(ang * 57.2958); m.Translate(u * ca - v * sa, u * sa + v * ca);
+            e.Transform = new MatrixTransform(m); grp.Children.Add(e);
+        }
+        for (int i = 0, n = (int)Rn(12, 20); i < n; i++) { double a = Rn(0, Math.PI * 2), d = core * Math.Sqrt(r.NextDouble()); Put(Math.Cos(a) * d * sq + core * 0.15, Math.Sin(a) * d, core * Rn(0.45, 0.8)); }
+        for (int i = 0, n = (int)(Rn(12, 22) + 12 * s.Speed); i < n; i++)
+        {
+            bool fwd = r.NextDouble() < 0.75;
+            double a = fwd ? Rn(-0.9, 0.9) : Rn(0, Math.PI * 2), d = core * (1.1 + Rn(0, 1.8) * (fwd ? 1 + s.Speed : 0.6));
+            if (d > 0.92) continue;
+            double rad = Math.Max(0.025, core * 0.62 * (1 - d) * Rn(0.45, 1.1));
+            Put(Math.Cos(a) * d, Math.Sin(a) * d, rad, fwd ? Rn(1.2, 2.4) : 1, a);
+            if (r.NextDouble() < 0.5) Put(Math.Cos(a) * d * 0.8, Math.Sin(a) * d * 0.8, rad * 0.6);
+        }
+        for (int i = 0, n = (int)Rn(18, 34); i < n; i++) { double a = Rn(0, Math.PI * 2), d = Rn(0.35, 0.95); Put(Math.Cos(a) * d, Math.Sin(a) * d, Rn(0.008, 0.025)); }
+        grp.Freeze(); splatShapes.AddOrUpdate(s, grp);
+        return grp;
+    }
     static readonly Brush SplatFill = Fz(new RadialGradientBrush(Color.FromRgb(255, 255, 255), Color.FromRgb(196, 210, 232)) { GradientOrigin = new Point(0.4, 0.38), Center = new Point(0.45, 0.42), RadiusX = 0.6, RadiusY = 0.6 });
     static readonly Geometry IcicleGeo = Fz(Geometry.Parse("M-0.5,0 L0.5,0 C0.42,0.4 0.12,0.8 0.03,1 C-0.12,0.8 -0.42,0.4 -0.5,0 Z"));
     static readonly Brush IcicleFill = Fz(new LinearGradientBrush(new GradientStopCollection {
@@ -74,8 +105,10 @@ sealed partial class Painter
             double y = s.Y + s.Slide; if (y > s.Win.Bottom - 4) continue;
             dc.PushOpacity(0.96 * fade);
             if (s.Slide > 2) dc.DrawRectangle(Fz(new SolidColorBrush(Color.FromArgb(50, 255, 255, 255))), null, new Rect(s.X - r * 0.28, s.Y, r * 0.55, s.Slide));
-            dc.PushTransform(new MatrixTransform(r * 2, 0, 0, r * 2, s.X, y));
-            dc.DrawGeometry(SplatFill, new Pen(Fz(new SolidColorBrush(Color.FromArgb(215, 128, 153, 194))), 1.3 / (r * 2)), SplatGeo[s.Seed]);
+            var shape = SplatShape(s);
+            dc.PushTransform(new MatrixTransform(r, 0, 0, r, s.X, y + 1.2 * S)); dc.DrawGeometry(SplatShadow, null, shape); dc.Pop();   // a soft cool shadow under it
+            dc.PushTransform(new MatrixTransform(r, 0, 0, r, s.X, y));
+            dc.DrawGeometry(SplatFill, null, shape);
             dc.Pop(); dc.Pop();
         }
         // icicles hanging from the top of the screen
