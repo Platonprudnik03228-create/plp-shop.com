@@ -2,9 +2,9 @@
 // the site: roll a snowball with the mouse, knock the icicles down, Santa flies over every 20–30 s and drops a gift with
 // "click the gift", a snowman comes out with "double-click — it falls apart"). The demo itself is the instructions.
 (function () {
-  const TT = [{ gift: 'Нажми на подарок 🎁', man: 'Кликни 2 раза — развалится', roll: 'Зажми снег и катай — снежок растёт', throw: 'Отпусти — бросок!', ice: 'Проведи мышкой по сосулькам',
+  const TT = [{ gift: 'Нажми на подарок 🎁', man: 'Кликни 2 раза — развалится', roll: 'Зажми снег и катай — снежок растёт', throw: 'Отпусти — бросок!', ice: 'Проведи мышкой по сосулькам', iceT: 'Смахни сосульки пальцем',
     wishes: ['С наступающим Новым годом!', 'Одевайся теплее — шапку не забудь', 'Пусть в новом году всё получится', 'Загадай желание — сбудется!', 'Больше тепла, меньше дедлайнов', 'Выпей какао и отдохни', 'Позвони близким — им будет приятно', 'Слепи снеговика — это полезно!', 'Мандарины — лучший витамин C', 'Ты молодец. Правда.'] }
-    , { gift: 'Click the gift 🎁', man: 'Double-click — it falls apart', roll: 'Press the snow and roll — the ball grows', throw: 'Let go — throw!', ice: 'Swipe the mouse across the icicles',
+    , { gift: 'Click the gift 🎁', man: 'Double-click — it falls apart', roll: 'Press the snow and roll — the ball grows', throw: 'Let go — throw!', ice: 'Swipe the mouse across the icicles', iceT: 'Swipe the icicles with a finger',
     wishes: ['Happy New Year to you!', "Dress warm — don't forget your hat", 'May everything work out this year', 'Make a wish — it will come true!', 'More warmth, fewer deadlines', 'Have a cocoa and take a break', 'Call someone you love today', "Build a snowman — doctor's orders!", 'Tangerines: the best vitamin C', "You're doing great. Really."] }];
   const T_ = () => TT[/^(ru|uk|be)/i.test(document.documentElement.lang || '') ? 0 : 1];
   const img = n => { const i = new Image(); i.src = 'img/' + n + '.png'; return i; };
@@ -96,7 +96,7 @@
 
     function manAt(p) { return men.find(m => Math.abs(p.x - m.x) < m.r[0] + 6 && p.y < m.y + 6 && p.y > m.y - (m.r[0] + m.r[1] + m.r[2]) * 1.9); }
     function raise(x, delay) {
-      const r0 = 24, m = { x: Math.max(40, Math.min(W - 40, x)), y: top(x) + 3, r: [r0, r0 * 0.75, r0 * 0.55], born: t + (delay || 0), look: 1, headless: false };
+      const r0 = W < 600 ? 18 : 24, m = { x: Math.max(40, Math.min(W - 40, x)), y: top(x) + 3, r: [r0, r0 * 0.75, r0 * 0.55], born: t + (delay || 0), look: 1, headless: false };
       men.push(m); if (men.length > 4) men.shift();
       setTimeout(() => hint(T_().man, m.x, m.y - 128, 5), ((delay || 0) + 0.9) * 1000);
     }
@@ -106,7 +106,7 @@
       for (let c = col(m.x - 30); c <= col(m.x + 30); c++) drift[c] = Math.min(18, (drift[c] || 0) + 8);
     }
     function splat(x, y, vx, vy) {
-      const r = rnd(28, 40), dir = Math.atan2(vy, vx), core = r * rnd(0.3, 0.38), lumps = [];
+      const r = rnd(28, 40) * (W < 600 ? 0.7 : 1), dir = Math.atan2(vy, vx), core = r * rnd(0.3, 0.38), lumps = [];
       for (let i = 0, n = 12 + Math.random() * 8 | 0; i < n; i++) { const a = rnd(0, 6.28), d = core * Math.sqrt(Math.random()); lumps.push([Math.cos(a) * d, Math.sin(a) * d, core * rnd(0.45, 0.8)]); }
       for (let i = 0, n = 16 + Math.random() * 10 | 0; i < n; i++) {
         const fwd = Math.random() < 0.75, a = (fwd ? rnd(-0.9, 0.9) : rnd(0, 6.28)) + (fwd ? dir : 0), d = core * (1.1 + rnd(0, 1.9));
@@ -133,7 +133,7 @@
         if (c.falling) { c.vy += 1500 * dt; c.y += c.vy * dt; c.rot += dt * 1.4; if (c.y + c.len / 2 >= top(c.x)) { for (let i = 0; i < 10; i++) spark(c.x, top(c.x) - 2, rnd(-140, 140), -rnd(40, 240), rnd(0.4, 0.9), rnd(1.5, 3.5), '#d8f2ff', 3, 900); c.falling = false; c.len = 0; c.regrow = 20; } }
         else if (c.regrow > 0) c.regrow -= dt; else c.len = Math.min(c.max, c.len + dt * 2);
       }
-      if (t > 4 && t < 4.1 && !shownRoll) hint(T_().ice, W * 0.3, 92, 4);
+      if (t > 4 && t < 4.1 && !shownRoll) hint(matchMedia('(pointer: coarse)').matches ? T_().iceT : T_().ice, W * 0.3, 92, 4);
       // Santa every 20–30 s
       if (!sleigh) { nextSleigh -= dt; if (nextSleigh <= 0) { nextSleigh = rnd(20, 30); const dir = Math.random() < 0.5 ? 1 : -1; sleigh = { x: dir > 0 ? -320 : W + 320, y0: H * rnd(0.18, 0.3), y: 0, dir, age: 0, dropped: false }; } }
       else {
