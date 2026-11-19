@@ -35,7 +35,25 @@ ol{margin:6px 0 0;padding-left:20px}li{margin:4px 0}
   <div class="card kpi"><div class="l">Скачиваний всего</div><div class="v" id="kTotal">—</div><div class="up" id="kSince"></div></div>
   <div class="card kpi"><div class="l">Mac</div><div class="v" id="kMac">—</div></div>
   <div class="card kpi"><div class="l">Windows</div><div class="v" id="kWin">—</div></div>
+  <div class="card kpi"><div class="l">Android</div><div class="v" id="kAnd">—</div></div>
   <div class="card kpi"><div class="l">За последние 24 часа</div><div class="v" id="k24">—</div><div class="dim small" id="k24n"></div></div>
+</div>
+
+<div class="card" id="salesCard">
+  <h2>Продажи (Paddle)</h2>
+  <div class="grid" style="margin-bottom:8px">
+    <div class="kpi"><div class="l">Купили всего</div><div class="v" id="sTotal">—</div></div>
+    <div class="kpi"><div class="l">За 24 часа</div><div class="v" id="s24">—</div></div>
+    <div class="kpi"><div class="l">Тебе на руки</div><div class="v" id="sEarn">—</div><div class="dim small">после налога и комиссии Paddle</div></div>
+    <div class="kpi"><div class="l">Открыли оплату и бросили</div><div class="v" id="sLeft">—</div></div>
+  </div>
+  <div class="dim small" id="sConv"></div>
+  <table style="margin-top:8px"><tbody id="sRows"></tbody></table>
+  <div id="sLogin" style="display:none;margin-top:8px">
+    <div class="dim small" id="sMsg"></div>
+    <input id="sTok" type="password" placeholder="Пароль админки (ADMIN_TOKEN)" style="margin-top:6px;padding:8px 10px;border-radius:8px;border:1px solid #333;background:#111;color:#fff;width:min(320px,100%)">
+    <button id="sGo" style="margin-top:6px">Показать продажи</button>
+  </div>
 </div>
 
 <div class="card">
@@ -118,7 +136,7 @@ async function load(){
     const sum=p=>[...all.values()].filter(x=>x.p==p).reduce((s,x)=>s+x.c,0);
     const mac=sum('mac'),win=sum('win'),and=sum('and'),tot=mac+win+and;
     const gone=tot-rel.reduce((s,r)=>s+r.count,0);
-    $('kTotal').textContent=fmt(tot);if(gone>0)$('kSince').title='в том числе '+gone+' скачиваний старых версий, которых уже нет на GitHub';$('kMac').textContent=fmt(mac);$('kWin').textContent=fmt(win);
+    $('kTotal').textContent=fmt(tot);if(gone>0)$('kSince').title='в том числе '+gone+' скачиваний старых версий, которых уже нет на GitHub';$('kMac').textContent=fmt(mac);$('kWin').textContent=fmt(win);$('kAnd').textContent=fmt(and);
     const prev=store('plp_admin_last2');
     $('kSince').textContent=prev&&tot>=prev.tot?`+${tot-prev.tot} с прошлого захода (${new Date(prev.at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})})`:'';
     store('plp_admin_last2',{tot,at:Date.now()});
@@ -126,11 +144,34 @@ async function load(){
     const dayAgo=pts.filter(p=>p.t<=Date.now()-864e5).pop();
     if(dayAgo){$('k24').textContent='+'+fmt(tot-dayAgo.mac-dayAgo.win-(dayAgo.and||0));$('k24n').textContent='Mac +'+(mac-dayAgo.mac)+' · Windows +'+(win-dayAgo.win)+' · Android +'+(and-(dayAgo.and||0))}
     else{$('k24').textContent='…';$('k24n').textContent='история копится, цифра появится через сутки'}
-    draw(pts);
+    draw(pts);lastTot=tot;if($('sTotal').textContent!=='—')loadSales();
     $('rows').innerHTML=rel.map(r=>`<tr><td><span class="tag ${r.p}">${r.p=='mac'?'Mac':r.p=='and'?'Android':'Windows'}</span> ${r.tag}</td><td class="dim small">${r.name}</td><td class="dim small">${r.date?new Date(r.date).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td><td class="n">${fmt(r.count)}</td></tr>`).join('');
     $('upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU');
   }catch(e){$('err').style.display='block';$('err').textContent='Не удалось загрузить: '+e.message;$('upd').textContent=''}
 }
-$('reload').onclick=load;load();setInterval(()=>{if(!document.hidden)load()},300000);
+// ---- sales: read from the licence server, which asks Paddle; the page itself holds no Paddle key ----
+const API='https://plp-license.prudnyk0369.workers.dev';
+let lastTot=0;
+async function loadSales(){
+  const tok=store('plp_admin_tok');const login=(m)=>{$('sLogin').style.display='block';$('sMsg').textContent=m};
+  if(!tok){login('Чтобы видеть продажи, введи пароль админки один раз — он запомнится на этом устройстве.');return}
+  try{
+    const r=await fetch(API+'/api/admin/sales',{headers:{Authorization:'Bearer '+tok},cache:'no-store'});
+    if(r.status==403){store('plp_admin_tok',null);login('Пароль не подошёл — введи ещё раз.');return}
+    if(r.status==503){login('На сервере ещё не задан пароль ADMIN_TOKEN (Cloudflare → plp-license → Settings → Variables).');return}
+    if(!r.ok){login('Сервер продаж ответил '+r.status+'. Если это 404 — на Cloudflare ещё старая версия сервера.');return}
+    const d=await r.json();$('sLogin').style.display='none';
+    const real=d.paid.filter(x=>!x.refunded),day=Date.now()-864e5;
+    $('sTotal').textContent=fmt(real.length);
+    $('s24').textContent='+'+real.filter(x=>Date.parse(x.at)>day).length;
+    const earn={};for(const x of real)earn[x.currency]=(earn[x.currency]||0)+x.earnings;
+    $('sEarn').textContent=Object.keys(earn).length?Object.entries(earn).map(([c,v])=>v.toFixed(2)+' '+c).join(' + '):'0';
+    $('sLeft').textContent=fmt(d.started.length);
+    $('sConv').textContent=lastTot?`Из ${fmt(lastTot)} скачиваний купили ${real.length} — это ${(real.length/lastTot*100).toFixed(1)}%.`+(d.paid.length>real.length?` Возвратов: ${d.paid.length-real.length}.`:''):'';
+    $('sRows').innerHTML=d.paid.slice(0,15).map(x=>`<tr><td class="dim small">${new Date(x.at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td><td>${x.total.toFixed(2)} ${x.currency}${x.refunded?' <span class="dim small">(возврат)</span>':''}</td><td class="n dim small">тебе ${x.earnings.toFixed(2)}</td></tr>`).join('')||'<tr><td class="dim small">Покупок пока нет.</td></tr>';
+  }catch(e){login('Сервер продаж недоступен: '+e.message)}
+}
+$('sGo').onclick=()=>{const v=$('sTok').value.trim();if(v){store('plp_admin_tok',v);$('sTok').value='';loadSales()}};
+$('reload').onclick=()=>{load();loadSales()};load();loadSales();setInterval(()=>{if(!document.hidden)load()},300000);
 </script>
 </body></html>
