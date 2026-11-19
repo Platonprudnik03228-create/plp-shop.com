@@ -13,9 +13,9 @@ jobs:
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cat parts/z.* > PLP-Seasons-0.4.92-macOS-arm64.zip
-          echo "f0352387a74886430ac1689e37f854702e157b2668dede43859e236ad710bd60  PLP-Seasons-0.4.92-macOS-arm64.zip" | sha256sum -c -
-          sha256sum PLP-Seasons-0.4.92-macOS-arm64.zip > SHA256SUMS.txt
-          gh release create v0.4.92 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.92 for Mac" \
-            --notes "PLP Seasons 0.4.92 for macOS 13+ (Apple Silicon). New Year: throw snowballs that splat on windows (each splat different), snow as a clean line along the Dock, double-click the drift for a snowman, fireworks with a countdown, icicles, Santa's sleigh with gifts. Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
-            PLP-Seasons-0.4.92-macOS-arm64.zip SHA256SUMS.txt
+          cat parts/z.* > PLP-Seasons-0.4.93-macOS-arm64.zip
+          echo "af997e2567a600a35455f929ccbedd290abfee6635fa95d5d1f9a5cb98feae43  PLP-Seasons-0.4.93-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.93-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.93 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.93 for Mac" \
+            --notes "PLP Seasons 0.4.93 for macOS 13+ (Apple Silicon). A short welcome with pictures on the first launch; a wish comes out of every gift; snow follows the Dock exactly once Accessibility is on. New Year: throw snowballs that splat on windows (each splat different), snow as a clean line along the Dock, double-click the drift for a snowman, fireworks with a countdown, icicles, Santa's sleigh with gifts. Bought once on plp-shop.com ($4.99, Mac + Windows, forever): the app asks for the key, and the Open-in-PLP-Seasons button on the site activates it. Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.93-macOS-arm64.zip SHA256SUMS.txt
