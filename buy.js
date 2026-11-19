@@ -8,7 +8,7 @@
     env: 'production',
   };
   const DL = {
-    mac: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.92/PLP-Seasons-0.4.92-macOS-arm64.zip',
+    mac: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/v0.4.93/PLP-Seasons-0.4.93-macOS-arm64.zip',
     win: 'https://github.com/Platonprudnik03228-create/plp-shop.com/releases/download/windows-v0.5.5/PLP-Seasons-0.5.5-Windows-x64.zip',
   };
   const ru = /^(ru|uk|be)/i.test(document.documentElement.lang || navigator.language || '');
