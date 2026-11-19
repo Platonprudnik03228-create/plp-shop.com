@@ -3,10 +3,12 @@ namespace PLPSeasons.Core;
 public sealed class Ball
 {
     public int Id; public double X, Y, R, VX, VY, Ang, Age; public int? On;
+    public bool Face; public double Fly = 9;     // 0.5.4: a snowman's knocked-off head; seconds since it was thrown
 }
 public sealed class Snowman
 {
     public double X, Y, VX, VY, Spin, Born, Wave, LastWave = -99; public double[] R = new double[3]; public int Hat; public bool Held;
+    public bool Headless; public double Look = 1;   // 0.5.4
 }
 public sealed class Garland
 {
@@ -57,6 +59,7 @@ public sealed partial class Simulation
     // ---------- the pointer ----------
     public bool IsInteractive(double x, double y)
     {
+        if (FestInteractive(x, y)) return true;
         if (Season != Season.Winter) return false;
         if (hold != Hold.None) return true;
         if (OverAWindow(x, y)) return false;
@@ -105,13 +108,11 @@ public sealed partial class Simulation
 
     public void MouseDown(double x, double y, int clicks)
     {
+        if (FestMouseDown(x, y)) return;
         if (Season != Season.Winter) return;
         mx = x; my = y; mt = Time;
-        if (clicks >= 2)
-        {
-            var sm = SnowmanAt(x, y); if (sm != null) { CrumbleSnowman(sm); hold = Hold.None; return; }
-            var bb = NearestBall(x, y); if (bb != null) { CrumbleBall(bb); hold = Hold.None; return; }
-        }
+        // 0.5.4: double-click on the drift raises a snowman (on a snowman / ball: it falls apart, as before)
+        if (clicks >= 2 && DoubleClick(x, y)) return;
         var b = NearestBall(x, y);
         if (b != null)
         {
@@ -150,7 +151,7 @@ public sealed partial class Simulation
         var (t0, x0, y0) = trail.Peek();
         double dt = Time - t0;
         if (dt > 0.012) { mvx = (x - x0) / dt; mvy = (y - y0) / dt; } else if (trail.Count <= 1) { mvx = mvy = 0; }
-        if (hold == Hold.None) MouseMove(x, y);
+        if (hold == Hold.None) { MouseMove(x, y); Trail(x, y); }
     }
 
     public void MouseMove(double x, double y)
@@ -204,7 +205,7 @@ public sealed partial class Simulation
         switch (hold)
         {
             case Hold.Ball:
-                if (HeldBall is { } b) { b.VX = Math.Clamp(mvx * 0.5, -900 * Scale, 900 * Scale); b.VY = Math.Clamp(mvy * 0.5, -900 * Scale, 900 * Scale); }
+                if (HeldBall is { } b) { b.VX = Math.Clamp(mvx * 0.5, -900 * Scale, 900 * Scale); b.VY = Math.Clamp(mvy * 0.5, -900 * Scale, 900 * Scale); b.Fly = 0; }
                 break;
             case Hold.Man:
                 if (heldMan != null)
@@ -308,8 +309,9 @@ public sealed partial class Simulation
     public void CrumbleSnowman(Snowman m)
     {
         double y = m.Y;
-        foreach (var r in m.R)
+        for (int ri = 0; ri < (m.Headless ? 2 : 3); ri++)
         {
+            double r = m.R[ri];
             var b = new Ball { Id = nextBall++, X = m.X, Y = y - r, R = r };
             Balls.Add(b); CrumbleBall(b); y -= r * 1.8;
         }
@@ -340,7 +342,7 @@ public sealed partial class Simulation
 
     void StepBalls(double dt)
     {
-        var smash = new List<Ball>(); var hitMen = new HashSet<Snowman>();
+        var smash = new List<Ball>(); var hitMen = new Dictionary<Snowman, Ball>(); var gone = new List<Ball>();
         int heldId = hold == Hold.Ball ? heldBall : -1;
         foreach (var b in Balls)
         {
@@ -349,9 +351,11 @@ public sealed partial class Simulation
             if (b.On is int on && Balls.FirstOrDefault(o => o.Id == on) is { } bs)
             { b.X = bs.X; b.Y = bs.Y - bs.R - b.R * 0.82; b.VX = b.VY = 0; continue; }
             b.On = null;
+            b.Fly += dt;
             b.VY += 1500 * Scale * dt;
             double ox = b.X;
             b.X += b.VX * dt; b.Y += b.VY * dt;
+            if (!b.Face && SplatCheck(b)) { gone.Add(b); continue; }
             double g = SnowTop(b.X);
             if (b.Y + b.R * 0.9 >= g)
             {
@@ -383,7 +387,7 @@ public sealed partial class Simulation
             if (Math.Sqrt(b.VX * b.VX + b.VY * b.VY) > 320 * Scale && b.Age > 0.12)
             {
                 var man = Snowmen.FirstOrDefault(m => !m.Held && Math.Abs(b.X - m.X) < m.R[0] + b.R * 0.8 && b.Y < m.Y + b.R && b.Y > m.Y - (m.R[0] + m.R[1] + m.R[2]) * 1.9 - b.R * 0.5);
-                if (man != null) { hitMen.Add(man); smash.Add(b); continue; }
+                if (man != null) { hitMen[man] = b; smash.Add(b); continue; }
             }
             // lands on another ball → stack; otherwise they push apart
             foreach (var o in Balls)
@@ -397,8 +401,9 @@ public sealed partial class Simulation
                 b.X += push; b.VX = -b.VX * 0.2;
             }
         }
+        foreach (var b in gone) Balls.Remove(b);
+        foreach (var (m, hb) in hitMen) if (Snowmen.Contains(m) && !HeadlessHit(m, hb)) CrumbleSnowman(m);   // 0.5.4: first the head flies off
         foreach (var b in smash) if (Balls.Contains(b)) CrumbleBall(b);
-        foreach (var m in hitMen) if (Snowmen.Contains(m)) CrumbleSnowman(m);
         Balls.RemoveAll(b => b.Id != heldId && b.On == null && (b.X < -b.R * 3 || b.X > Width + b.R * 3));
         BuildSnowmen();
         foreach (var m in Snowmen)
@@ -410,6 +415,8 @@ public sealed partial class Simulation
             if (m.Y >= g - 0.5) { m.VX *= Math.Pow(0.04, dt); m.Spin *= Math.Pow(0.02, dt); }
             if (Math.Abs(m.VX) < 8) m.VX = 0;
             m.Wave = Math.Max(0, m.Wave - dt);
+            double want = mx >= 0 ? (mx < m.X - 6 * Scale ? -1 : mx > m.X + 6 * Scale ? 1 : m.Look) : 1;   // it looks at the pointer
+            m.Look += (want - m.Look) * Math.Min(1, dt * 5);
         }
         if (hold != Hold.Man) Snowmen.RemoveAll(m => m.X < -120 * Scale || m.X > Width + 120 * Scale);
     }

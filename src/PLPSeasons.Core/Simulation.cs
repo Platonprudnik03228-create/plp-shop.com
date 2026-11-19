@@ -204,6 +204,7 @@ public sealed partial class Simulation
             Relax(s);
         }
         StepWinter(dt);
+        StepFestive(dt);
     }
 
     /// <summary>The highest surface whose snow top a falling particle at (x,y) has just reached.</summary>

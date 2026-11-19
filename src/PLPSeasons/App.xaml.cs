@@ -24,7 +24,7 @@ public partial class App : Application
     WeatherCard? weatherCard;
     RemoteCard? remoteCard;
     System.Windows.Threading.DispatcherTimer? updTimer;
-    double demoStart, demoLength = 80; bool demoMan, demoPlow, demoFill;
+    double demoStart, demoLength = 80; bool demoMan, demoPlow, demoFill, demoSleigh, demoRaise, demoFire;
     int frames; double fpsT; readonly List<double> gaps = new();
 
     protected override void OnStartup(StartupEventArgs e)
@@ -205,6 +205,16 @@ public partial class App : Application
         var plow = new Forms.ToolStripMenuItem(L.T("🚜 Вызвать снегоуборщик", "🚜 Call the snowplow")) { Enabled = set.Season == Season.Winter };
         plow.Click += (_, _) => CallPlow();
         m.Items.Add(plow);
+        // 0.5.4: New Year things on demand (for videos too)
+        var ny = new Forms.ToolStripMenuItem(L.T("🎄 Новый год", "🎄 New Year"));
+        ny.DropDownItems.Add(new Forms.ToolStripMenuItem(L.T("🎆 Салют с отсчётом", "🎆 Fireworks with countdown"), null, (_, _) => { foreach (var o in overlays) o.Sim.StartFireworks(5, 30); }));
+        ny.DropDownItems.Add(new Forms.ToolStripMenuItem(L.T("🦌 Позвать Деда Мороза", "🦌 Call Santa's sleigh"), null, (_, _) => { if (overlays.Count > 0) overlays[0].Sim.CallSleigh(); }));
+        ny.DropDownItems.Add(new Forms.ToolStripMenuItem(L.T("⛄ Слепить снеговика", "⛄ Build a snowman"), null, (_, _) => { if (overlays.Count > 0) { var s0 = overlays[0].Sim; s0.RaiseSnowman(s0.Width / 2 + (Random.Shared.NextDouble() - 0.5) * 400 * s0.Scale); } }));
+        ny.DropDownItems.Add(new Forms.ToolStripSeparator());
+        foreach (var tip in new[] { L.T("Двойной клик по сугробу — снеговик", "Double-click the drift: a snowman"), L.T("Слепи снежок и кинь его в окно", "Scoop a snowball, throw it at a window"),
+                                    L.T("Проведи мышью по сосулькам", "Swipe the pointer across the icicles"), L.T("Кликни по саням — подарок", "Click the sleigh: a gift") })
+            ny.DropDownItems.Add(new Forms.ToolStripMenuItem(tip) { Enabled = false });
+        m.Items.Add(ny);
         var gar = new Forms.ToolStripMenuItem(L.T("Гирлянды", "Garlands"));
         foreach (var (name, v) in new[] { (L.T("Цветные", "Coloured"), 1), (L.T("Тёплые", "Warm"), 2), (L.T("Выключить", "Off"), 0) })
         {
@@ -318,6 +328,14 @@ public partial class App : Application
         if (t > 2 && !demoFill && overlays.Count > 0 && overlays[0].Sim.Floor is { } fl) { demoFill = true; for (int c = 0; c < fl.Depth.Length; c++) fl.Depth[c] = 22 * overlays[0].Sim.Scale; }
         if (t > 3 && !demoMan && overlays.Count > 0) { demoMan = true; var sim0 = overlays[0].Sim; if (sim0.Floor != null) sim0.AddSnowman(sim0.Width * 0.62, 34 * sim0.Scale); }
         if (t > 4 && !demoPlow) { demoPlow = true; CallPlow(); }
+        // 0.5.4: the New Year things in the test video
+        if (overlays.Count > 0)
+        {
+            var s0 = overlays[0].Sim;
+            if (t > 6 && !demoSleigh) { demoSleigh = true; s0.CallSleigh(); }
+            if (t > 9 && !demoRaise) { demoRaise = true; s0.RaiseSnowman(s0.Width * 0.3); }
+            if (t > 13 && !demoFire) { demoFire = true; s0.StartFireworks(3, 12); }
+        }
         Season want = t switch { < 50 => Season.Winter, < 55 => Season.Rain, < 60 => Season.Storm, < 66 => Season.Autumn, < 71 => Season.Spring, _ => Season.Winter };
         if (want != set.Season) { set.Season = want; ApplyAll(); UpdateWallpaper(want); remoteCard?.Refresh(); }
         if (t > demoLength) Quit();

@@ -171,6 +171,9 @@ public class WinterPlayTests
         s.MouseUp(1460, 876);
         Assert.True(ball.VX < -320, $"vx={ball.VX}");
         Run(s, 3);
+        // 0.5.4: the first hit knocks the head off (it flies on with its face), a second one the rest
+        Assert.True(s.Snowmen.Count == 0 || s.Snowmen[0].Headless, "head knocked off");
+        if (s.Snowmen.Count == 1) { Assert.Contains(s.Balls, b => b.Face); s.CrumbleSnowman(s.Snowmen[0]); }
         Assert.Empty(s.Snowmen);
     }
 
@@ -229,5 +232,72 @@ public class WinterPlayTests
         Assert.Single(s.Garlands);
         s.Season = Season.Rain; s.Step(1 / 60.0);
         Assert.Empty(s.Garlands);
+    }
+
+    // ---------- 0.5.4: New Year ----------
+    [Fact] public void DoubleClickOnTheDriftRaisesASnowman()
+    {
+        var s = Snowy();
+        s.MouseDown(500, 1012, 1); s.MouseUp(500, 1012);
+        s.MouseDown(500, 1012, 2); s.MouseUp(500, 1012);
+        Run(s, 4);
+        Assert.Single(s.Snowmen);
+        Assert.True(Math.Abs(s.Snowmen[0].X - 500) < 20);
+    }
+
+    [Fact] public void ASnowballSplatsOnAWindow()
+    {
+        var s = Snowy();
+        s.Windows = new List<RectI> { new RectI(300, 200, 1500, 1000) };
+        s.Balls.Add(new Ball { Id = 999, X = 800, Y = 900, R = 9, VY = -900, Fly = 0 });
+        Run(s, 1);
+        Assert.Single(s.Splats);
+        Assert.DoesNotContain(s.Balls, b => b.Id == 999);
+        s.Windows = new List<RectI>(); Run(s, 0.1);
+        Assert.Empty(s.Splats);                        // the window went away: so did its splat
+    }
+
+    [Fact] public void FireworksAfterTheCountdown()
+    {
+        var s = Snowy();
+        s.StartFireworks(2, 4);
+        Run(s, 1); Assert.True(s.Countdown > 0);
+        Run(s, 1.5); Assert.True(s.Greet > 0); Assert.Equal(-1, s.Countdown);
+        Run(s, 1.5); Assert.True(s.Sparks.Count > 50, $"sparks {s.Sparks.Count}");
+        s.CheckNewYear(new DateTime(2026, 12, 31, 23, 59, 50));
+        Assert.InRange(s.Countdown, 9.5, 10.5);
+    }
+
+    [Fact] public void SantaDropsAGiftThatOpens()
+    {
+        var s = Snowy();
+        s.CallSleigh();
+        Run(s, 12);
+        Assert.Null(s.Sleigh);
+        Assert.NotEmpty(s.Gifts);
+        var g = s.Gifts[0];
+        Assert.True(g.Landed);
+        Assert.True(s.FestInteractive(g.X, g.Y));
+        s.MouseDown(g.X, g.Y, 1);
+        Assert.Empty(s.Gifts);
+        Assert.True(s.Sparks.Count > 50);
+    }
+
+    [Fact] public void IciclesBreakWhenThePointerSweepsThem()
+    {
+        var s = Snowy();
+        Run(s, 0.5);
+        Assert.NotEmpty(s.Icicles);
+        foreach (var c in s.Icicles) c.Len = c.Max;
+        for (int i = 0; i < 30; i++) { s.Step(1 / 60.0); s.Pointer(100 + i * 60, 6); }
+        Run(s, 2);
+        Assert.Contains(s.Icicles, c => c.Regrow > 0 || c.Falling);
+    }
+
+    [Fact] public void ThePointerLeavesAGrooveInTheDrift()
+    {
+        var s = Snowy();
+        for (double x = 300; x <= 900; x += 6) { s.Step(1 / 60.0); s.Pointer(x, 1032 - 15); }
+        Assert.True(s.Floor!.Depth[s.Floor.ColAt(600)] < 28, $"depth {s.Floor!.Depth[s.Floor.ColAt(600)]}");
     }
 }

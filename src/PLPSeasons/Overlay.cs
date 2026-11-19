@@ -75,7 +75,7 @@ sealed class Overlay : Window
 }
 
 /// <summary>Draws particles and snow caps. The DPI transform maps physical pixels to WPF units.</summary>
-sealed class Painter : FrameworkElement
+sealed partial class Painter : FrameworkElement
 {
     readonly Overlay o;
     static readonly Brush FlakeSoft, FlakeCore, SnowFill, SnowEdge, Flash;
@@ -195,6 +195,7 @@ sealed class Painter : FrameworkElement
             }
         }
         if (clip) dc.Pop();
+        DrawFestive(dc, sim);       // 0.5.4: over the windows
         dc.Pop();
     }
 
@@ -316,17 +317,20 @@ sealed class Painter : FrameworkElement
             double a = -0.5 - wave;
             var hand = new Point(Px(c1) + r1 * 0.7 + Math.Cos(a) * r1 * 1.3, c1 - r1 * 0.1 + Math.Sin(a) * r1 * 1.3);
             dc.DrawLine(Twig, new Point(Px(c1) + r1 * 0.7, c1 - r1 * 0.1), hand);
-            DrawBall(dc, Px(c0), c0, r0, r0); DrawBall(dc, Px(c1), c1, r1, r1); DrawBall(dc, Px(c2), c2, r2, r2);
+            DrawBall(dc, Px(c0), c0, r0, r0); DrawBall(dc, Px(c1), c1, r1, r1); if (!m.Headless) DrawBall(dc, Px(c2), c2, r2, r2);
             for (int k = 0; k < 3; k++) dc.DrawEllipse(Coal, null, new Point(Px(c1), c1 - r1 * (0.45 - k * 0.4)), r1 * 0.1, r1 * 0.1);
             dc.DrawRoundedRectangle(Scarf, null, new Rect(Px(c2) - r2 * 1.05, c2 + r2 * 0.62, r2 * 2.1, r2 * 0.36), r2 * 0.15, r2 * 0.15);
             dc.PushTransform(new RotateTransform(-7 + Math.Sin(t * 1.3) * 3, Px(c2) + r2 * 0.42, c2 + r2 * 0.75));
             dc.DrawRoundedRectangle(Scarf, null, new Rect(Px(c2) + r2 * 0.25, c2 + r2 * 0.7, r2 * 0.35, r2 * 1.2), r2 * 0.12, r2 * 0.12);
             dc.Pop();
-            dc.DrawEllipse(Coal, null, new Point(Px(c2) - r2 * 0.3, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
-            dc.DrawEllipse(Coal, null, new Point(Px(c2) + r2 * 0.3, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
-            for (int k = 0; k < 5; k++) { double an = Math.PI * (0.2 + 0.6 * k / 4.0); dc.DrawEllipse(Coal, null, new Point(Px(c2) + Math.Cos(an) * r2 * 0.42, c2 + r2 * 0.05 + Math.Sin(an) * r2 * 0.35), r2 * 0.05, r2 * 0.05); }
+            if (m.Headless) continue;
+            // 0.5.4: it looks towards the pointer (eyes follow, the carrot turns round)
+            double lk = Math.Clamp(m.Look, -1, 1), ex = r2 * 0.12 * lk, nl = r2 * 0.9 * Math.Max(0.25, Math.Abs(lk)) * (lk >= 0 ? 1 : -1);
+            dc.DrawEllipse(Coal, null, new Point(Px(c2) - r2 * 0.3 + ex, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
+            dc.DrawEllipse(Coal, null, new Point(Px(c2) + r2 * 0.3 + ex, c2 - r2 * 0.15), r2 * 0.1, r2 * 0.1);
+            for (int k = 0; k < 5; k++) { double an = Math.PI * (0.2 + 0.6 * k / 4.0); dc.DrawEllipse(Coal, null, new Point(Px(c2) + ex * 0.7 + Math.Cos(an) * r2 * 0.42, c2 + r2 * 0.05 + Math.Sin(an) * r2 * 0.35), r2 * 0.05, r2 * 0.05); }
             var nose = new StreamGeometry();
-            using (var c = nose.Open()) { c.BeginFigure(new Point(Px(c2) + r2 * 0.05, c2 - r2 * 0.05), true, true); c.LineTo(new Point(Px(c2) + r2 * 0.95, c2 + r2 * 0.08), true, true); c.LineTo(new Point(Px(c2) + r2 * 0.05, c2 + r2 * 0.18), true, true); }
+            using (var c = nose.Open()) { c.BeginFigure(new Point(Px(c2) + ex + r2 * 0.05 * Math.Sign(nl), c2 - r2 * 0.05), true, true); c.LineTo(new Point(Px(c2) + ex + nl, c2 + r2 * 0.08), true, true); c.LineTo(new Point(Px(c2) + ex + r2 * 0.05 * Math.Sign(nl), c2 + r2 * 0.18), true, true); }
             nose.Freeze(); dc.DrawGeometry(Carrot, null, nose);
             var hat = m.Hat == 0 ? HatA : HatB;
             dc.DrawRoundedRectangle(hat, null, new Rect(Px(c2) - r2 * 0.8, c2 - r2 * 1.45, r2 * 1.6, r2 * 0.75), r2 * 0.35, r2 * 0.35);
@@ -338,6 +342,14 @@ sealed class Painter : FrameworkElement
             double g = sim.SnowTop(b.X);
             if (Math.Abs(b.Y + b.R * 0.9 - g) < 3) dc.DrawEllipse(Shadow, null, new Point(b.X, g + 1), b.R * 1.05, b.R * 0.22);
             DrawBall(dc, b.X, b.Y, b.R, b.Ang);
+            if (b.Face)
+            {   // a knocked-off head keeps its face, turning as it rolls
+                Point At(double dx, double dy) => new(b.X + dx * Math.Cos(b.Ang) - dy * Math.Sin(b.Ang), b.Y + dx * Math.Sin(b.Ang) + dy * Math.Cos(b.Ang));
+                dc.DrawEllipse(Coal, null, At(-b.R * 0.3, -b.R * 0.12), b.R * 0.1, b.R * 0.1); dc.DrawEllipse(Coal, null, At(b.R * 0.3, -b.R * 0.12), b.R * 0.1, b.R * 0.1);
+                var fn = new StreamGeometry();
+                using (var c = fn.Open()) { c.BeginFigure(At(b.R * 0.05, 0), true, true); c.LineTo(At(b.R * 0.95, b.R * 0.1), true, true); c.LineTo(At(b.R * 0.05, b.R * 0.2), true, true); }
+                fn.Freeze(); dc.DrawGeometry(Carrot, null, fn);
+            }
         }
         if (sim.Plow != PlowState.Idle && sim.Floor is { } f) DrawPlow(dc, sim, f);
     }

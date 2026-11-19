@@ -65,6 +65,17 @@ jobs:
           [W]::Drag(1560, 1022, 1530, 1022, 500)
           [W]::Throw(1530, 1000, 1330, 930, 150)
           Start-Sleep 4
+          # 0.5.4: double-click on the drift raises a snowman; a snowball thrown up splats on a window
+          [W]::SetCursorPos(600, 1022); Start-Sleep -Milliseconds 200
+          [W]::mouse_event(2,0,0,0,[UIntPtr]::Zero); [W]::mouse_event(4,0,0,0,[UIntPtr]::Zero); Start-Sleep -Milliseconds 80
+          [W]::mouse_event(2,0,0,0,[UIntPtr]::Zero); [W]::mouse_event(4,0,0,0,[UIntPtr]::Zero)
+          Start-Sleep 3
+          [W]::Drag(1000, 1022, 980, 1022, 300)
+          [W]::Throw(980, 1000, 960, 760, 100)
+          Start-Sleep 3
+          # sweep the icicles along the top
+          for ($i = 0; $i -le 40; $i++) { [W]::SetCursorPos(200 + $i * 40, 8); Start-Sleep -Milliseconds 16 }
+          Start-Sleep 2
           # move a window so its snow falls off
           $n = (Get-Process notepad | Select-Object -First 1).MainWindowHandle
           [W]::MoveWindow($n, 200, 420, 900, 500, $true) | Out-Null
@@ -80,12 +91,7 @@ jobs:
             PLP-Seasons-Windows-x64.zip
             windows_test.mp4
             ffmpeg.log
-      - name: Publish test files to a release
-        shell: pwsh
-        env: { GH_TOKEN: "${{ github.token }}" }
-        run: |
-          $tag = "windows-ci-${{ github.run_number }}"
-          gh release create $tag --repo ${{ github.repository }} --target ${{ github.sha }} --prerelease --title "Windows CI ${{ github.run_number }} (test, not for users)" --notes "Automatic test run" PLP-Seasons-Windows-x64.zip windows_test.mp4 ffmpeg.log fps.txt
+            fps.txt
       - name: Public release (only for commits marked [release])
         if: contains(github.event.head_commit.message, '[release]')
         shell: pwsh
