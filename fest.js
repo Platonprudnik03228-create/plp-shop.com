@@ -20,6 +20,7 @@
     cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2';
     cv.setAttribute('aria-hidden', 'true');
     hero.appendChild(cv);
+    hero.style.touchAction = 'pan-y';                  // a sideways swipe on a phone rolls the snowball, an up/down one still scrolls
     const g = cv.getContext('2d');
     let W = 0, H = 0, dpr = 1, t = 0;
     let colW = 4, drift = [];
@@ -47,7 +48,7 @@
     hero.addEventListener('pointerdown', e => {
       if (!winter() || isControl(e)) return;
       const p = pos(e);
-      const gi = gifts.findIndex(o => Math.abs(o.x - p.x) < 26 && Math.abs(o.y - p.y) < 26);
+      const gi = gifts.findIndex(o => Math.abs(o.x - p.x) < 34 && Math.abs(o.y - p.y) < 34);
       if (gi >= 0) { openGift(gifts[gi]); gifts.splice(gi, 1); return; }
       if (sleigh && p.x > sleigh.x - 90 && p.x < sleigh.x + 300 && Math.abs(p.y - sleigh.y) < 60 && sleigh.dir > 0 || sleigh && p.x < sleigh.x + 90 && p.x > sleigh.x - 300 && Math.abs(p.y - sleigh.y) < 60 && sleigh.dir < 0) { dropGift(); return; }
       if (manAt(p)) return;                                                          // a double-click may follow
@@ -72,7 +73,7 @@
         if (ny + held.r > g0 - 2) {                       // rolling on the snow: it grows and leaves a track
           ny = g0 - held.r * 0.9;
           const d = drift[col(p.x)];
-          if (true) { held.r = Math.min(46, Math.sqrt(held.r * held.r + Math.abs(dx) * Math.max(5, Math.min(d, held.r)) * 0.35 / Math.PI)); for (let c = col(Math.min(p.x, held.x)); c <= col(Math.max(p.x, held.x)); c++) drift[c] = Math.max(0, drift[c] * 0.9); }
+          if (true) { held.r = Math.min(46, Math.sqrt(held.r * held.r + Math.abs(dx) * Math.max(6, Math.min(d, held.r)) * 0.6 / Math.PI)); for (let c = col(Math.min(p.x, held.x)); c <= col(Math.max(p.x, held.x)); c++) drift[c] = Math.max(0, drift[c] * 0.9); }
           held.ang += dx / held.r;
         }
         held.x = p.x; held.y = ny;
@@ -97,7 +98,7 @@
     function raise(x, delay) {
       const r0 = 24, m = { x: Math.max(40, Math.min(W - 40, x)), y: top(x) + 3, r: [r0, r0 * 0.75, r0 * 0.55], born: t + (delay || 0), look: 1, headless: false };
       men.push(m); if (men.length > 4) men.shift();
-      setTimeout(() => hint(T_().man, m.x, m.y - 130, 4), ((delay || 0) + 0.9) * 1000);
+      setTimeout(() => hint(T_().man, m.x, m.y - 128, 5), ((delay || 0) + 0.9) * 1000);
     }
     function crumble(m) {
       const n = men.indexOf(m); if (n >= 0) men.splice(n, 1);
@@ -120,7 +121,7 @@
     }
     function openGift(o) {
       for (let k = 0; k < 70; k++) { const a = rnd(0.15, 0.85) * Math.PI; spark(o.x, o.y, Math.cos(a) * rnd(80, 330), -Math.sin(a) * rnd(160, 520), rnd(1.6, 2.8), rnd(4, 7), FIRE[k % FIRE.length], 2, 420); }
-      hints.push({ text: T_().wishes[Math.random() * T_().wishes.length | 0], x: o.x, y: o.y - 70, age: 0, life: 6, big: true });
+      hints.push({ text: T_().wishes[Math.random() * T_().wishes.length | 0], x: o.x, y: o.y - 175, age: 0, life: 6, big: true });
       raise(o.x + (o.x < W / 2 ? 80 : -80), 0.6);
     }
 
@@ -132,7 +133,7 @@
         if (c.falling) { c.vy += 1500 * dt; c.y += c.vy * dt; c.rot += dt * 1.4; if (c.y + c.len / 2 >= top(c.x)) { for (let i = 0; i < 10; i++) spark(c.x, top(c.x) - 2, rnd(-140, 140), -rnd(40, 240), rnd(0.4, 0.9), rnd(1.5, 3.5), '#d8f2ff', 3, 900); c.falling = false; c.len = 0; c.regrow = 20; } }
         else if (c.regrow > 0) c.regrow -= dt; else c.len = Math.min(c.max, c.len + dt * 2);
       }
-      if (t > 4 && t < 4.1 && !shownRoll) hint(T_().ice, W * 0.7, 90, 3.5);
+      if (t > 4 && t < 4.1 && !shownRoll) hint(T_().ice, W * 0.4, 92, 4);
       // Santa every 20–30 s
       if (!sleigh) { nextSleigh -= dt; if (nextSleigh <= 0) { nextSleigh = rnd(20, 30); const dir = Math.random() < 0.5 ? 1 : -1; sleigh = { x: dir > 0 ? -320 : W + 320, y0: H * rnd(0.18, 0.3), y: 0, dir, age: 0, dropped: false }; } }
       else {
@@ -141,7 +142,7 @@
         if (!sleigh.dropped && sleigh.age > 2.6 && sleigh.x > W * 0.2 && sleigh.x < W * 0.8) dropGift();
         if (sleigh.dir > 0 ? sleigh.x > W + 360 : sleigh.x < -360) sleigh = null;
       }
-      for (const o of gifts) { o.age += dt; if (!o.landed) { o.vy += 650 * dt; o.y += o.vy * dt; if (o.y >= top(o.x) - 15) { o.y = top(o.x) - 15; o.landed = true; o.age = 0; hint(T_().gift, o.x, o.y - 44, 6); } } else o.y = top(o.x) - 15; }
+      for (const o of gifts) { o.age += dt; if (!o.landed) { o.vy += 650 * dt; o.y += o.vy * dt; if (o.y >= top(o.x) - 20) { o.y = top(o.x) - 20; o.landed = true; o.age = 0; } } else o.y = top(o.x) - 20; }
       gifts = gifts.filter(o => !(o.landed && o.age > 60));
       for (const b of balls) {
         if (b === held) continue;
@@ -184,6 +185,12 @@
       const a = R(ex, -r * 0.05), b = R(ex + dir * nl, r * 0.08), c = R(ex, r * 0.18);
       g.fillStyle = '#f0801e'; g.beginPath(); g.moveTo(...a); g.lineTo(...b); g.lineTo(...c); g.closePath(); g.fill();
     }
+    function label(text, x0, y, a, size, big) {
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.font = '700 ' + size.toFixed(1) + 'px Inter, system-ui, sans-serif';
+      const w = g.measureText(text).width, x = Math.max(w / 2 + 14, Math.min(W - w / 2 - 14, x0));
+      g.globalAlpha = a * 0.85; g.fillStyle = '#10182a'; g.beginPath(); g.roundRect ? g.roundRect(x - w / 2 - 12, y - size * 0.95, w + 24, size * 1.9, 14) : g.rect(x - w / 2 - 12, y - size * 0.95, w + 24, size * 1.9); g.fill();
+      g.globalAlpha = a; g.fillStyle = big ? '#ffe6a8' : '#fff'; g.fillText(text, x, y); g.globalAlpha = 1;
+    }
     function draw() {
       g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
       if (!winter()) return;
@@ -210,10 +217,16 @@
       // gifts
       const GC = [['#d8262e', '#f4c542'], ['#1f8a4c', '#e8303a'], ['#2f6fd6', '#e9eef5']];
       for (const o of gifts) {
-        const w = 30, bob = o.landed ? Math.max(0, Math.sin(o.age * 4)) * 2 : 0, [a, b] = GC[o.c];
+        const w = 40, bob = o.landed ? Math.max(0, Math.sin(o.age * 4)) * 2 : 0, [a, b] = GC[o.c];
         g.fillStyle = a; g.fillRect(o.x - w * 0.38, o.y - w * 0.15 - bob, w * 0.76, w * 0.6); g.fillRect(o.x - w * 0.43, o.y - w * 0.3 - bob, w * 0.86, w * 0.2);
         g.fillStyle = b; g.fillRect(o.x - w * 0.06, o.y - w * 0.3 - bob, w * 0.12, w * 0.75);
         g.strokeStyle = b; g.lineWidth = w * 0.08; g.beginPath(); g.ellipse(o.x - w * 0.12, o.y - w * 0.39 - bob, w * 0.12, w * 0.08, 0, 0, 7); g.stroke(); g.beginPath(); g.ellipse(o.x + w * 0.12, o.y - w * 0.39 - bob, w * 0.12, w * 0.08, 0, 0, 7); g.stroke();
+      }
+      // a waiting gift keeps a pulsing "click me" label over it
+      for (const o of gifts) if (o.landed) {
+        const pulse = 1 + Math.sin(t * 5) * 0.06, a = Math.min(1, o.age * 3), gr = g.createRadialGradient(o.x, o.y, 0, o.x, o.y, 42);
+        gr.addColorStop(0, 'rgba(255,220,120,' + (0.35 + Math.sin(t * 5) * 0.12) * a + ')'); gr.addColorStop(1, 'rgba(255,220,120,0)'); g.fillStyle = gr; g.beginPath(); g.arc(o.x, o.y, 42, 0, 7); g.fill();
+        label(T_().gift, o.x, o.y - 52, a, 16 * pulse, false);
       }
       // snowmen
       for (const m of men) {
@@ -249,13 +262,7 @@
       g.globalAlpha = 1;
       // hints and wishes
       g.textAlign = 'center'; g.textBaseline = 'middle';
-      for (const h of hints) {
-        const a = Math.min(1, h.age * 3) * Math.min(1, (h.life - h.age) * 2), y = h.y - Math.min(1, h.age) * 18, size = h.big ? 22 : 16;
-        g.font = '700 ' + size + 'px Inter, system-ui, sans-serif';
-        const w = g.measureText(h.text).width, x = Math.max(w / 2 + 14, Math.min(W - w / 2 - 14, h.x));
-        g.globalAlpha = a * 0.85; g.fillStyle = '#10182a'; g.beginPath(); g.roundRect ? g.roundRect(x - w / 2 - 12, y - size * 0.95, w + 24, size * 1.9, 14) : g.rect(x - w / 2 - 12, y - size * 0.95, w + 24, size * 1.9); g.fill();
-        g.globalAlpha = a; g.fillStyle = h.big ? '#ffe6a8' : '#fff'; g.fillText(h.text, x, y);
-      }
+      for (const h of hints) label(h.text, h.x, h.y - Math.min(1, h.age) * 18, Math.min(1, h.age * 3) * Math.min(1, (h.life - h.age) * 2), h.big ? 22 : 16, h.big);
       g.globalAlpha = 1;
     }
     let prev = 0;
