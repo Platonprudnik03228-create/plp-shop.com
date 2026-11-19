@@ -169,6 +169,13 @@ sealed partial class Painter
                 }
             }
         }
+        foreach (var w in sim.Wishes)
+        {
+            double rise = Math.Min(1, w.Age / 0.9), e = 1 - Math.Pow(1 - rise, 3);
+            double a = Math.Min(1, w.Age * 3) * (w.Age > 6 ? Math.Max(0, 1 - (w.Age - 6)) : 1);
+            double half = TextGeo(w.Text, 30 * S).Bounds.Width / 2 + 10 * S;
+            DrawText(dc, w.Text, 30 * S, Math.Clamp(w.X, half, sim.Width - half), w.Y - 60 * S * e, 0.8 + 0.2 * e, a);
+        }
         DrawCountdown(dc, sim);
     }
 

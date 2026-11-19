@@ -74,7 +74,7 @@ public partial class App : Application
         lastScan = -1;
     }
 
-    void Apply(Simulation s) { s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; s.OverWindows = set.SnowOverWindows; }
+    void Apply(Simulation s) { Simulation.Russian = L.Ru; s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; s.OverWindows = set.SnowOverWindows; }
 
     TimeSpan lastRender;
     void OnFrame(object? sender, EventArgs e)

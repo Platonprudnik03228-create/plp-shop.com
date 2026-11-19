@@ -19,6 +19,18 @@ public sealed partial class Simulation
     public readonly List<Icicle> Icicles = new();
     public readonly List<Gift> Gifts = new();
     public Sleigh? Sleigh;
+    /// <summary>0.5.6 (owner): a New Year wish comes out of every gift. Russian / English, chosen by <see cref="Russian"/>.</summary>
+    public readonly List<(double X, double Y, double Age, string Text)> Wishes = new();
+    public static bool Russian = true;
+    int lastWish = -1;
+    static readonly (string ru, string en)[] WishList = {
+        ("С наступающим Новым годом!", "Happy New Year to you!"), ("Одевайся теплее — шапку не забудь", "Dress warm — don't forget your hat"),
+        ("Пусть в новом году всё получится", "May everything work out this year"), ("Загадай желание — сбудется!", "Make a wish — it will come true!"),
+        ("Больше тепла, меньше дедлайнов", "More warmth, fewer deadlines"), ("Выпей какао и отдохни", "Have a cocoa and take a break"),
+        ("Позвони близким — им будет приятно", "Call someone you love today"), ("Слепи снеговика — это полезно!", "Build a snowman — doctor's orders!"),
+        ("Счастья, здоровья и денег побольше", "Health, happiness and a bit of luck"), ("Мандарины — лучший витамин C", "Tangerines: the best vitamin C"),
+        ("Пусть снег будет только за окном", "May the snow stay outside the window"), ("Ты молодец. Правда.", "You're doing great. Really."),
+        ("Выспись в праздники — заслужил", "Sleep in this holiday — you earned it"), ("Новый год — новые идеи!", "New year, new ideas!") };
     public double Countdown = -1, Greet, Show, FlashX, FlashY, FlashA; public byte FlashR = 255, FlashG = 255, FlashB = 255;
     double nextSleigh = 150, nextRocket, pendingShow, clockAcc; int newYearDone;
     readonly List<(double at, double x, double r)> drops = new();
@@ -36,6 +48,7 @@ public sealed partial class Simulation
         StepGifts(dt);
         StepFireworks(dt);
         StepSparks(dt);
+        for (int i = Wishes.Count - 1; i >= 0; i--) { var w = Wishes[i]; w.Age += dt; if (w.Age > 7) Wishes.RemoveAt(i); else Wishes[i] = w; }
         clockAcc += dt;
         if (clockAcc > 1) { clockAcc = 0; CheckNewYear(DateTime.Now); }
     }
@@ -236,6 +249,9 @@ public sealed partial class Simulation
             AddSpark(g.X, g.Y - 4 * Scale, Math.Cos(a) * R(80, 330), -Math.Sin(a) * R(160, 520), R(1.6, 2.8), R(4, 7), c, 2, 420, 0.35, R(-14, 14));
         }
         for (int k = 0; k < 14; k++) AddSpark(g.X + R(-14, 14) * Scale, g.Y - R(-6, 18) * Scale, R(-40, 40), -R(20, 120), R(0.6, 1.2), R(5, 10), (255, 235, 153), 6, 30, 0.4);
+        int k = rng.Next(WishList.Length); if (k == lastWish) k = (k + 1) % WishList.Length; lastWish = k;
+        Wishes.Add((g.X, g.Y - 26 * Scale, 0, Russian ? WishList[k].ru : WishList[k].en));
+        if (Wishes.Count > 3) Wishes.RemoveAt(0);
         if (Season == Season.Winter && rng.NextDouble() < 0.35) RaiseSnowman(g.X);
     }
 

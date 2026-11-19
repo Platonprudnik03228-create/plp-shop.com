@@ -37,7 +37,7 @@ static class Store
 
 static class L
 {
-    static readonly bool Ru = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName is "ru" or "uk" or "be" or "kk";
+    public static readonly bool Ru = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName is "ru" or "uk" or "be" or "kk";
     public static string T(string ru, string en) => Ru ? ru : en;
     public static string Name(Season s) => s switch
     {

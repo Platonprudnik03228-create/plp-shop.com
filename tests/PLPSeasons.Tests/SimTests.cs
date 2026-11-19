@@ -281,6 +281,7 @@ public class WinterPlayTests
         s.MouseDown(g.X, g.Y, 1);
         Assert.Empty(s.Gifts);
         Assert.True(s.Sparks.Count > 50);
+        Assert.Single(s.Wishes);                       // a New Year wish comes out
     }
 
     [Fact] public void IciclesBreakWhenThePointerSweepsThem()
