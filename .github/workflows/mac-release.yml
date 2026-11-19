@@ -9,13 +9,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Publish the Android app
+      - name: Put the zip back together and publish it
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cd parts
-          echo "5b21572e6f1721ceaf675a31486b92eea143d62211c0f3992ca73f738634da79  PLP-Seasons-1.0.0-Android.apk" | sha256sum -c -
-          sha256sum PLP-Seasons-1.0.0-Android.apk > SHA256SUMS-android.txt
-          gh release create android-v1.0.0 --repo ${{ github.repository }} --target main --title "PLP Seasons 1.0.0 for Android" \
-            --notes "PLP Seasons for Android 8+: a live wallpaper with the real weather (snow, rain), a weather widget with snow, and the New Year tricks. Works with the same key as Mac and Windows ($4.99, bought once on plp-shop.com). How to install: https://plp-shop.com/android.html" \
-            PLP-Seasons-1.0.0-Android.apk SHA256SUMS-android.txt
+          cat parts/z.* > PLP-Seasons-0.4.94-macOS-arm64.zip
+          echo "75edb7434aa0ef04aec4da6549db2d3ebab752f6b59bb19541b35ba8bcbebdaf  PLP-Seasons-0.4.94-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.94-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.94 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.94 for Mac" \
+            --notes "PLP Seasons 0.4.94 for macOS 13+ (Apple Silicon). Santa's sleigh and reindeer newly painted; a welcome with pictures on the first launch; a wish in every gift; the snow follows the Dock exactly once Accessibility is on. Bought once on plp-shop.com ($4.99, Mac + Windows + Android, forever). Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.94-macOS-arm64.zip SHA256SUMS.txt
