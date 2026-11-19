@@ -17,7 +17,7 @@ button,.btn{background:var(--red);color:#fff;border:0;border-radius:10px;padding
 .up{color:var(--win);font-size:13px;font-weight:600}
 table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}th{color:var(--dim);font-weight:500;font-size:13px}
 td.n{text-align:right;font-variant-numeric:tabular-nums}
-.tag{font-size:11px;border-radius:6px;padding:2px 7px;font-weight:600}.tag.mac{background:#16304d;color:var(--mac)}.tag.win{background:#173317;color:var(--win)}
+.tag{font-size:11px;border-radius:6px;padding:2px 7px;font-weight:600}.tag.mac{background:#16304d;color:var(--mac)}.tag.win{background:#173317;color:var(--win)}.tag.and{background:#2b2b2b;color:#cfcfcf}
 .note{border-left:3px solid #e0a800;padding:10px 14px;background:#1d1906;border-radius:8px;margin-top:10px}
 #chart{width:100%;height:220px;display:block}
 .legend{display:flex;gap:16px;font-size:13px;color:var(--dim);margin-top:6px}.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px}
@@ -72,7 +72,7 @@ ol{margin:6px 0 0;padding-left:20px}li{margin:4px 0}
 const REPO='Platonprudnik03228-create/plp-shop.com';
 const CSV='https://raw.githubusercontent.com/'+REPO+'/stats/stats/downloads.csv';
 const $=id=>document.getElementById(id);
-const plat=n=>/windows/i.test(n)?'win':'mac';
+const plat=n=>/windows/i.test(n)?'win':/android|\.apk$/i.test(n)?'and':'mac';
 const fmt=n=>n.toLocaleString('ru-RU');
 function store(k,v){try{if(v===undefined)return JSON.parse(localStorage.getItem(k));localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}}
 
@@ -82,25 +82,28 @@ async function releases(){
   const out=[];
   for(const rel of await r.json()){
     if(rel.tag_name.startsWith('windows-ci-')) continue;
-    for(const a of rel.assets) if(a.name.endsWith('.zip'))
+    for(const a of rel.assets) if(/\.(zip|apk)$/.test(a.name))
       out.push({tag:rel.tag_name,name:a.name,count:a.download_count,date:rel.published_at||rel.created_at,p:plat(a.name)});
   }
   return out.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
 }
+// Lifetime counters. GitHub forgets the downloads of a release once the release is removed (the old previews went with
+// 150+ downloads), so every snapshot carries forward the last known count of every file ever seen.
 async function history(){
-  try{const r=await fetch(CSV+'?t='+Date.now());if(!r.ok)return[];
-    const lines=(await r.text()).trim().split('\n').slice(1);
-    const snaps={};
-    for(const l of lines){const [t,tag,name,c]=l.split(',');(snaps[t]??={mac:0,win:0})[plat(name)]+=+c}
-    return Object.entries(snaps).map(([t,v])=>({t:new Date(t.replace('Z',':00Z')),...v})).sort((a,b)=>a.t-b.t);
-  }catch(e){return[]}
+  try{const r=await fetch(CSV+'?t='+Date.now());if(!r.ok)return{pts:[],seen:new Map()};
+    const rows=(await r.text()).trim().split('\n').slice(1).map(l=>l.split(',')).filter(x=>x.length>=4);
+    const times=[...new Set(rows.map(x=>x[0]))].sort();const seen=new Map(),pts=[];
+    for(const t of times){for(const [tt,tag,name,c] of rows)if(tt===t){const k=tag+'|'+name;seen.set(k,{p:plat(name),c:Math.max(+c,seen.get(k)?.c||0)})}
+      const v={mac:0,win:0,and:0};for(const x of seen.values())v[x.p]+=x.c;pts.push({t:new Date(t.replace('Z',':00Z')),...v})}
+    return{pts,seen};
+  }catch(e){return{pts:[],seen:new Map()}}
 }
 function draw(points){
   const svg=$('chart');svg.innerHTML='';
   // per-day increase: last snapshot of a day minus last snapshot of the previous day
   const byDay=new Map();for(const p of points)byDay.set(p.t.toISOString().slice(0,10),p);
   const days=[...byDay.entries()];const bars=[];
-  for(let i=1;i<days.length;i++){const [d,c]=days[i],p=days[i-1][1];bars.push({d,mac:Math.max(0,c.mac-p.mac),win:Math.max(0,c.win-p.win)})}
+  for(let i=1;i<days.length;i++){const [d,c]=days[i],p=days[i-1][1];bars.push({d,mac:Math.max(0,c.mac-p.mac),win:Math.max(0,c.win+(c.and||0)-p.win-(p.and||0))})}
   if(!bars.length){$('chartNote').textContent='История копится с сегодняшнего дня — график появится завтра.';return}
   $('chartNote').textContent='';
   const last=bars.slice(-30),max=Math.max(1,...last.map(b=>b.mac+b.win)),w=1000/last.length,H=190;
@@ -110,18 +113,21 @@ function draw(points){
 async function load(){
   $('err').style.display='none';$('upd').textContent='Загрузка…';
   try{
-    const [rel,hist]=await Promise.all([releases(),history()]);
-    const mac=rel.filter(r=>r.p=='mac').reduce((s,r)=>s+r.count,0),win=rel.filter(r=>r.p=='win').reduce((s,r)=>s+r.count,0),tot=mac+win;
-    $('kTotal').textContent=fmt(tot);$('kMac').textContent=fmt(mac);$('kWin').textContent=fmt(win);
-    const prev=store('plp_admin_last');
+    const [rel,h]=await Promise.all([releases(),history()]);const hist=h.pts;
+    const all=new Map(h.seen);for(const r of rel){const k=r.tag+'|'+r.name;all.set(k,{p:r.p,c:Math.max(r.count,all.get(k)?.c||0)})}
+    const sum=p=>[...all.values()].filter(x=>x.p==p).reduce((s,x)=>s+x.c,0);
+    const mac=sum('mac'),win=sum('win'),and=sum('and'),tot=mac+win+and;
+    const gone=tot-rel.reduce((s,r)=>s+r.count,0);
+    $('kTotal').textContent=fmt(tot);if(gone>0)$('kSince').title='в том числе '+gone+' скачиваний старых версий, которых уже нет на GitHub';$('kMac').textContent=fmt(mac);$('kWin').textContent=fmt(win);
+    const prev=store('plp_admin_last2');
     $('kSince').textContent=prev&&tot>=prev.tot?`+${tot-prev.tot} с прошлого захода (${new Date(prev.at).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})})`:'';
-    store('plp_admin_last',{tot,at:Date.now()});
-    const now={t:new Date(),mac,win};const pts=[...hist,now];
+    store('plp_admin_last2',{tot,at:Date.now()});
+    const now={t:new Date(),mac,win,and};const pts=[...hist,now];
     const dayAgo=pts.filter(p=>p.t<=Date.now()-864e5).pop();
-    if(dayAgo){$('k24').textContent='+'+fmt(tot-dayAgo.mac-dayAgo.win);$('k24n').textContent='Mac +'+(mac-dayAgo.mac)+' · Windows +'+(win-dayAgo.win)}
+    if(dayAgo){$('k24').textContent='+'+fmt(tot-dayAgo.mac-dayAgo.win-(dayAgo.and||0));$('k24n').textContent='Mac +'+(mac-dayAgo.mac)+' · Windows +'+(win-dayAgo.win)+' · Android +'+(and-(dayAgo.and||0))}
     else{$('k24').textContent='…';$('k24n').textContent='история копится, цифра появится через сутки'}
     draw(pts);
-    $('rows').innerHTML=rel.map(r=>`<tr><td><span class="tag ${r.p}">${r.p=='mac'?'Mac':'Windows'}</span> ${r.tag}</td><td class="dim small">${r.name}</td><td class="dim small">${r.date?new Date(r.date).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td><td class="n">${fmt(r.count)}</td></tr>`).join('');
+    $('rows').innerHTML=rel.map(r=>`<tr><td><span class="tag ${r.p}">${r.p=='mac'?'Mac':r.p=='and'?'Android':'Windows'}</span> ${r.tag}</td><td class="dim small">${r.name}</td><td class="dim small">${r.date?new Date(r.date).toLocaleString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'—'}</td><td class="n">${fmt(r.count)}</td></tr>`).join('');
     $('upd').textContent='Обновлено '+new Date().toLocaleTimeString('ru-RU');
   }catch(e){$('err').style.display='block';$('err').textContent='Не удалось загрузить: '+e.message;$('upd').textContent=''}
 }

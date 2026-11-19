@@ -25,7 +25,7 @@ jobs:
           [ -f stats/downloads.csv ] || echo "time,tag,asset,count" > stats/downloads.csv
           now=$(date -u +%Y-%m-%dT%H:%MZ)
           gh api "repos/${REPO}/releases" --paginate \
-            -q '.[] | select(.tag_name|startswith("windows-ci-")|not) | .tag_name as $t | .assets[] | select(.name|endswith(".zip")) | "\($t),\(.name),\(.download_count)"' \
+            -q '.[] | select(.tag_name|startswith("windows-ci-")|not) | .tag_name as $t | .assets[] | select((.name|endswith(".zip")) or (.name|endswith(".apk"))) | "\($t),\(.name),\(.download_count)"' \
             | sed "s/^/${now},/" >> stats/downloads.csv
           git config user.name "plp-stats-bot"
           git config user.email "plp-stats-bot@users.noreply.github.com"
