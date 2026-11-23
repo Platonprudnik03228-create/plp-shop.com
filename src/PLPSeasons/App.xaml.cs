@@ -33,7 +33,9 @@ public partial class App : Application
         DispatcherUnhandledException += (_, ev) => { ev.Handled = true; };   // one bad frame never closes the app (0.5.2)
         single = new Mutex(true, "PLP.Seasons.Single", out bool first);
         if (!first) { Shutdown(); return; }
-        demo = e.Args.Contains("--demo");
+        // 0.5.9: --demo (used only to film the test video on our own build server) must NOT be a way to run the app
+        // without a key. It is honoured only when our build server sets PLP_CI=1; on anyone else's computer it does nothing.
+        demo = e.Args.Contains("--demo") && Environment.GetEnvironmentVariable("PLP_CI") == "1";
         Overlay.Legacy = e.Args.Contains("--legacy");
         int ix = Array.IndexOf(e.Args, "--seconds"); if (ix >= 0 && ix + 1 < e.Args.Length) double.TryParse(e.Args[ix + 1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out demoLength);
         set = Store.Load();

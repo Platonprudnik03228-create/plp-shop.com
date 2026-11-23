@@ -22,6 +22,7 @@ jobs:
         run: Set-DisplayResolution -Width 1920 -Height 1080 -Force
       - name: Film it on real Windows
         shell: pwsh
+        env: { PLP_CI: '1' }
         run: |
           choco install ffmpeg -y --no-progress | Out-Null
           $env:Path += ";C:\ProgramData\chocolatey\bin"
