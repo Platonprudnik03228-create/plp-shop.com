@@ -1,6 +1,6 @@
 namespace PLPSeasons.Core;
 
-public enum Kind : byte { Flake, Drop, Leaf, Petal, Crumb, Splash }
+public enum Kind : byte { Flake, Drop, Leaf, Petal, Crumb, Splash, Clump }
 
 public struct Particle
 {
@@ -92,14 +92,20 @@ public sealed partial class Simulation
     /// <summary>The snow of a surface breaks into crumbs that fall (white, no blue tint).</summary>
     public void ShedAll(Surface s, bool moved)
     {
-        for (int c = 0; c < s.Depth.Length; c += 2)
+        // 0.5.8 (owner: "the snow should slide off as soft little heaps and fall DOWN, not fly apart"): the snow of every
+        // ~15 px of the top gathers into one soft clump that drops almost straight down and settles as a small mound below
+        const int g = 5;
+        for (int c = 0; c < s.Depth.Length; c += g)
         {
-            double d = s.Depth[c]; if (d < 1.2) continue;
-            int n = Math.Min(3, (int)(d / 4) + 1);
-            for (int k = 0; k < n; k++)
-                Add(new Particle { Kind = Kind.Crumb, X = s.Rect.Left + c * Surface.Col + rng.NextDouble() * 3, Y = s.Rect.Top - rng.NextDouble() * d,
-                    VX = (rng.NextDouble() - 0.5) * (moved ? 120 : 50), VY = rng.NextDouble() * -40, Size = 1.5 + rng.NextDouble() * Math.Min(5, d * 0.35), Alive = true, Life = 4 });
+            int c1 = Math.Min(s.Depth.Length, c + g);
+            double area = 0, top = 0;
+            for (int k = c; k < c1; k++) { area += s.Depth[k] * Surface.Col; top = Math.Max(top, s.Depth[k]); }
+            if (top < 0.8 * Scale || area < 6 * Scale) continue;
+            Add(new Particle { Kind = Kind.Clump, X = s.Rect.Left + (c + c1) * 0.5 * Surface.Col + (rng.NextDouble() - 0.5) * 4, Y = s.Rect.Top - top * 0.5,
+                VX = (rng.NextDouble() - 0.5) * 12 * Scale, VY = -rng.NextDouble() * 10 * Scale, Size = Math.Clamp(Math.Sqrt(area) * 0.55, 2.5 * Scale, 9 * Scale),
+                Angle = rng.NextDouble() * 6.28, Spin = (rng.NextDouble() - 0.5) * 1.6, Alive = true, Life = 6 });
         }
+        for (int c = 0; c < s.Depth.Length; c++) s.Depth[c] = 0;
     }
 
     /// <summary>A particle that finished its fall starts again at the top - unless there are more than the intensity
@@ -141,12 +147,12 @@ public sealed partial class Simulation
         {
             bool first = (int)lastSeason == -1;
             lastSeason = Season;
-            P.RemoveAll(x => x.Kind is not Kind.Crumb);
+            P.RemoveAll(x => x.Kind is not (Kind.Crumb or Kind.Clump));
             int n = first ? Target : Target / 2;
             for (int i = 0; i < n; i++) Add(Spawn(true));
         }
         Time += dt;
-        int alive = P.Count(x => x.Alive && x.Kind is not Kind.Crumb and not Kind.Splash);
+        int alive = P.Count(x => x.Alive && x.Kind is not Kind.Crumb and not Kind.Splash and not Kind.Clump);
         int target = Target;
         if (alive < target)
         {
@@ -179,6 +185,20 @@ public sealed partial class Simulation
                     p.VY += 900 * dt; p.X += p.VX * dt; p.Y += p.VY * dt; p.Life -= dt; if (p.Life <= 0 || p.Y > Height + 20) p.Alive = false; continue;
                 case Kind.Splash:
                     p.Life -= dt; if (p.Life <= 0) p.Alive = false; continue;
+                case Kind.Clump:
+                {   // falls gently (the air slows it), turns a little, and lands on the taskbar / screen bottom as a low mound
+                    p.VY = Math.Min(360 * Scale, p.VY + 520 * Scale * dt); p.X += p.VX * dt; p.Y += p.VY * dt; p.VX *= Math.Pow(0.3, dt);
+                    p.Angle += p.Spin * dt; p.Life -= dt;
+                    if (p.VY > 0)
+                        foreach (var g in Surfaces.Values)
+                        {
+                            if (g.Id >= 0 || p.X < g.Rect.Left || p.X >= g.Rect.Right || p.Y + p.Size * 0.6 < g.TopAt(p.X)) continue;
+                            if (Season == Season.Winter) foreach (var o in new[] { -0.9, 0, 0.9 }) Deposit(g, p.X + o * p.Size, p.Size * 0.34);
+                            p.Alive = false; break;
+                        }
+                    if (p.Life <= 0 || p.Y > Height + 20) p.Alive = false;
+                    continue;
+                }
             }
             if (p.Y > Height + 30 || p.X < -150 || p.X > Width + 150) { Recycle(ref p, ref alive, target); continue; }
             // landing

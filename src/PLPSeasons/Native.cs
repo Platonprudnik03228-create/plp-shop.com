@@ -19,6 +19,7 @@ static class Native
     [DllImport("user32.dll")] public static extern bool EnumWindows(EnumWindowsProc cb, IntPtr lParam);
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr h);
     [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr h);
+    [DllImport("user32.dll")] public static extern bool IsZoomed(IntPtr h);
     [DllImport("user32.dll")] public static extern int GetWindowTextLength(IntPtr h);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] public static extern int InternalGetWindowText(IntPtr h, StringBuilder s, int max);
     public static bool HasTitle(IntPtr h) { var sb = new StringBuilder(4); return InternalGetWindowText(h, sb, sb.Capacity) > 0; }
@@ -36,6 +37,8 @@ static class Native
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint param, string? pv, uint flags);
     [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)] public static extern bool SystemParametersInfo(uint action, uint param, StringBuilder pv, uint flags);
     [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [DllImport("shell32.dll")] public static extern int SHQueryUserNotificationState(out int state);
+    [DllImport("user32.dll")] public static extern IntPtr GetAncestor(IntPtr h, uint flags);
     [DllImport("user32.dll")] public static extern bool GetCursorPos(out POINT p);
     [StructLayout(LayoutKind.Sequential)] public struct POINT { public int X, Y; }
 

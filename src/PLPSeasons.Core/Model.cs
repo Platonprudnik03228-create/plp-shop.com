@@ -46,6 +46,7 @@ public sealed class AppSettings
     public int Garlands { get; set; } = 1;
     public bool AutoPlow { get; set; } = true;
     public bool SnowOverWindows { get; set; }
+    public bool HideForFullScreen { get; set; } = true;   // 0.5.8: nothing on top of a video / film / game that fills the screen
     public string? City { get; set; }
     public double CityLat { get; set; }
     public double CityLon { get; set; }

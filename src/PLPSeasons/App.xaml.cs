@@ -61,7 +61,7 @@ public partial class App : Application
     void BuildOverlays()
     {
         foreach (var o in overlays) o.Close();
-        overlays.Clear();
+        overlays.Clear(); quiet.Clear();
         int seed = 1;
         foreach (var sc in Forms.Screen.AllScreens)
         {
@@ -87,11 +87,57 @@ public partial class App : Application
         if (demo) FpsLog(now, dt);
         if (set.Paused) return;
         if (demo) DemoScript(now);
+        if (now - lastQuiet > 0.5) { lastQuiet = now; UpdateQuiet(); }
         if (now - lastScan > 0.2) { lastScan = now; ScanWindows(); }
-        if (now - lastTop > 2) { lastTop = now; foreach (var o in overlays) o.KeepOnTop(); }
+        if (now - lastTop > 2) { lastTop = now; foreach (var o in overlays) if (!quiet.Contains(o)) o.KeepOnTop(); }
         if (now - lastWall > 60) { lastWall = now; UpdateWallpaper(set.Season); }
         PointerToSnow();
-        foreach (var o in overlays) { o.Sim.Step(dt); o.Redraw(); }
+        foreach (var o in overlays) { if (quiet.Contains(o)) continue; o.Sim.Step(dt); o.Redraw(); }
+    }
+
+    // 0.5.8 (owner: "when I watch YouTube or a film, no garlands, no snow, no gift in the middle"): while the front window
+    // fills a whole monitor (a video or film full screen, F11, a game, a slide show) that monitor shows nothing of ours;
+    // everything comes back as soon as the full-screen window is gone
+    readonly HashSet<Overlay> quiet = new();
+    double lastQuiet;
+    void UpdateQuiet()
+    {
+        var full = set.HideForFullScreen ? FullScreenRect() : null;
+        foreach (var o in overlays)
+        {
+            bool q = full is RectI f && f.Left <= o.Screen.Left + 2 && f.Top <= o.Screen.Top + 2 && f.Right >= o.Screen.Right - 2 && f.Bottom >= o.Screen.Bottom - 2;
+            if (q == quiet.Contains(o)) continue;
+            if (q) { quiet.Add(o); o.SetInteractive(false); o.Hide(); }
+            else { quiet.Remove(o); o.Show(); o.KeepOnTop(); }
+        }
+    }
+
+    /// <summary>The rectangle of the foreground window when it covers a whole monitor (or the system says a full-screen
+    /// D3D app or a presentation runs), else null. The desktop and our own windows never count.</summary>
+    RectI? FullScreenRect()
+    {
+        var h = Native.GetForegroundWindow();
+        if (h == IntPtr.Zero) return null;
+        var root = Native.GetAncestor(h, 2 /*GA_ROOT*/); if (root != IntPtr.Zero) h = root;
+        Native.GetWindowThreadProcessId(h, out var pid);
+        if (pid == (uint)Environment.ProcessId) return null;
+        var cls = Native.ClassOf(h);
+        if (cls is "Progman" or "WorkerW" or "Shell_TrayWnd" or "Shell_SecondaryTrayWnd") return null;
+        if (!Native.GetWindowRect(h, out var r)) return null;
+        var rect = new RectI(r.Left, r.Top, r.Right, r.Bottom);
+        foreach (var o in overlays)
+        {
+            var s = o.Screen;
+            if (!(rect.Left <= s.Left + 2 && rect.Top <= s.Top + 2 && rect.Right >= s.Right - 2 && rect.Bottom >= s.Bottom - 2)) continue;
+            // a maximised window (its frame hangs ~8 px over the edges) with an auto-hidden taskbar is not full screen
+            if (Native.IsZoomed(h) && (rect.Left < s.Left - 3 || rect.Top < s.Top - 3)) continue;
+            return rect;
+        }
+        // exclusive full screen (games, some players) may not report a window rectangle that matches: ask the shell
+        if (Native.SHQueryUserNotificationState(out int st) == 0 && (st == 3 /*D3D full screen*/ || st == 4 /*presentation*/))
+            foreach (var o in overlays)
+                if (o.Screen.Contains((rect.Left + rect.Right) / 2, (rect.Top + rect.Bottom) / 2)) return o.Screen;
+        return null;
     }
 
     /// <summary>Over snow you can play with, the overlay takes the mouse; everywhere else clicks go to the windows below.</summary>
@@ -199,6 +245,9 @@ public partial class App : Application
         var over = new Forms.ToolStripMenuItem(L.T("Снег идёт поверх окон", "Snow falls over windows")) { Checked = set.SnowOverWindows };
         over.Click += (_, _) => { set.SnowOverWindows = !set.SnowOverWindows; ApplyAll(); Save(); };
         m.Items.Add(over);
+        var hideFull = new Forms.ToolStripMenuItem(L.T("Прятать, когда видео или игра на весь экран", "Hide while a video or game is full screen")) { Checked = set.HideForFullScreen };
+        hideFull.Click += (_, _) => { set.HideForFullScreen = !set.HideForFullScreen; Save(); UpdateQuiet(); };
+        m.Items.Add(hideFull);
         var onWin = new Forms.ToolStripMenuItem(L.T("Сугробы на окнах", "Snow piles on windows")) { Checked = set.SnowOnWindows };
         onWin.Click += (_, _) => { set.SnowOnWindows = !set.SnowOnWindows; Save(); };
         m.Items.Add(onWin);
@@ -297,7 +346,9 @@ public partial class App : Application
     public void TogglePause()
     {
         set.Paused = !set.Paused; Save(); remoteCard?.Refresh();
+        quiet.Clear();
         foreach (var o in overlays) { if (set.Paused) o.Hide(); else o.Show(); }
+        if (!set.Paused) UpdateQuiet();
     }
 
     void Quit()

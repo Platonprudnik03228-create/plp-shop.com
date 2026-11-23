@@ -40,9 +40,27 @@ public class SimTests
         var s = Winter(30, (1, new RectI(400, 300, 1300, 900), 8));
         s.SetSurfaces(Array.Empty<(long, RectI, double)>());
         Assert.False(s.Surfaces.ContainsKey(1));
-        Assert.True(s.P.Count(p => p.Kind == Kind.Crumb && p.Alive) > 20);
+        Assert.True(s.P.Count(p => p.Kind == Kind.Clump && p.Alive) > 10);
         for (int i = 0; i < 240; i++) s.Step(1 / 60.0);
-        Assert.Equal(0, s.P.Count(p => p.Kind == Kind.Crumb && p.Alive));
+        Assert.Equal(0, s.P.Count(p => p.Kind == Kind.Clump && p.Alive));
+    }
+
+    [Fact] public void ClosedWindowSnowFallsSoftlyDownAndHeapsOnTheTaskbar()
+    {
+        var s = Winter(30, (-1, new RectI(0, 1032, 1920, 1081), 0), (1, new RectI(400, 300, 1300, 900), 8));
+        s.SetSurfaces(new[] { (-1L, new RectI(0, 1032, 1920, 1081), 0.0) });
+        var clumps = s.P.Where(p => p.Kind == Kind.Clump && p.Alive).ToList();
+        Assert.All(clumps, p => Assert.True(Math.Abs(p.VX) <= 6.01 && p.VY <= 0.01 && p.VY >= -10.01));   // no burst sideways or upwards
+        double maxDx = 0, maxY = 0;
+        var start = clumps.Select(p => p.X).ToList();
+        for (int i = 0; i < 300; i++)
+        {
+            s.Step(1 / 60.0);
+            foreach (var p in s.P) if (p.Kind == Kind.Clump && p.Alive) { maxDx = Math.Max(maxDx, start.Min(x => Math.Abs(x - p.X))); maxY = Math.Max(maxY, p.Y); }
+        }
+        Assert.True(maxDx < 12, $"clumps drifted {maxDx:0.0} px sideways");
+        Assert.Equal(0, s.P.Count(p => p.Kind == Kind.Clump && p.Alive));
+        Assert.True(maxY < 1040, $"a clump fell through the taskbar ({maxY:0})");    // every clump landed on the taskbar snow
     }
 
     [Fact] public void MovingAWindowDropsItsSnowButCoverChangeKeepsIt()

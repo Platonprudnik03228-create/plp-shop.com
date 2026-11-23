@@ -174,6 +174,14 @@ sealed partial class Painter : FrameworkElement
                 }
                 case Kind.Crumb:
                     dc.DrawEllipse(FlakeCore, null, new Point(p.X, p.Y), p.Size, p.Size); break;
+                case Kind.Clump:
+                {   // a soft, slightly lumpy ball of snow: two soft blobs and a firmer core
+                    double r = p.Size * 1.25, ox = Math.Cos(p.Angle) * p.Size * 0.4, oy = Math.Sin(p.Angle) * p.Size * 0.25;
+                    dc.DrawImage(SoftSprite, new Rect(p.X - r, p.Y - r * 0.85, r * 2, r * 1.7));
+                    dc.DrawImage(SoftSprite, new Rect(p.X + ox - r * 0.7, p.Y + oy - r * 0.6, r * 1.4, r * 1.2));
+                    dc.DrawEllipse(FlakeCore, null, new Point(p.X, p.Y), p.Size * 0.62, p.Size * 0.5);
+                    break;
+                }
                 case Kind.Drop:
                 {
                     double len = p.VY * 0.022, k = sim.Wind * 0.25;

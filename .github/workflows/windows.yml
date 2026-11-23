@@ -79,6 +79,10 @@ jobs:
           # move a window so its snow falls off
           $n = (Get-Process notepad | Select-Object -First 1).MainWindowHandle
           [W]::MoveWindow($n, 200, 420, 900, 500, $true) | Out-Null
+          Start-Sleep 5
+          # 0.5.8: a window that fills the whole screen (like a film or YouTube full screen): nothing of ours may show on it
+          $fs = Start-Process powershell -ArgumentList '-NoProfile','-Command','Add-Type -AssemblyName System.Windows.Forms; $f=New-Object Windows.Forms.Form; $f.FormBorderStyle=0; $f.WindowState=2; $f.BackColor=[Drawing.Color]::FromArgb(20,20,20); $f.Text=''fullscreen test''; $t=New-Object Windows.Forms.Timer; $t.Interval=7000; $t.Add_Tick({$f.Close()}); $t.Start(); [void]$f.ShowDialog()' -PassThru
+          $fs.WaitForExit(20000) | Out-Null
           $rec.WaitForExit()
           Get-Process | Where-Object { $_.ProcessName -like 'PLP*' } | Format-Table ProcessName, Id, CPU, WorkingSet
           Copy-Item "$env:TEMP\plp_fps.txt" fps.txt -ErrorAction SilentlyContinue
