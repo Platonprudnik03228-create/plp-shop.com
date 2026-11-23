@@ -9,13 +9,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Put the zip back together and publish it
+      - name: Put the zip back together and publish it (Mac 0.4.95 + Android 1.1.0)
         env: { GH_TOKEN: "${{ github.token }}" }
         run: |
           set -e
-          cat parts/z.* > PLP-Seasons-0.4.94-macOS-arm64.zip
-          echo "75edb7434aa0ef04aec4da6549db2d3ebab752f6b59bb19541b35ba8bcbebdaf  PLP-Seasons-0.4.94-macOS-arm64.zip" | sha256sum -c -
-          sha256sum PLP-Seasons-0.4.94-macOS-arm64.zip > SHA256SUMS.txt
-          gh release create v0.4.94 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.94 for Mac" \
-            --notes "PLP Seasons 0.4.94 for macOS 13+ (Apple Silicon). Santa's sleigh and reindeer newly painted; a welcome with pictures on the first launch; a wish in every gift; the snow follows the Dock exactly once Accessibility is on. Bought once on plp-shop.com ($4.99, Mac + Windows + Android, forever). Not notarized yet: on first launch right-click the app → Open." \
-            PLP-Seasons-0.4.94-macOS-arm64.zip SHA256SUMS.txt
+          cat parts/z.* > PLP-Seasons-0.4.95-macOS-arm64.zip
+          echo "4af17712c2ac8c9885456eb66d5346e828a05f75333c8a64d8c899fb868c3033  PLP-Seasons-0.4.95-macOS-arm64.zip" | sha256sum -c -
+          sha256sum PLP-Seasons-0.4.95-macOS-arm64.zip > SHA256SUMS.txt
+          gh release create v0.4.95 --repo ${{ github.repository }} --target main --title "PLP Seasons 0.4.95 for Mac" \
+            --notes "PLP Seasons 0.4.95 for macOS 13+ (Apple Silicon). Nothing of ours over a video or film: garlands, snow and gifts step aside while YouTube or a film plays or anything is full screen (also on MacBooks with the camera notch). Snow on a window that is yanked or closed falls straight down as soft clumps and settles as little heaps. Cozy illustrated wallpapers, snowmen with a wardrobe, Deck your screen decorations, the yellow plow on the Dock. Bought once on plp-shop.com (\$4.99, Mac + Windows + Android, forever). Not notarized yet: on first launch right-click the app → Open." \
+            PLP-Seasons-0.4.95-macOS-arm64.zip SHA256SUMS.txt
+          cp parts/PLP-Seasons-1.1.0-Android.apk .
+          echo "ead7d2763d6d5ae531dbd5070e37c179d487833a6638c46ff672a6212d87bc33  PLP-Seasons-1.1.0-Android.apk" | sha256sum -c -
+          sha256sum PLP-Seasons-1.1.0-Android.apk > SHA256SUMS-android.txt
+          gh release create android-v1.1.0 --repo ${{ github.repository }} --target main --title "PLP Seasons 1.1.0 for Android" \
+            --notes "PLP Seasons 1.1.0 for Android 8+: live wallpaper with snow, the yellow plow, snowmen with a wardrobe and the cozy illustrated worlds. Same key as on Mac and Windows." \
+            PLP-Seasons-1.1.0-Android.apk SHA256SUMS-android.txt
