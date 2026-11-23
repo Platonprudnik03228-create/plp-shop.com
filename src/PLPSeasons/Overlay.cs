@@ -141,22 +141,25 @@ sealed partial class Painter : FrameworkElement
 
     public Painter(Overlay owner) { o = owner; IsHitTestVisible = true; RenderOptions.SetBitmapScalingMode(this, BitmapScalingMode.Linear); }
 
+    // diagnostics only (PLP_DIAG=noclip,nogarland,nofest,noflakes,nocaps): measures what each part costs; never set for people
+    static readonly string Diag = Environment.GetEnvironmentVariable("PLP_DIAG") ?? "";
+    static bool Off(string what) => Diag.Contains(what);
     protected override void OnRender(DrawingContext dc)
     {
         var dpi = VisualTreeHelper.GetDpi(this);
         dc.PushTransform(new ScaleTransform(1 / dpi.DpiScaleX, 1 / dpi.DpiScaleY));
         var sim = o.Sim;
         dc.DrawRectangle(HitBrush, null, new Rect(0, 0, sim.Width, sim.Height));   // 1/255 alpha: lets the window take the mouse when asked
-        DrawGarlands(dc, sim);
+        if (!Off("nogarland")) DrawGarlands(dc, sim);
         // the snow falls behind the app windows (unless "snow over windows" is on): everything below is clipped
         // to the parts of the screen no window covers
-        bool clip = !sim.OverWindows && sim.Windows.Count > 0;
+        bool clip = !sim.OverWindows && sim.Windows.Count > 0 && !Off("noclip");
         if (clip) dc.PushClip(FreeArea(sim));
-        DrawSnowCaps(dc, sim);
+        if (!Off("nocaps")) DrawSnowCaps(dc, sim);
         DrawWinter(dc, sim);
         foreach (ref readonly var p in System.Runtime.InteropServices.CollectionsMarshal.AsSpan(sim.P))
         {
-            if (!p.Alive) continue;
+            if (!p.Alive || (p.Kind == Kind.Flake && Off("noflakes"))) continue;
             switch (p.Kind)
             {
                 case Kind.Flake:
@@ -196,7 +199,7 @@ sealed partial class Painter : FrameworkElement
             }
         }
         if (clip) dc.Pop();
-        DrawFestive(dc, sim);       // 0.5.4: over the windows
+        if (!Off("nofest")) DrawFestive(dc, sim);       // 0.5.4: over the windows
         dc.Pop();
     }
 

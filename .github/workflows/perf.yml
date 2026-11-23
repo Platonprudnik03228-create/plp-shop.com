@@ -37,18 +37,19 @@ jobs:
             $a = $late.ToArray(); [Array]::Sort($a); "{0:0.0} ms p95, {1:0.0} ms max" -f $a[[int]($a.Length*0.95)], $a[-1]
           }
           "idle (nothing of ours): " + (Probe 8)
-          foreach ($v in 'old','new','old','new') {
+          foreach ($cfg in 'new:','new:noclip','new:nogarland','new:nofest','new:noflakes','new:nocaps','new:noclip,nogarland,nofest,noflakes,nocaps') {
+            $v, $env:PLP_DIAG = $cfg.Split(':')
             Remove-Item "$env:TEMP\plp_fps.txt" -ErrorAction SilentlyContinue
-            $p = Start-Process "out_$v/PLP Seasons.exe" -ArgumentList '--demo','--seconds','45' -PassThru
+            $p = Start-Process "out_$v/PLP Seasons.exe" -ArgumentList '--demo','--seconds','30' -PassThru
             Start-Sleep 10
             $dwm = Get-Process dwm -ErrorAction SilentlyContinue | Select-Object -First 1
             $c0 = (Get-Process -Id $p.Id).TotalProcessorTime.TotalMilliseconds; $d0 = if ($dwm) { $dwm.TotalProcessorTime.TotalMilliseconds } else { 0 }
-            $lag = Probe 25
+            $lag = Probe 15
             $c1 = (Get-Process -Id $p.Id).TotalProcessorTime.TotalMilliseconds; $d1 = if ($dwm) { (Get-Process -Id $dwm.Id).TotalProcessorTime.TotalMilliseconds } else { 0 }
             $mem = [math]::Round((Get-Process -Id $p.Id).WorkingSet64 / 1MB)
             $p.WaitForExit(60000) | Out-Null
             $fps = (Get-Content "$env:TEMP\plp_fps.txt" -ErrorAction SilentlyContinue | Select-Object -Skip 2) -join ' | '
-            "RESULT $v : PLP cpu {0:0}% of one core, dwm {1:0}%, memory {2} MB, other program wake-up {3}; {4}" -f (($c1-$c0)/250), (($d1-$d0)/250), $mem, $lag, $fps
+            "RESULT $cfg : PLP cpu {0:0}% of one core, dwm {1:0}%, memory {2} MB, other program wake-up {3}; {4}" -f (($c1-$c0)/150), (($d1-$d0)/150), $mem, $lag, $fps
             Start-Sleep 3
           }
           "cores: " + [Environment]::ProcessorCount
