@@ -1,0 +1,54 @@
+name: perf
+on:
+  push:
+    branches: [perf-probe]
+jobs:
+  compare:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - name: Build 0.5.8 and the fix
+        shell: pwsh
+        run: |
+          git worktree add ../old 3db1f76
+          dotnet publish ../old/src/PLPSeasons -c Release -o out_old | Out-Null
+          dotnet publish src/PLPSeasons -c Release -o out_new | Out-Null
+          Get-ChildItem out_old/*.exe, out_new/*.exe | Select Name, Length
+      - name: Many windows, measure
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          Set-DisplayResolution -Width 1920 -Height 1080 -Force -ErrorAction SilentlyContinue
+          Add-Type @"
+          using System; using System.Runtime.InteropServices;
+          public static class W { [DllImport("user32.dll")] public static extern bool MoveWindow(IntPtr h,int x,int y,int w,int ht,bool r); }
+          "@
+          # 12 ordinary windows spread over the screen, like a busy desktop
+          for ($i = 0; $i -lt 12; $i++) { Start-Process notepad; Start-Sleep -Milliseconds 400 }
+          Start-Sleep 2
+          $k = 0
+          foreach ($p in Get-Process notepad) { $x = 40 + ($k % 4) * 450; $y = 60 + [math]::Floor($k / 4) * 300; [W]::MoveWindow($p.MainWindowHandle, $x, $y, 520, 330, $true) | Out-Null; $k++ }
+          function Probe([int]$secs) {   # how late a 5 ms sleep wakes up in another program (the "the computer lags" feeling)
+            $sw = [Diagnostics.Stopwatch]::StartNew(); $late = New-Object System.Collections.Generic.List[double]
+            while ($sw.Elapsed.TotalSeconds -lt $secs) { $t0 = $sw.Elapsed.TotalMilliseconds; Start-Sleep -Milliseconds 5; $late.Add($sw.Elapsed.TotalMilliseconds - $t0 - 5) }
+            $a = $late.ToArray(); [Array]::Sort($a); "{0:0.0} ms p95, {1:0.0} ms max" -f $a[[int]($a.Length*0.95)], $a[-1]
+          }
+          "idle (nothing of ours): " + (Probe 8)
+          foreach ($v in 'old','new','old','new') {
+            Remove-Item "$env:TEMP\plp_fps.txt" -ErrorAction SilentlyContinue
+            $p = Start-Process "out_$v/PLP Seasons.exe" -ArgumentList '--demo','--seconds','45' -PassThru
+            Start-Sleep 10
+            $dwm = Get-Process dwm -ErrorAction SilentlyContinue | Select-Object -First 1
+            $c0 = (Get-Process -Id $p.Id).TotalProcessorTime.TotalMilliseconds; $d0 = if ($dwm) { $dwm.TotalProcessorTime.TotalMilliseconds } else { 0 }
+            $lag = Probe 25
+            $c1 = (Get-Process -Id $p.Id).TotalProcessorTime.TotalMilliseconds; $d1 = if ($dwm) { (Get-Process -Id $dwm.Id).TotalProcessorTime.TotalMilliseconds } else { 0 }
+            $mem = [math]::Round((Get-Process -Id $p.Id).WorkingSet64 / 1MB)
+            $p.WaitForExit(60000) | Out-Null
+            $fps = (Get-Content "$env:TEMP\plp_fps.txt" -ErrorAction SilentlyContinue | Select-Object -Skip 2) -join ' | '
+            "RESULT $v : PLP cpu {0:0}% of one core, dwm {1:0}%, memory {2} MB, other program wake-up {3}; {4}" -f (($c1-$c0)/250), (($d1-$d0)/250), $mem, $lag, $fps
+            Start-Sleep 3
+          }
+          "cores: " + [Environment]::ProcessorCount

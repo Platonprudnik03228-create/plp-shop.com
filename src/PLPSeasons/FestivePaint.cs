@@ -151,11 +151,11 @@ sealed partial class Painter
                 {
                     double a = k > 0.8 ? (1 - k) * 5 : 1;
                     dc.PushTransform(new RotateTransform(s.Rot * 0.3 * 57.3, s.X, s.Y));
-                    dc.DrawRectangle(new SolidColorBrush(Color.FromArgb((byte)(255 * a), s.R, s.G, s.B)), null, new Rect(s.X - s.Size / 2, s.Y - s.Size * 0.22 * Math.Abs(Math.Cos(s.Rot)), s.Size, s.Size * 0.45 * Math.Abs(Math.Cos(s.Rot)) + 0.5));
+                    dc.DrawRectangle(Solid(Color.FromArgb((byte)(255 * a), s.R, s.G, s.B)), null, new Rect(s.X - s.Size / 2, s.Y - s.Size * 0.22 * Math.Abs(Math.Cos(s.Rot)), s.Size, s.Size * 0.45 * Math.Abs(Math.Cos(s.Rot)) + 0.5));
                     dc.Pop(); break;
                 }
                 case 3: case 5:
-                    dc.DrawEllipse(new SolidColorBrush(Color.FromArgb((byte)(230 * (1 - k)), s.R, s.G, s.B)), null, new Point(s.X, s.Y), s.Size * 0.5, s.Size * 0.5); break;
+                    dc.DrawEllipse(Solid(Color.FromArgb((byte)(230 * (1 - k)), s.R, s.G, s.B)), null, new Point(s.X, s.Y), s.Size * 0.5, s.Size * 0.5); break;
                 default:
                 {
                     double a = Math.Pow(1 - k, 1.4);

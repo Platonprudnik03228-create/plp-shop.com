@@ -77,12 +77,15 @@ public partial class App : Application
     void Apply(Simulation s) { Simulation.Russian = L.Ru; s.Season = set.Season; s.Intensity = set.Intensity; s.Wind = set.Wind; s.GarlandMode = set.Garlands; s.PlowEnabled = set.AutoPlow; s.OverWindows = set.SnowOverWindows; }
 
     TimeSpan lastRender;
+    // 0.5.9: a computer without graphics acceleration for WPF (old/basic video driver, remote desktop, some virtual machines)
+    // draws every frame on the processor - there 30 redraws a second, so the rest of the computer stays quick
+    static readonly double MinGap = (RenderCapability.Tier >> 16) == 0 ? 1.0 / 31 : 1.0 / 62;
     void OnFrame(object? sender, EventArgs e)
     {
         // the time WPF will show this frame at - steadier than a stopwatch, so the flakes move without judder
         if (e is RenderingEventArgs re) { if (re.RenderingTime == lastRender) return; lastRender = re.RenderingTime; }
         double now = clock.Elapsed.TotalSeconds;
-        if (now - last < 1.0 / 62) return;   // at most ~60 redraws a second, also on 120-144 Hz screens (0.5.2)
+        if (now - last < MinGap) return;   // at most ~60 redraws a second, also on 120-144 Hz screens (0.5.2)
         double dt = Math.Min(0.1, now - last); last = now;
         if (demo) FpsLog(now, dt);
         if (set.Paused) return;

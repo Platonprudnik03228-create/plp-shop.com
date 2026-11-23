@@ -151,14 +151,7 @@ sealed partial class Painter : FrameworkElement
         // the snow falls behind the app windows (unless "snow over windows" is on): everything below is clipped
         // to the parts of the screen no window covers
         bool clip = !sim.OverWindows && sim.Windows.Count > 0;
-        if (clip)
-        {
-            var holes = new GeometryGroup { FillRule = FillRule.Nonzero };
-            foreach (var w in sim.Windows) holes.Children.Add(new RectangleGeometry(new Rect(w.Left, w.Top, w.Width, w.Height)));
-            var free = new CombinedGeometry(GeometryCombineMode.Exclude, new RectangleGeometry(new Rect(-50, -50, sim.Width + 100, sim.Height + 100)), holes);
-            free.Freeze();
-            dc.PushClip(free);
-        }
+        if (clip) dc.PushClip(FreeArea(sim));
         DrawSnowCaps(dc, sim);
         DrawWinter(dc, sim);
         foreach (ref readonly var p in System.Runtime.InteropServices.CollectionsMarshal.AsSpan(sim.P))
@@ -196,7 +189,7 @@ sealed partial class Painter : FrameworkElement
                     var b = p.Tint == 9 ? FlakeSoft : p.Kind == Kind.Leaf ? LeafBrushes[p.Tint % 4] : PetalBrushes[(int)(p.Phase * 10) % 3];
                     var m = new Matrix(); m.Scale(p.Size * 0.5 * Math.Abs(Math.Cos(p.Angle * 0.7)) + p.Size * 0.15, p.Size * 0.5); m.Rotate(p.Angle * 57.3); m.Translate(p.X, p.Y);
                     dc.PushTransform(new MatrixTransform(m));
-                    dc.DrawGeometry(b, p.Kind == Kind.Leaf ? new Pen(b, 0.08) : null, g);
+                    dc.DrawGeometry(b, p.Kind == Kind.Leaf ? LeafPen(b) : null, g);
                     dc.Pop();
                     break;
                 }
@@ -206,6 +199,45 @@ sealed partial class Painter : FrameworkElement
         DrawFestive(dc, sim);       // 0.5.4: over the windows
         dc.Pop();
     }
+
+    // 0.5.9: the "free screen" clip is made once per change of the windows, not 60 times a second
+    Geometry? freeGeo; RectI[] freeFor = Array.Empty<RectI>(); double freeW, freeH;
+    Geometry FreeArea(Simulation sim)
+    {
+        var ws = sim.Windows;
+        bool same = freeGeo != null && freeW == sim.Width && freeH == sim.Height && freeFor.Length == ws.Count;
+        if (same) for (int i = 0; i < ws.Count; i++) if (!freeFor[i].Equals(ws[i])) { same = false; break; }
+        if (same) return freeGeo!;
+        var holes = new GeometryGroup { FillRule = FillRule.Nonzero };
+        foreach (var w in ws) holes.Children.Add(new RectangleGeometry(new Rect(w.Left, w.Top, w.Width, w.Height)));
+        var free = new CombinedGeometry(GeometryCombineMode.Exclude, new RectangleGeometry(new Rect(-50, -50, sim.Width + 100, sim.Height + 100)), holes);
+        free.Freeze();
+        freeGeo = free; freeFor = ws.ToArray(); freeW = sim.Width; freeH = sim.Height;
+        return free;
+    }
+
+    // 0.5.9: brushes and pens that were made anew for every bulb, leaf and spark 60 times a second are kept and reused
+    // (the same colours to the byte - nothing looks different, the computer just does far less work)
+    static readonly Dictionary<uint, Brush> solidCache = new();
+    internal static Brush Solid(Color c)
+    {
+        uint k = ((uint)c.A << 24) | ((uint)c.R << 16) | ((uint)c.G << 8) | c.B;
+        if (solidCache.TryGetValue(k, out var b)) return b;
+        b = F(new SolidColorBrush(c));
+        if (solidCache.Count < 20000) solidCache[k] = b;
+        return b;
+    }
+    static readonly Dictionary<uint, Brush> bulbGlowCache = new();
+    static Brush BulbGlow(byte a, Color col)
+    {
+        uint k = ((uint)a << 24) | ((uint)col.R << 16) | ((uint)col.G << 8) | col.B;
+        if (bulbGlowCache.TryGetValue(k, out var b)) return b;
+        b = F(new RadialGradientBrush(Color.FromArgb(a, col.R, col.G, col.B), Color.FromArgb(0, col.R, col.G, col.B)));
+        bulbGlowCache[k] = b;
+        return b;
+    }
+    static readonly Dictionary<Brush, Pen> leafPens = new();
+    static Pen LeafPen(Brush b) { if (!leafPens.TryGetValue(b, out var p)) { p = F(new Pen(b, 0.08)); leafPens[b] = p; } return p; }
 
     void DrawSnowCaps(DrawingContext dc, Simulation sim)
     {
@@ -266,9 +298,9 @@ sealed partial class Painter : FrameworkElement
                     if (sim.GarlandMode == 1)
                         b = 0.2 + 0.8 * (prog switch { 1 => Math.Max(0, Math.Cos(t * 5 - i * 0.9)), 2 => ((int)(t * 2.2) + i) % 2 == 0 ? 1 : 0.15, 3 => 0.5 + 0.5 * Math.Sin(t * 2.2 - i * 0.35), _ => b });
                     var col = sim.GarlandMode == 2 ? Color.FromRgb(255, 200, 115) : BulbColors[(i + (int)(g.Id % 7)) % BulbColors.Length];
-                    var glow = new RadialGradientBrush(Color.FromArgb((byte)(110 * b), col.R, col.G, col.B), Color.FromArgb(0, col.R, col.G, col.B)); glow.Freeze();
+                    var glow = BulbGlow((byte)(110 * b), col);
                     dc.DrawEllipse(glow, null, new Point(x, y + 1), 13, 13);
-                    var bulb = new SolidColorBrush(Color.FromRgb((byte)(col.R * (0.55 + 0.45 * b)), (byte)(col.G * (0.55 + 0.45 * b)), (byte)(col.B * (0.55 + 0.45 * b)))); bulb.Freeze();
+                    var bulb = Solid(Color.FromRgb((byte)(col.R * (0.55 + 0.45 * b)), (byte)(col.G * (0.55 + 0.45 * b)), (byte)(col.B * (0.55 + 0.45 * b))));
                     dc.DrawRectangle(Coal, null, new Rect(x - 1.6, y - 4.5, 3.2, 2.5));
                     dc.DrawEllipse(bulb, null, new Point(x, y + 1), 2.8, 4.3);
                 }
